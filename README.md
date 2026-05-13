@@ -25,11 +25,12 @@ Agentic-AI/
 │   ├── 02_Parallel_Workflows/          # Concurrent metric splits & consensus reducers
 │   ├── 03_Conditional_Workflows/       # Mathematical logic switches & Sentiment routing
 │   ├── 04_Iterative_Workflows/         # Evaluator-Optimizer cyclical content generation loops
-│   ├── 05_Chatbots_and_Persistence/    # Memory saver databases & persistent chat histories
-│   ├── 06_Tool_Calling_and_MCP/        # Native tool-binding (.bind_tools) & MCP clients
-│   ├── 07_Advanced_Agentic_RAG/        # Contextual retrieval graphs & PDF dataset assets
-│   ├── 08_Human_in_the_Loop_HITL/      # Deliberate compilation interrupts & manual approvals
-│   └── 09_Subgraphs_Orchestration/     # Encapsulating StateGraphs as modular nested subgraphs
+│   ├── 05_Basic_Chatbot/               # Direct string history appends & policy loops
+│   ├── 06_Persistence_and_Time_Travel/ # Memory saver databases & persistent chat histories
+│   ├── 07_Tool_Calling_and_MCP/        # Native tool-binding (.bind_tools) & MCP clients
+│   ├── 08_Advanced_Agentic_RAG/        # Contextual retrieval graphs & PDF dataset assets
+│   ├── 09_Human_in_the_Loop_HITL/      # Deliberate compilation interrupts & manual approvals
+│   └── 10_Subgraphs_Orchestration/     # Encapsulating StateGraphs as modular nested subgraphs
 │
 └── langgraph_mastery/                  # 🚀 Production-Grade Codebase Translations
     ├── 01_Sequential_Workflows/
@@ -42,8 +43,10 @@ Agentic-AI/
     ├── 03_Conditional_Workflows/
     │   ├── 06_Quadratic_Equation_Workflow/
     │   └── 07_Review_Reply_Workflow/
-    └── 04_Iterative_Workflows/
-        └── 08_X_Post_Generator/
+    ├── 04_Iterative_Workflows/
+    │   └── 08_X_Post_Generator/
+    ├── 05_Basic_Chatbot/
+    └── 06_Persistence_and_Time_Travel/
 ```
 
 ---

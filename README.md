@@ -47,7 +47,8 @@ Agentic-AI/
     │   └── 08_X_Post_Generator/
     ├── 05_Basic_Chatbot/
     ├── 06_Persistence_and_Time_Travel/
-    └── 07_Chatbot_UI_and_Streaming/
+    ├── 07_Chatbot_UI_and_Streaming/
+    └── 08_Streamlit_Chatbot_UI/
 ```
 
 ---

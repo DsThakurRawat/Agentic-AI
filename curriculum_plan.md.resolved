@@ -1,0 +1,46 @@
+# LangGraph Enterprise Mastery Curriculum Plan
+
+This plan establishes a high-density mastery repository incorporating practical codebase translations (`langgraph_mastery/`) alongside deep theoretical syllabus explanations (`langgraph_topics/`) mirroring the official LangChain/LangGraph curriculum.
+
+---
+
+## 📂 Master Directory Structure Tree
+
+We organize the workspace into distinct, synchronized pedagogical paths:
+
+```
+/home/divyansh-rawat/Agentic-AI/
+├── langgraph_topics/                   # Core Theoretical Syllabus Concepts
+│   ├── 01_What_is_LangGraph/           
+│   ├── 02_LLM_Workflows/               
+│   ├── 03_Graphs_Nodes_and_Edges/      
+│   ├── 04_State/                       
+│   ├── 05_Reducers/                    
+│   └── 06_LangGraph_Execution_Model/   
+│
+├── langgraph-tutorials/                # Raw Reference Jupyter Source Code
+│   ├── 00_Installation_and_Setup/
+│   ├── 01_Sequential_Workflows/
+│   ├── 02_Parallel_Workflows/
+│   ├── 03_Conditional_Workflows/
+│   ├── 04_Iterative_Workflows/
+│   ├── 05_Chatbots_and_Persistence/
+│   ├── 06_Tool_Calling_and_MCP/
+│   ├── 07_Advanced_Agentic_RAG/
+│   ├── 08_Human_in_the_Loop_HITL/
+│   └── 09_Subgraphs_Orchestration/
+│
+└── langgraph_mastery/                  # Production-Grade Codebase Translations
+    ├── 01_Sequential_Workflows/
+    │   ├── 01_BMI_Workflow/
+    │   ├── 02_Simple_LLM_Workflow/
+    │   └── 03_Prompt_Chaining/
+    ├── 02_Parallel_Workflows/
+    │   ├── 04_Batsman_Workflow/
+    │   └── 05_UPSC_Essay_Workflow/
+    ├── 03_Conditional_Workflows/
+    │   ├── 06_Quadratic_Equation_Workflow/
+    │   └── 07_Review_Reply_Workflow/
+    └── 04_Iterative_Workflows/
+        └── 08_X_Post_Generator/
+```

@@ -1,0 +1,9 @@
+{
+  "node_version": "20",
+  "python_version": "3.11",
+  "dockerfile": "",
+  "graphs": {
+    "agent": "./graph.py:graph"
+  },
+  "env": "../.env"
+}

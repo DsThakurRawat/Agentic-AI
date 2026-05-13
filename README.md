@@ -19,6 +19,8 @@ Agentic-AI/
 │   ├── 05_Reducers/                    # Concurrency memory safety & Annotated list reducers
 │   └── 06_LangGraph_Execution_Model/   # Supersteps boundaries, message loops & Persistence
 │
+├── streaming_use_cases_and_implementation/ # ⚡ Advanced LLM, Multimodal Voice & Agentic Chunks
+│
 ├── langgraph-tutorials/                # 📓 Raw Reference Jupyter Tutorial Notebooks
 │   ├── 00_Installation_and_Setup/      # Framework installation verification
 │   ├── 01_Sequential_Workflows/        # Linear prompt sequences & static parameter chains

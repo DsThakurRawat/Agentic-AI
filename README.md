@@ -46,7 +46,8 @@ Agentic-AI/
     ├── 04_Iterative_Workflows/
     │   └── 08_X_Post_Generator/
     ├── 05_Basic_Chatbot/
-    └── 06_Persistence_and_Time_Travel/
+    ├── 06_Persistence_and_Time_Travel/
+    └── 07_Chatbot_UI_and_Streaming/
 ```
 
 ---

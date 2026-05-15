@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Encyclopedia | Master Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0ea5e9',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#bc13fe',
+                tertiaryColor: '#020617'
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.05) 0, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .code-block {
+            background: #010409;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #e6edf3;
+        }
+        .token.keyword { color: #ff7b72; }
+        .token.function { color: #d2a8ff; }
+        .token.comment { color: #8b949e; }
+        
+        .active-tab {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+        .highlight-card {
+            border-left: 4px solid #38bdf8;
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.1) 0%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-8 py-4 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html" class="p-2 bg-brand-400/20 rounded-lg border border-brand-400/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                </a>
+                <span class="text-xl font-display font-bold tracking-tight">RAG <span class="text-brand-400">Encyclopedia</span></span>
+            </div>
+            <nav class="flex gap-6">
+                <a href="#why" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Why RAG?</a>
+                <a href="#naive" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Naive</a>
+                <a href="#advanced" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Advanced</a>
+                <a href="#agentic" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Agentic</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-16 px-8">
+        
+        <!-- Intro -->
+        <div class="mb-20">
+            <h1 class="text-5xl md:text-7xl font-display font-extrabold mb-8 tracking-tight text-white">
+                The Anatomy of <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Modern RAG Systems</span>
+            </h1>
+            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
+                RAG isn't just a tool; it's an architecture for **Dynamic Grounding**. It solves the "Stale Knowledge" problem by providing LLMs with an external, searchable memory.
+            </p>
+        </div>
+
+        <!-- Section 0: The Core Idea -->
+        <section id="idea" class="mb-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl font-display font-bold mb-8 flex items-center gap-3 text-white">
+                        <span class="text-brand-400">00</span>
+                        The Science of Retrieval
+                    </h2>
+                    <div class="space-y-6 text-slate-400 leading-relaxed">
+                        <div class="space-y-4">
+                            <h4 class="text-white font-bold text-lg">Parametric vs. Non-Parametric</h4>
+                            <p>
+                                <strong>Parametric Knowledge:</strong> This is the knowledge stored in the LLM's weights (parameters). It's like a person's long-term memory. It's fast but gets outdated quickly and is hard to correct.
+                            </p>
+                            <p>
+                                <strong>Non-Parametric Knowledge:</strong> This is the external data (PDFs, Databases, Web) that RAG provides. It's like a person's library or notebook. It's infinitely scalable and always up-to-date.
+                            </p>
+                        </div>
+                        
+                        <div class="p-6 glass rounded-2xl border-l-4 border-neon-purple bg-neon-purple/5">
+                            <h4 class="font-bold text-white mb-2">In-Context Learning (ICL)</h4>
+                            <p class="text-sm">
+                                The miracle of RAG is based on <strong>In-Context Learning</strong>. This is the ability of an LLM to "learn" or adapt to new information provided within the prompt itself, without any permanent changes to its weights. We are essentially using the LLM's attention mechanism to focus on the provided context.
+                            </p>
+                        </div>
+                        
+                        <p>
+                            RAG essentially shifts the burden of **Factual Accuracy** from the model's weights to the retrieval engine, allowing the model to focus purely on its core strength: <strong>Reasoning and Synthesis</strong>.
+                        </p>
+                    </div>
+                </div>
+                <div class="glass p-12 rounded-3xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <svg width="200" height="200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <div class="mermaid">
+                        graph TD
+                            A[User Query] --> B[Encoder]
+                            B --> C{Semantic Space}
+                            D[(Vector Database)] --> C
+                            C -- "Nearest Neighbors" --> E[Context]
+                            E --> F[Augmented Prompt]
+                            F -- "In-Context Learning" --> G[LLM]
+                            G --> H[Final Response]
+                            
+                            style G fill:#bc13fe,stroke:#fff
+                            style D fill:#1e293b,stroke:#38bdf8
+                    </div>
+                    <p class="text-[10px] text-center text-slate-500 mt-6 uppercase tracking-widest text-white">Figure 1: The Principle of In-Context Grounding</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Why RAG? -->
+        <section id="why" class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3 text-white">
+                <span class="text-brand-400">01</span>
+                Solving the Three Pillars of Failure
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass p-8 rounded-3xl highlight-card">
+                    <h3 class="text-xl font-bold mb-4 text-brand-400">1. Knowledge Cutoff</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Models are frozen in time (e.g., Oct 2023). RAG allows them to answer questions about events that happened 5 minutes ago by fetching fresh news or internal docs.
+                    </p>
+                </div>
+                <div class="glass p-8 rounded-3xl highlight-card border-l-neon-purple">
+                    <h3 class="text-xl font-bold mb-4 text-neon-purple">2. Data Privacy</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Uploading private data to OpenAI for fine-tuning is a security risk. RAG keeps your data in your local Vector DB (like FAISS) and only sends the relevant snippets.
+                    </p>
+                </div>
+                <div class="glass p-8 rounded-3xl highlight-card">
+                    <h3 class="text-xl font-bold mb-4 text-brand-400">3. Hallucination Control</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        When an LLM doesn't know an answer, it guesses. In RAG, we tell the model: <em>"Use ONLY the provided context. If it's not there, say you don't know."</em>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: How it works (The Goated Visualization) -->
+        <section id="how" class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3 text-white text-center justify-center">
+                <span class="text-brand-400">02</span>
+                The End-to-End RAG Architecture
+            </h2>
+            
+            <!-- GOATED VISUALIZATION CONTAINER -->
+            <div class="glass p-12 rounded-[3rem] mb-16 border border-brand-400/20 relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-brand-400 to-neon-purple rounded-[3rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                <div class="relative">
+                    <div class="mermaid">
+                        graph TD
+                            subgraph "1. Data Ingestion (ETL Phase)"
+                                Source([WWW / Local PDF]) --> Loader[Document Loader]
+                                Loader --> Splitter[Text Splitter]
+                                Splitter --> C1[Chunk 1]
+                                Splitter --> C2[Chunk 2]
+                                Splitter --> C3[Chunk 3]
+                            end
+
+                            subgraph "2. Vectorization (The Embedding Phase)"
+                                C1 --> Embed[Embedding Model]
+                                C2 --> Embed
+                                C3 --> Embed
+                                Embed --> Vectors[Vector Representations]
+                                Vectors --> Store[(Vector Store / DB)]
+                            end
+
+                            subgraph "3. Retrieval & Augmentation"
+                                UserQuery([User Query]) --> Retriever[Semantic Retriever]
+                                Store -- "Similarity Search" --> Retriever
+                                Retriever --> Context[Most Relevant Chunks]
+                                UserQuery --> Builder[Prompt Builder]
+                                Context --> Builder
+                            end
+
+                            subgraph "4. Generation"
+                                Builder --> Prompt[Augmented Prompt]
+                                Prompt --> LLM[LLM Reasoning Engine]
+                                LLM --> Response([Final Answer])
+                            end
+
+                            style Source fill:#1e293b,stroke:#38bdf8,stroke-width:2px
+                            style Store fill:#0ea5e9,stroke:#fff,stroke-width:2px
+                            style LLM fill:#bc13fe,stroke:#fff,stroke-width:2px
+                            style UserQuery fill:#38bdf8,stroke:#fff
+                            style Response fill:#10b981,stroke:#fff
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Stage Explanation (Better than Faculty) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Step 1 -->
+                <div class="glass p-6 rounded-2xl hover:border-brand-400/50 transition-colors">
+                    <div class="text-brand-400 font-bold text-xs mb-4 uppercase tracking-[0.2em]">01. Ingestion</div>
+                    <h5 class="text-white font-bold mb-2">The Splitter</h5>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        LLMs have finite attention. We use <strong>Recursive Splitters</strong> to break documents into chunks that preserve semantic boundaries (paragraphs, sentences) rather than just character counts.
+                    </p>
+                </div>
+                <!-- Step 2 -->
+                <div class="glass p-6 rounded-2xl hover:border-brand-400/50 transition-colors">
+                    <div class="text-neon-purple font-bold text-xs mb-4 uppercase tracking-[0.2em]">02. Embeddings</div>
+                    <h5 class="text-white font-bold mb-2">Vector Space</h5>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        We transform text into <strong>Tensor Embeddings</strong>. This projects words into a multi-dimensional map where "King" and "Queen" are mathematically closer than "King" and "Apple".
+                    </p>
+                </div>
+                <!-- Step 3 -->
+                <div class="glass p-6 rounded-2xl hover:border-brand-400/50 transition-colors">
+                    <div class="text-brand-400 font-bold text-xs mb-4 uppercase tracking-[0.2em]">03. Retrieval</div>
+                    <h5 class="text-white font-bold mb-2">Semantic Search</h5>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        Unlike SQL (Exact Match), we use <strong>K-Nearest Neighbors (KNN)</strong> to find the most meaningful context, even if the user uses different words than the document.
+                    </p>
+                </div>
+                <!-- Step 4 -->
+                <div class="glass p-6 rounded-2xl hover:border-brand-400/50 transition-colors">
+                    <div class="text-neon-purple font-bold text-xs mb-4 uppercase tracking-[0.2em]">04. Synthesis</div>
+                    <h5 class="text-white font-bold mb-2">In-Context Logic</h5>
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        The LLM doesn't just "read" the context; it performs <strong>Attention-based Synthesis</strong>, cross-referencing the query with the retrieved snippets to produce a grounded response.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Code Walkthrough -->
+        <section id="code" class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3 text-white">
+                <span class="text-brand-400">03</span>
+                Implementation Walkthrough
+            </h2>
+            
+            <!-- Naive RAG Code -->
+            <div class="mb-16">
+                <h4 class="text-xl font-bold mb-6 text-white">1. The Naive RAG Script</h4>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="code-block">
+<pre><code><span class="token keyword">def</span> <span class="token function">implement_naive_rag</span>(documents, query):
+    <span class="token comment"># 1. Recursive splitting to preserve context</span>
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=<span class="token number">500</span>, chunk_overlap=<span class="token number">50</span>
+    )
+    texts = splitter.create_documents(documents)
+    
+    <span class="token comment"># 2. Local vector storage (FAISS)</span>
+    vs = FAISS.from_documents(texts, embeddings)
+    retriever = vs.as_retriever()
+    
+    <span class="token comment"># 3. Augmenting the prompt</span>
+    chain = (
+        {<span class="token string">"context"</span>: retriever, <span class="token string">"question"</span>: RunnablePassthrough()}
+        | prompt | llm | StrOutputParser()
+    )
+    <span class="token keyword">return</span> chain.invoke(query)</code></pre>
+                    </div>
+                    <div class="glass p-8 rounded-3xl flex flex-col justify-center">
+                        <h5 class="text-brand-400 font-bold mb-4 uppercase tracking-widest text-xs">How this code works:</h5>
+                        <ul class="space-y-4 text-sm text-slate-400">
+                            <li class="flex items-start gap-2">
+                                <span class="text-brand-400">➜</span>
+                                <span>The <code>RecursiveCharacterTextSplitter</code> ensures that paragraphs aren't split mid-sentence.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-brand-400">➜</span>
+                                <span><code>FAISS</code> (Facebook AI Similarity Search) builds an efficient index for fast retrieval.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-brand-400">➜</span>
+                                <span>The <code>RunnablePassthrough</code> allows the question to flow directly into the prompt alongside the retrieved context.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agentic RAG Code -->
+            <div>
+                <h4 class="text-xl font-bold mb-6 text-white">2. The Agentic (LangGraph) Pattern</h4>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="glass p-8 rounded-3xl flex flex-col justify-center order-2 lg:order-1">
+                        <h5 class="text-neon-purple font-bold mb-4 uppercase tracking-widest text-xs">Why use LangGraph for RAG?</h5>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            Naive RAG is linear. Agentic RAG is **Cyclical**. In the code below, we don't just "Retrieve and Generate"—we define a state machine that can grade its own performance.
+                        </p>
+                        <ul class="space-y-4 text-xs text-slate-500">
+                            <li><strong>Stateful Routing:</strong> Decide if a web search is needed based on local retrieval scores.</li>
+                            <li><strong>Self-Correction:</strong> If the LLM generates an answer not found in the context, re-run the loop.</li>
+                        </ul>
+                    </div>
+                    <div class="code-block order-1 lg:order-2">
+<pre><code><span class="token keyword">def</span> <span class="token function">build_agentic_rag_graph</span>():
+    workflow = StateGraph(AgenticRAGState)
+    
+    <span class="token comment"># Define specialized nodes</span>
+    workflow.add_node(<span class="token string">"retrieve"</span>, retrieve_node)
+    workflow.add_node(<span class="token string">"grade_docs"</span>, grade_documents_node)
+    workflow.add_node(<span class="token string">"generate"</span>, generate_node)
+    
+    <span class="token comment"># Define the flow</span>
+    workflow.add_edge(START, <span class="token string">"retrieve"</span>)
+    workflow.add_edge(<span class="token string">"retrieve"</span>, <span class="token string">"grade_docs"</span>)
+    workflow.add_conditional_edges(
+        <span class="token string">"grade_docs"</span>, 
+        decide_next_step <span class="token comment"># Logic-based routing</span>
+    )</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.4em]">
+        Agentic AI RAG Encyclopedia • Master Your Data
+    </footer>
+
+</body>
+</html>

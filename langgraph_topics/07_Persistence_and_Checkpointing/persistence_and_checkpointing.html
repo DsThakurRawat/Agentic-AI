@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persistence & Checkpointing | Agentic AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0ea5e9',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#bc13fe',
+                tertiaryColor: '#020617'
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.05) 0, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .code-block {
+            background: #010409;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #e6edf3;
+        }
+        .token.keyword { color: #ff7b72; }
+        .token.function { color: #d2a8ff; }
+        .token.comment { color: #8b949e; }
+        
+        .active-tab {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+        .benefit-card {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .benefit-card:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-8 py-4 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../../index.html" class="p-2 bg-brand-400/20 rounded-lg border border-brand-400/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                </a>
+                <span class="text-xl font-display font-bold tracking-tight">Module 7: <span class="text-brand-400">Persistence & Checkpointing</span></span>
+            </div>
+            <nav class="flex gap-6">
+                <a href="../../index.html" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Nexus Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-16 px-8">
+        
+        <!-- Intro -->
+        <div class="mb-20">
+            <h1 class="text-5xl md:text-6xl font-display font-extrabold mb-8 tracking-tight">
+                State Retention & <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Time Travel Mechanics</span>
+            </h1>
+            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
+                Persistence decouples processing nodes from context loss. By saving and restoring the state of a workflow over time, we enable short-term memory, fault tolerance, and human-in-the-loop control.
+            </p>
+        </div>
+
+        <!-- How it Works -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
+                <span class="text-brand-400">01</span>
+                The Checkpointer Pattern
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="code-block">
+<pre><code><span class="token keyword">from</span> langgraph.checkpoint.memory <span class="token keyword">import</span> MemorySaver
+
+<span class="token comment"># 1. Instantiate engine</span>
+checkpointer = MemorySaver()
+
+<span class="token comment"># 2. Bind during compilation</span>
+app = graph.compile(checkpointer=checkpointer)
+
+<span class="token comment"># 3. Route via Thread IDs</span>
+config = {"configurable": {"thread_id": "user_42"}}
+app.invoke(data, config=config)</code></pre>
+                    </div>
+                </div>
+                <div class="glass p-8 rounded-3xl border-l-4 border-brand-400">
+                    <h4 class="text-lg font-bold mb-4">Thread Partitioning</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">The checkpointer partitions state records isolation tables matching the passed `thread_id`, ensuring User A's state never overrides User B's context.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visual Visualization of Threads -->
+        <section class="mb-24">
+            <div class="glass p-12 rounded-3xl overflow-hidden">
+                <div class="mermaid">
+                    graph LR
+                        subgraph "Persistence Store (MemorySaver)"
+                            direction TB
+                            T1["Thread: user_01"] --> S1["[State v1]"]
+                            T1 --> S2["[State v2]"]
+                            T2["Thread: user_02"] --> S3["[State v1]"]
+                        end
+                        
+                        UI[Browser Interface] -- "thread_id: user_01" --> T1
+                        style UI fill:#0f172a,stroke:#334155
+                        style T1 fill:#0ea5e9,stroke:#38bdf8
+                        style T2 fill:#1e293b,stroke:#334155
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Benefits Grid -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">Foundational Technical Capabilities</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="glass p-8 rounded-3xl benefit-card">
+                    <h4 class="text-lg font-bold mb-4 flex items-center gap-3">
+                        <span class="text-brand-400 text-2xl">🧠</span> Short Term Memory
+                    </h4>
+                    <p class="text-sm text-slate-400">Retains exact conversational structures across multiple turns without requiring manual context re-injection.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl benefit-card">
+                    <h4 class="text-lg font-bold mb-4 flex items-center gap-3">
+                        <span class="text-brand-400 text-2xl">🛡️</span> Fault Tolerance
+                    </h4>
+                    <p class="text-sm text-slate-400">Automatically logs superstep variables. Resumes cleanly from the last valid checkpoint if a failure occurs.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl benefit-card">
+                    <h4 class="text-lg font-bold mb-4 flex items-center gap-3">
+                        <span class="text-brand-400 text-2xl">🛑</span> Human-in-the-Loop (HITL)
+                    </h4>
+                    <p class="text-sm text-slate-400">Enables runtime pauses using `interrupt_before`, allowing humans to inspect or inject dynamic feedback mid-stream.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl benefit-card">
+                    <h4 class="text-lg font-bold mb-4 flex items-center gap-3">
+                        <span class="text-brand-400 text-2xl">⏳</span> Time Travel
+                    </h4>
+                    <p class="text-sm text-slate-400">Read/Write access over historical state arrays. Rewind execution, branch alternate outcomes, or edit past choices.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Implementation Tabs -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">Real-World Logic Demonstration</h2>
+            <div class="glass rounded-3xl overflow-hidden">
+                <div class="flex border-b border-white/10 bg-black/20">
+                    <button onclick="switchTab('ticket')" id="btn-ticket" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] active-tab transition-all">Support Ticket Session</button>
+                    <button onclick="switchTab('finance')" id="btn-finance" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">Finance Ledger HITL</button>
+                </div>
+                
+                <div class="p-8">
+                    <div id="content-ticket" class="block space-y-6">
+                        <p class="text-sm text-slate-400">Proves state preservation across disconnected user turns in a customer support context.</p>
+                        <div class="code-block">
+<pre><code><span class="token keyword">def</span> <span class="token function">execute_ticket_flow</span>():
+    thread_config = {"configurable": {"thread_id": "session_001"}}
+    
+    <span class="token comment"># Turn 1: Initial submission</span>
+    app.invoke({"issue": "Billing error"}, config=thread_config)
+    
+    <span class="token comment"># Turn 2: Disconnected follow-up</span>
+    <span class="token comment"># The app still remembers the "Billing error" context!</span>
+    app.invoke({"query": "Any update?"}, config=thread_config)</code></pre>
+                        </div>
+                    </div>
+                    <div id="content-finance" class="hidden space-y-6">
+                        <p class="text-sm text-slate-400">Uses compilation-level breakpoints to halt execution before high-risk transactional nodes.</p>
+                        <div class="code-block">
+<pre><code><span class="token comment"># Compile with interruption hooks</span>
+audited_app = graph.compile(
+    checkpointer=memory,
+    interrupt_before=["settlement"]
+)
+
+<span class="token comment"># Interrogate state during pause</span>
+snapshot = audited_app.get_state(config)
+print(snapshot.next) <span class="token comment"># Output: ('settlement',)</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-[0.4em] opacity-40">
+        Module 7 • Persistence • Agentic AI Knowledge Base
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            document.getElementById('content-ticket').classList.add('hidden');
+            document.getElementById('content-finance').classList.add('hidden');
+            document.getElementById('btn-ticket').classList.remove('active-tab');
+            document.getElementById('btn-finance').classList.remove('active-tab');
+            document.getElementById('btn-ticket').classList.add('text-slate-500');
+            document.getElementById('btn-finance').classList.add('text-slate-500');
+            
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active-tab');
+            document.getElementById('btn-' + tabId).classList.remove('text-slate-500');
+        }
+    </script>
+</body>
+</html>

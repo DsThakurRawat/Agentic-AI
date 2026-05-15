@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 1: Linear State Passing Engine (BMI Workflow)</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Pygments CSS for syntax highlighting -->
+    <style>
+        /* Syntax highlighting styles (Monokai-ish) */
+        .codehilite { background: #272822; color: #f8f8f2; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin-bottom: 1.5rem; }
+        .codehilite .hll { background-color: #49483e }
+        .codehilite .c { color: #75715e } /* Comment */
+        .codehilite .err { color: #960050; background-color: #1e0010 } /* Error */
+        .codehilite .k { color: #66d9ef } /* Keyword */
+        .codehilite .l { color: #ae81ff } /* Literal */
+        .codehilite .n { color: #f8f8f2 } /* Name */
+        .codehilite .o { color: #f92672 } /* Operator */
+        .codehilite .p { color: #f8f8f2 } /* Punctuation */
+        .codehilite .ch { color: #75715e } /* Comment.Hashbang */
+        .codehilite .cm { color: #75715e } /* Comment.Multiline */
+        .codehilite .cp { color: #75715e } /* Comment.Preproc */
+        .codehilite .cpf { color: #75715e } /* Comment.PreprocFile */
+        .codehilite .c1 { color: #75715e } /* Comment.Single */
+        .codehilite .cs { color: #75715e } /* Comment.Special */
+        .codehilite .gd { color: #f92672 } /* Generic.Deleted */
+        .codehilite .ge { font-style: italic } /* Generic.Emph */
+        .codehilite .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+        .codehilite .gr { color: #f92672 } /* Generic.Error */
+        .codehilite .gh { color: #f92672; font-weight: bold } /* Generic.Heading */
+        .codehilite .gi { color: #a6e22e } /* Generic.Inserted */
+        .codehilite .go { color: #66d9ef } /* Generic.Output */
+        .codehilite .gp { color: #f92672; font-weight: bold } /* Generic.Prompt */
+        .codehilite .gs { font-weight: bold } /* Generic.Strong */
+        .codehilite .gu { color: #75715e } /* Generic.Subheading */
+        .codehilite .gt { color: #f92672 } /* Generic.Traceback */
+        .codehilite .kc { color: #66d9ef } /* Keyword.Constant */
+        .codehilite .kd { color: #66d9ef } /* Keyword.Declaration */
+        .codehilite .kn { color: #f92672 } /* Keyword.Namespace */
+        .codehilite .kp { color: #66d9ef } /* Keyword.Pseudo */
+        .codehilite .kr { color: #66d9ef } /* Keyword.Reserved */
+        .codehilite .kt { color: #66d9ef } /* Keyword.Type */
+        .codehilite .ld { color: #e6db74 } /* Literal.Date */
+        .codehilite .m { color: #ae81ff } /* Literal.Number */
+        .codehilite .s { color: #e6db74 } /* Literal.String */
+        .codehilite .na { color: #a6e22e } /* Name.Attribute */
+        .codehilite .nb { color: #f8f8f2 } /* Name.Builtin */
+        .codehilite .nc { color: #a6e22e } /* Name.Class */
+        .codehilite .no { color: #66d9ef } /* Name.Constant */
+        .codehilite .nd { color: #a6e22e } /* Name.Decorator */
+        .codehilite .ni { color: #f8f8f2 } /* Name.Entity */
+        .codehilite .ne { color: #a6e22e } /* Name.Exception */
+        .codehilite .nf { color: #a6e22e } /* Name.Function */
+        .codehilite .nl { color: #f8f8f2 } /* Name.Label */
+        .codehilite .nn { color: #f8f8f2 } /* Name.Namespace */
+        .codehilite .nx { color: #a6e22e } /* Name.Other */
+        .codehilite .py { color: #f8f8f2 } /* Name.Property */
+        .codehilite .nt { color: #f92672 } /* Name.Tag */
+        .codehilite .nv { color: #f8f8f2 } /* Name.Variable */
+        .codehilite .ow { color: #f92672 } /* Operator.Word */
+        .codehilite .w { color: #f8f8f2 } /* Text.Whitespace */
+        .codehilite .mb { color: #ae81ff } /* Literal.Number.Bin */
+        .codehilite .mf { color: #ae81ff } /* Literal.Number.Float */
+        .codehilite .mh { color: #ae81ff } /* Literal.Number.Hex */
+        .codehilite .mi { color: #ae81ff } /* Literal.Number.Integer */
+        .codehilite .mo { color: #ae81ff } /* Literal.Number.Oct */
+        .codehilite .sa { color: #e6db74 } /* Literal.String.Affix */
+        .codehilite .sb { color: #e6db74 } /* Literal.String.Backtick */
+        .codehilite .sc { color: #e6db74 } /* Literal.String.Char */
+        .codehilite .dl { color: #e6db74 } /* Literal.String.Delimiter */
+        .codehilite .sd { color: #e6db74 } /* Literal.String.Doc */
+        .codehilite .s2 { color: #e6db74 } /* Literal.String.Double */
+        .codehilite .se { color: #ae81ff } /* Literal.String.Escape */
+        .codehilite .sh { color: #e6db74 } /* Literal.String.Heredoc */
+        .codehilite .si { color: #e6db74 } /* Literal.String.Interpol */
+        .codehilite .sx { color: #e6db74 } /* Literal.String.Other */
+        .codehilite .sr { color: #e6db74 } /* Literal.String.Regex */
+        .codehilite .s1 { color: #e6db74 } /* Literal.String.Single */
+        .codehilite .ss { color: #e6db74 } /* Literal.String.Symbol */
+        .codehilite .il { color: #ae81ff } /* Literal.Number.Integer.Long */
+        
+        body {
+            background-color: #0f172a; /* slate-900 */
+            color: #f8fafc; /* slate-50 */
+        }
+        .prose {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .prose a {
+            color: #3b82f6;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .prose a:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+            color: #ffffff;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .prose p, .prose ul, .prose ol {
+            margin-bottom: 1.25rem;
+            line-height: 1.75;
+            color: #cbd5e1; /* slate-300 */
+        }
+        .prose strong {
+            color: #f1f5f9; /* slate-100 */
+            font-weight: 600;
+        }
+        .prose table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+        .prose th, .prose td {
+            border: 1px solid #334155;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .prose th {
+            background-color: #1e293b; /* slate-800 */
+            color: #f8fafc;
+        }
+        .prose tr:nth-child(even) {
+            background-color: #0f172a;
+        }
+        .prose tr:nth-child(odd) {
+            background-color: #1e293b;
+        }
+        .prose blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            color: #94a3b8;
+            font-style: italic;
+            background-color: rgba(59, 130, 246, 0.1);
+            padding: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .prose code:not(.codehilite code) {
+            background-color: #1e293b;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            color: #e2e8f0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        
+        /* Layout enhancements */
+        .page-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid #334155;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .content-wrapper {
+            padding: 0 1.5rem 4rem 1.5rem;
+            min-height: calc(100vh - 200px);
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #f8fafc;
+        }
+        .back-link svg {
+            margin-right: 0.5rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500/30">
+    <header class="page-header">
+        <div class="header-content">
+            <div class="site-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                Agentic AI Knowledge Base
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        <article class="prose">
+            <h1 id="topic-1-linear-state-passing-engine-bmi-workflow">Topic 1: Linear State Passing Engine (BMI Workflow)</h1>
+<p>This directory translates <code>1_bmi_workflow.ipynb</code> into a production-ready module demonstrating immutable dictionary-based state mutations in LangGraph.</p>
+<hr/>
+<h2 id="architectural-topology">🧠 Architectural Topology</h2>
+<div class="codehilite"><pre><span></span><code><span class="n">graph</span><span class="w"> </span><span class="n">TD</span>
+<span class="w">    </span><span class="n">__start__</span><span class="p">(</span><span class="o">[</span><span class="n">START</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="c1">--&gt; calculate_bmi</span>
+<span class="w">    </span><span class="n">calculate_bmi</span><span class="w"> </span><span class="c1">--&gt; label_bmi</span>
+<span class="w">    </span><span class="n">label_bmi</span><span class="w"> </span><span class="c1">--&gt; __end__([END])</span>
+</code></pre></div>
+<h3 id="core-principles-demonstrated">Core Principles Demonstrated</h3>
+<ol>
+<li><strong><code>TypedDict</code> Schema Integration</strong>: State keys define clear programmatic contracts across all subsequent node actions.</li>
+<li><strong>Sequential Flow Execution</strong>: Linear control flow passing the entire execution envelope along a singular path.</li>
+<li><strong>Dictionary Subset Overwrites</strong>: Returning a key-value mapping automatically overrides previous values for those keys inside the master state graph.</li>
+</ol>
+<hr/>
+<h2 id="execution-guide">🚀 Execution Guide</h2>
+<p>Run the self-contained state machine locally to test static graph compilation and node processing steps:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Execute local typed verification script</span>
+/home/divyansh-rawat/Agentic-AI/venv/bin/python3<span class="w"> </span>bmi_workflow.py
+</code></pre></div>
+        </article>
+    </main>
+    
+    <footer class="border-t border-slate-800 mt-12 py-8 text-center text-slate-500 text-sm">
+        <p>Generated dynamically from Markdown • Agentic AI Workspace</p>
+    </footer>
+</body>
+</html>

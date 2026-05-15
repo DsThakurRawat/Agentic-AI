@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastery | Agentic AI Enterprise Track</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(15, 23, 42, 0.9) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(30, 41, 59, 0.4) 0, transparent 50%);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .prose h1, .prose h2, .prose h3 {
+            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+        .feature-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .feature-card:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar-item {
+            transition: all 0.2s;
+        }
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Sticky Dashboard Header -->
+    <header class="sticky top-0 z-50 glass border-b border-white/5 px-8 py-4">
+        <div class="max-w-8xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <div class="bg-brand-500 p-2 rounded-lg group-hover:rotate-12 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                    </div>
+                    <span class="text-xl font-display font-bold tracking-tight">Agentic <span class="text-brand-400">Mastery</span></span>
+                </a>
+            </div>
+            <div class="flex gap-6 items-center">
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 bg-slate-500/10 px-3 py-1 rounded-full border border-slate-500/20">Production Ready</span>
+                <div class="h-4 w-px bg-white/10"></div>
+                <a href="index.html" class="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Nexus Home</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-8xl mx-auto flex">
+        <!-- Documentation Sidebar -->
+        <aside class="hidden lg:block w-72 h-[calc(100vh-73px)] overflow-y-auto border-r border-white/5 p-8 sticky top-[73px]">
+            <div class="mb-10">
+                <h5 class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">Foundation</h5>
+                <nav class="space-y-1">
+                    <a href="README.html" class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-brand-400 bg-brand-400/5 rounded-lg border-r-2 border-brand-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        Main Overview
+                    </a>
+                    <a href="syllabus.html" class="sidebar-item flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        Full Syllabus
+                    </a>
+                </nav>
+            </div>
+
+            <div class="mb-10">
+                <h5 class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">Core Modules</h5>
+                <nav class="space-y-1">
+                    <a href="langgraph_topics/README.html" class="sidebar-item flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 rounded-lg">Theoretical Concepts</a>
+                    <a href="langgraph-tutorials/README.html" class="sidebar-item flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 rounded-lg">Interactive Tutorials</a>
+                    <a href="langgraph_mastery/README.html" class="sidebar-item flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 rounded-lg">Production Mastery</a>
+                </nav>
+            </div>
+
+            <div class="mb-10">
+                <h5 class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">Advanced Protocol</h5>
+                <nav class="space-y-1">
+                    <a href="MCP/README.html" class="sidebar-item flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 rounded-lg">Model Context Protocol</a>
+                    <a href="streaming_use_cases_and_implementation/README.html" class="sidebar-item flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 rounded-lg">Streaming Systems</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0 py-12 px-8 lg:px-16">
+            <div class="max-w-4xl mx-auto">
+                
+                <!-- Hero Section -->
+                <div class="mb-16">
+                    <h1 class="text-5xl font-display font-extrabold mb-6 tracking-tight leading-tight">
+                        🕸️ Agentic AI Enterprise <br/>
+                        <span class="text-brand-400">Mastery Track</span>
+                    </h1>
+                    <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
+                        An elite, high-density repository designed to bridge theoretical agentic design patterns with robust, enterprise-ready implementation architectures using LangGraph and LangChain.
+                    </p>
+                </div>
+
+                <!-- Three Functional Zones -->
+                <h2 class="text-2xl font-display font-bold mb-8 flex items-center gap-3">
+                    <span class="w-8 h-8 bg-brand-400/10 rounded flex items-center justify-center text-brand-400 text-lg font-bold">🏛️</span>
+                    Workspace Architecture
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                    <div class="feature-card p-6 rounded-2xl">
+                        <div class="text-brand-400 mb-4 font-display font-bold text-lg">🧠 Theory Zone</div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Core syllabus concepts: Graph compilation, State schemas, and Reducers for concurrent execution.</p>
+                        <div class="mt-4 text-[10px] text-slate-600 font-mono">/langgraph_topics/</div>
+                    </div>
+                    <div class="feature-card p-6 rounded-2xl">
+                        <div class="text-neon-purple mb-4 font-display font-bold text-lg">📓 Learning Zone</div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Jupyter-style executable tutorials for everything from basic chatbots to HITL subgraphs.</p>
+                        <div class="mt-4 text-[10px] text-slate-600 font-mono">/langgraph-tutorials/</div>
+                    </div>
+                    <div class="feature-card p-6 rounded-2xl">
+                        <div class="text-neon-blue mb-4 font-display font-bold text-lg">🚀 Production Zone</div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Drop-in production code translations for complex workflows (BMI, UPSC, X-Generator).</p>
+                        <div class="mt-4 text-[10px] text-slate-600 font-mono">/langgraph_mastery/</div>
+                    </div>
+                </div>
+
+                <!-- Detailed Module Breakdown -->
+                <h2 class="text-2xl font-display font-bold mb-8">🛠️ Strategic Modules In-Depth</h2>
+                <div class="space-y-4 mb-16">
+                    <div class="glass p-8 rounded-3xl">
+                        <h3 class="text-xl font-bold mb-4 text-white">LangGraph Execution Model</h3>
+                        <p class="text-slate-400 mb-6 leading-relaxed">
+                            Understanding **Supersteps** is critical for building reliable agents. This module covers the boundary between state transitions, how message loops are handled, and how **Persistence** ensures your agent can resume from failures.
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 text-xs">
+                            <div class="bg-slate-900/50 p-3 rounded-xl border border-white/5">
+                                <span class="text-brand-400 font-bold block mb-1">StateGraph</span>
+                                Immutable workflow topologies.
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded-xl border border-white/5">
+                                <span class="text-brand-400 font-bold block mb-1">Reducers</span>
+                                Thread-safe concurrent memory management.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass p-8 rounded-3xl border-l-4 border-neon-purple">
+                        <h3 class="text-xl font-bold mb-4 text-white">Advanced Tooling & MCP</h3>
+                        <p class="text-slate-400 mb-6 leading-relaxed">
+                            Integration with the **Model Context Protocol (MCP)** allows your agents to securely connect to local data sources, file systems, and external APIs using a standardized, bi-directional communication layer.
+                        </p>
+                        <div class="flex gap-3">
+                            <span class="px-3 py-1 bg-neon-purple/10 text-neon-purple text-[10px] font-bold uppercase rounded-full border border-neon-purple/20">MCP Clients</span>
+                            <span class="px-3 py-1 bg-brand-400/10 text-brand-400 text-[10px] font-bold uppercase rounded-full border border-brand-400/20">Bindable Tools</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Execution Instructions -->
+                <div class="bg-slate-900/80 border border-brand-400/20 p-8 rounded-3xl mb-16">
+                    <h2 class="text-2xl font-display font-bold mb-6 text-brand-400 flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                        Environment Execution
+                    </h2>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="text-xs font-bold text-slate-500 uppercase mb-2">1. Activation</div>
+                            <div class="bg-black/40 p-4 rounded-xl font-mono text-sm text-slate-300">source /home/divyansh-rawat/Agentic-AI/venv/bin/activate</div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-500 uppercase mb-2">2. Deployment</div>
+                            <div class="bg-black/40 p-4 rounded-xl font-mono text-sm text-slate-300">python3 langgraph_topics/04_State/state.py</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Stats -->
+                <div class="flex justify-between items-center py-8 border-t border-white/5 opacity-40">
+                    <div class="text-[10px] font-bold uppercase tracking-widest">Built with LangGraph v0.x</div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-right">Updated May 2026</div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Right TOC -->
+        <aside class="hidden xl:block w-64 py-12 px-8 sticky top-[73px] h-[calc(100vh-73px)]">
+            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-6">On This Page</div>
+            <ul class="space-y-4 text-sm font-medium text-slate-400">
+                <li><a href="#" class="hover:text-white transition-colors">Overview</a></li>
+                <li><a href="#" class="hover:text-white transition-colors">Architecture</a></li>
+                <li><a href="#" class="hover:text-white transition-colors">Strategic Modules</a></li>
+                <li><a href="#" class="hover:text-white transition-colors">Execution</a></li>
+            </ul>
+        </aside>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State Management | Agentic AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0ea5e9',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#bc13fe',
+                tertiaryColor: '#020617'
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.05) 0, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .code-block {
+            background: #010409;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #e6edf3;
+        }
+        .token.keyword { color: #ff7b72; }
+        .token.function { color: #d2a8ff; }
+        .token.comment { color: #8b949e; }
+        
+        .active-tab {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+        .state-chip {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        .state-chip.changed {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-8 py-4 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../../index.html" class="p-2 bg-brand-400/20 rounded-lg border border-brand-400/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                </a>
+                <span class="text-xl font-display font-bold tracking-tight">Module 4: <span class="text-brand-400">State Management</span></span>
+            </div>
+            <nav class="flex gap-6">
+                <a href="../../index.html" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Nexus Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-16 px-8">
+        
+        <!-- Introduction -->
+        <div class="mb-20">
+            <h1 class="text-5xl md:text-6xl font-display font-extrabold mb-8 tracking-tight">
+                Schema Contracts & <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Override Semantics</span>
+            </h1>
+            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
+                The central communication mechanism in LangGraph is its **Shared Graph State**. Functional nodes read from and return subset overrides directly onto a structured, persistent state dictionary.
+            </p>
+        </div>
+
+        <!-- Strategy Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
+            <div class="glass p-8 rounded-3xl border-t-4 border-brand-400">
+                <h3 class="text-xl font-display font-bold mb-4">TypedDict Standards</h3>
+                <p class="text-sm text-slate-400 leading-relaxed mb-6">Lightweight structural wrappers. Best suited for basic mathematical or string aggregation flows where speed and minimal overhead are priority.</p>
+                <div class="code-block text-xs">
+<pre><code><span class="token keyword">class</span> <span class="token function">StateSchema</span>(TypedDict):
+    target: str
+    count: int</code></pre>
+                </div>
+            </div>
+            <div class="glass p-8 rounded-3xl border-t-4 border-neon-purple">
+                <h3 class="text-xl font-display font-bold mb-4">Pydantic Enforcement</h3>
+                <p class="text-sm text-slate-400 leading-relaxed mb-6">Strict dynamic validation. Ensures numerical bounds, regex matching, and field-level constraints during live processing.</p>
+                <div class="code-block text-xs">
+<pre><code><span class="token keyword">class</span> <span class="token function">SecureState</span>(BaseModel):
+    tier: int = Field(1, ge=1, le=5)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Logic: State Update -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">Master State Override Logic</h2>
+            <div class="glass p-12 rounded-3xl">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+                    <!-- Base State -->
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Current Master State</h4>
+                        <div class="state-chip">user: 'Admin'</div>
+                        <div class="state-chip">tokens: 15</div>
+                        <div class="state-chip">log: 'Verified'</div>
+                    </div>
+                    <!-- Node Return -->
+                    <div class="relative py-12 flex flex-col items-center">
+                        <div class="w-px h-full bg-gradient-to-b from-brand-400 to-neon-purple absolute left-1/2 -translate-x-1/2 opacity-20"></div>
+                        <div class="bg-slate-900 border border-brand-400/30 p-6 rounded-2xl relative z-10 text-center">
+                            <div class="text-[10px] font-bold text-brand-400 uppercase mb-2">Node Returns</div>
+                            <code class="text-xs text-white">{'tokens': 20, 'log': 'Job Executed'}</code>
+                        </div>
+                        <div class="mt-4 text-neon-purple animate-bounce">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                    <!-- Final State -->
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-brand-400 mb-4">Updated Master State</h4>
+                        <div class="state-chip">user: 'Admin'</div>
+                        <div class="state-chip changed">tokens: 20</div>
+                        <div class="state-chip changed">log: 'Job Executed'</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Deep Dive -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">Technical Implementation</h2>
+            <div class="glass rounded-3xl overflow-hidden">
+                <div class="flex border-b border-white/10 bg-black/20">
+                    <button onclick="switchTab('pydantic')" id="btn-pydantic" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] active-tab transition-all">Pydantic Validation</button>
+                    <button onclick="switchTab('typeddict')" id="btn-typeddict" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">TypedDict Overrides</button>
+                </div>
+                
+                <div class="p-8">
+                    <div id="content-pydantic" class="block space-y-6">
+                        <div class="code-block">
+<pre><code><span class="token keyword">from</span> pydantic <span class="token keyword">import</span> BaseModel, Field, ValidationError
+
+<span class="token keyword">class</span> <span class="token function">SecurityPayload</span>(BaseModel):
+    authorized_user: str = Field(..., min_length=3)
+    tier: int = Field(1, ge=1, le=5)
+
+<span class="token keyword">def</span> <span class="token function">security_node</span>(state: dict):
+    <span class="token keyword">try</span>:
+        validated = SecurityPayload(**state)
+        <span class="token keyword">return</span> validated.model_dump()
+    <span class="token keyword">except</span> ValidationError <span class="token keyword">as</span> e:
+        <span class="token keyword">return</span> {"error": str(e)}</code></pre>
+                        </div>
+                    </div>
+                    <div id="content-typeddict" class="hidden space-y-6">
+                        <div class="code-block">
+<pre><code><span class="token keyword">class</span> <span class="token function">OverrideState</span>(TypedDict):
+    target_host: str
+    active_connections: int
+
+<span class="token keyword">def</span> <span class="token function">process_node</span>(state: OverrideState):
+    <span class="token comment"># Only return the keys that need changing</span>
+    <span class="token keyword">return</span> {"active_connections": state["active_connections"] + 5}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-[0.4em] opacity-40">
+        Module 4 • State Management • Agentic AI Knowledge Base
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            document.getElementById('content-pydantic').classList.add('hidden');
+            document.getElementById('content-typeddict').classList.add('hidden');
+            document.getElementById('btn-pydantic').classList.remove('active-tab');
+            document.getElementById('btn-typeddict').classList.remove('active-tab');
+            document.getElementById('btn-pydantic').classList.add('text-slate-500');
+            document.getElementById('btn-typeddict').classList.add('text-slate-500');
+            
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active-tab');
+            document.getElementById('btn-' + tabId).classList.remove('text-slate-500');
+        }
+    </script>
+</body>
+</html>

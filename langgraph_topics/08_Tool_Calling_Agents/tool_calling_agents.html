@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Calling Agents | Agentic AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0ea5e9',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#bc13fe',
+                tertiaryColor: '#020617'
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.05) 0, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .code-block {
+            background: #010409;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #e6edf3;
+        }
+        .token.keyword { color: #ff7b72; }
+        .token.function { color: #d2a8ff; }
+        .token.comment { color: #8b949e; }
+        
+        .active-tab {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+        .scenario-card {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .scenario-card:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+            background: rgba(56, 189, 248, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-8 py-4 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../../index.html" class="p-2 bg-brand-400/20 rounded-lg border border-brand-400/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                </a>
+                <span class="text-xl font-display font-bold tracking-tight">Module 8: <span class="text-brand-400">Tool Calling Agents</span></span>
+            </div>
+            <nav class="flex gap-6">
+                <a href="../../index.html" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Nexus Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-16 px-8">
+        
+        <!-- Intro -->
+        <div class="mb-20">
+            <h1 class="text-5xl md:text-6xl font-display font-extrabold mb-8 tracking-tight">
+                Native Dispatch & <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Execution Hubs</span>
+            </h1>
+            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
+                Empower your LLMs to interact with external enterprise environments—databases, APIs, and calculators—using native tool-calling architectures and automated execution hubs.
+            </p>
+        </div>
+
+        <!-- Comprehensive Theory -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
+                <span class="text-brand-400">01</span>
+                Theoretical Foundations
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="glass p-8 rounded-3xl">
+                    <h3 class="text-xl font-bold mb-4">Function Binding (.bind_tools)</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                        Annotate Python utility definitions with standard Pydantic type hints. Calling `llm.bind_tools()` compiles these into strict JSON schema arrays broadcasted to the underlying chat engine.
+                    </p>
+                    <ul class="space-y-3 text-xs text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
+                            Automatic JSON Schema Generation
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
+                            Strict Type Enforcement
+                        </li>
+                    </ul>
+                </div>
+                <div class="glass p-8 rounded-3xl">
+                    <h3 class="text-xl font-bold mb-4">ToolNode Execution Hubs</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                        Instead of manually authoring routing switches, developers use the prebuilt `ToolNode` dispatcher. It intercepts tool invocations, executes them locally, and appends serialized results back onto the state.
+                    </p>
+                    <ul class="space-y-3 text-xs text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-neon-purple"></span>
+                            Decoupled Tool Logic
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-neon-purple"></span>
+                            Automated Result Serialization
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualization -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">The Tool Dispatch Lifecycle</h2>
+            <div class="glass p-12 rounded-3xl">
+                <div class="mermaid">
+                    graph TD
+                        subgraph "Iterative Inference Phase"
+                            T[app.invoke Input Query] --> LLM[Chat Model with Tools]
+                            LLM -- Evaluates Intent --> Check{Tool Requested?}
+                        end
+
+                        subgraph "Native Execution Interface"
+                            Check -- "Yes: Returns tool_calls" --> Hub[ToolNode Dispatcher]
+                            Hub -- Executes Python Logic --> Hub
+                            Hub -- Serializes Output --> LLM
+                        end
+
+                        Check -- "No: Final Reply" --> End([Terminate Loop])
+                        
+                        style T fill:#0f172a,stroke:#334155
+                        style LLM fill:#0f172a,stroke:#334155
+                        style Hub fill:#0ea5e9,stroke:#38bdf8
+                        style Check fill:#1e293b,stroke:#38bdf8
+                        style End fill:#bc13fe,stroke:#a855f7
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Implementation -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">Code Implementation</h2>
+            <div class="glass rounded-3xl overflow-hidden">
+                <div class="flex border-b border-white/10 bg-black/20">
+                    <button onclick="switchTab('calc')" id="btn-calc" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] active-tab transition-all">Dynamic Calculator</button>
+                    <button onclick="switchTab('diag')" id="btn-diag" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">Pydantic Diagnostics</button>
+                </div>
+                
+                <div class="p-8">
+                    <!-- Example 1 -->
+                    <div id="content-calc" class="block space-y-6">
+                        <div class="code-block">
+<pre><code><span class="token keyword">def</span> <span class="token function">calculate_bulk_order</span>(unit_price: int, quantity: int) -> int:
+    <span class="token comment"># Core tool utility performing financial processing</span>
+    <span class="token keyword">return</span> unit_price * quantity
+
+<span class="token keyword">def</span> <span class="token function">mock_inference_node</span>(state: InventoryState):
+    <span class="token comment"># Model extracts parameters natively</span>
+    extracted = {"unit_price": 45, "quantity": 200}
+    <span class="token keyword">return</span> {"extracted_tool_args": extracted}</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Example 2 -->
+                    <div id="content-diag" class="hidden space-y-6">
+                        <div class="code-block">
+<pre><code><span class="token keyword">class</span> <span class="token function">NetworkDiagnosticSchema</span>(BaseModel):
+    <span class="token comment"># Strict validation contract for tool arguments</span>
+    target_ip: str = Field(..., description="Server IP")
+    depth: int = Field(..., ge=1, le=5)
+
+<span class="token keyword">def</span> <span class="token function">validation_tool</span>(args: dict):
+    <span class="token comment"># Enforcing strict programmatic constraints</span>
+    validated = NetworkDiagnosticSchema(**args)
+    <span class="token keyword">return</span> f"Scan started for {validated.target_ip}"</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scenarios Grid -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">Operational Scenarios</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="glass p-8 rounded-3xl scenario-card">
+                    <h4 class="text-lg font-bold mb-4 text-brand-400">Automated Inventory</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">A supply chain agent fields restock requests, extracting quantity integers and passing them to SQL multipliers.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl scenario-card">
+                    <h4 class="text-lg font-bold mb-4 text-neon-purple">Secure API Validation</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">Binds rigid Pydantic schemas to downstream utilities to enforce argument formats before external web calls.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-[0.4em] opacity-40">
+        Module 8 • Tool Calling Agents • Agentic AI Knowledge Base
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            document.getElementById('content-calc').classList.add('hidden');
+            document.getElementById('content-diag').classList.add('hidden');
+            document.getElementById('btn-calc').classList.remove('active-tab');
+            document.getElementById('btn-diag').classList.remove('active-tab');
+            document.getElementById('btn-calc').classList.add('text-slate-500');
+            document.getElementById('btn-diag').classList.add('text-slate-500');
+            
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active-tab');
+            document.getElementById('btn-' + tabId).classList.remove('text-slate-500');
+        }
+    </script>
+</body>
+</html>

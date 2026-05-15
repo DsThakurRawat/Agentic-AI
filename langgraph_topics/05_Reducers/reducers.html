@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State Reducers | Agentic AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0ea5e9',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#bc13fe',
+                tertiaryColor: '#020617'
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.05) 0, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .code-block {
+            background: #010409;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #e6edf3;
+        }
+        .token.keyword { color: #ff7b72; }
+        .token.function { color: #d2a8ff; }
+        .token.comment { color: #8b949e; }
+        
+        .active-tab {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-8 py-4 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../../index.html" class="p-2 bg-brand-400/20 rounded-lg border border-brand-400/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                </a>
+                <span class="text-xl font-display font-bold tracking-tight">Module 5: <span class="text-brand-400">State Reducers</span></span>
+            </div>
+            <nav class="flex gap-6">
+                <a href="../../index.html" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Nexus Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-16 px-8">
+        
+        <!-- Introduction -->
+        <div class="mb-20">
+            <h1 class="text-5xl md:text-6xl font-display font-extrabold mb-8 tracking-tight">
+                Safe Concurrency & <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Custom Aggregation</span>
+            </h1>
+            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
+                Advanced graph runtimes require cumulative state operations. **Custom State Reducers** guide the framework engine on how to safely merge concurrent updates returned by independent parallel nodes.
+            </p>
+        </div>
+
+        <!-- Problem/Solution Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24">
+            <div class="glass p-8 rounded-3xl border-l-4 border-red-500/50">
+                <h3 class="text-lg font-bold mb-4 text-red-400">The Problem: Value Clobbering</h3>
+                <p class="text-sm text-slate-400 leading-relaxed mb-6">In standard state schemas, if two parallel nodes return updates to the same key, the framework uses "Last Write Wins" logic. One update is silently overwritten (clobbered).</p>
+                <div class="mermaid">
+                    graph TD
+                        A[Start] --> B[Node 1: score=8]
+                        A --> C[Node 2: score=5]
+                        B --> D{Race}
+                        C --> D
+                        D --> E[Final State: score=5]
+                        style E fill:#450a0a,stroke:#991b1b
+                </div>
+            </div>
+            <div class="glass p-8 rounded-3xl border-l-4 border-brand-400">
+                <h3 class="text-lg font-bold mb-4 text-brand-400">The Solution: State Reducers</h3>
+                <p class="text-sm text-slate-400 leading-relaxed mb-6">By annotating keys with reducer functions (like `operator.add`), we tell the engine to merge values instead of replacing them. Lists are concatenated safely.</p>
+                <div class="mermaid">
+                    graph TD
+                        A[Start] --> B[Node 1: [8]]
+                        A --> C[Node 2: [5]]
+                        B --> D[Reducer]
+                        C --> D
+                        D --> E[Final State: [8, 5]]
+                        style E fill:#0c4a6e,stroke:#0ea5e9
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">The Annotated Pattern</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-6">
+                    <p class="text-slate-400 leading-relaxed">
+                        To implement safe parallel appending, we use the `Annotated` type from Python's typing library, passing a reduction function as metadata.
+                    </p>
+                    <div class="code-block">
+<pre><code><span class="token keyword">import</span> operator
+<span class="token keyword">from</span> typing <span class="token keyword">import</span> Annotated, TypedDict
+
+<span class="token keyword">class</span> <span class="token function">ParallelState</span>(TypedDict):
+    <span class="token comment"># operator.add triggers list concatenation</span>
+    audits: Annotated[list[str], operator.add]</code></pre>
+                    </div>
+                </div>
+                <div class="glass p-8 rounded-3xl">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6">Custom Reduction Logic</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-6">You aren't limited to `operator.add`. You can author custom functions to handle complex merging (e.g., taking the max, averaging, or merging dictionaries).</p>
+                    <div class="code-block text-xs">
+<pre><code><span class="token keyword">def</span> <span class="token function">custom_sum</span>(current: int, new: int):
+    <span class="token keyword">return</span> current + new
+
+<span class="token keyword">class</span> <span class="token function">State</span>(TypedDict):
+    throughput: Annotated[int, custom_sum]</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Parallel Flow Visualization -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12">Fan-Out / Fan-In Visualization</h2>
+            <div class="glass p-12 rounded-3xl">
+                <div class="mermaid">
+                    graph LR
+                        S([START]) --> W1[Worker A: Scan DB]
+                        S --> W2[Worker B: Scan API]
+                        W1 -- "[DB_OK]" --> C[Consensus Join]
+                        W2 -- "[API_OK]" --> C
+                        C -- "Final State: [DB_OK, API_OK]" --> E([END])
+                        style S fill:#0ea5e9,stroke:#38bdf8
+                        style E fill:#bc13fe,stroke:#a855f7
+                        style C fill:#1e293b,stroke:#38bdf8
+                        style W1 fill:#0f172a,stroke:#334155
+                        style W2 fill:#0f172a,stroke:#334155
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-[0.4em] opacity-40">
+        Module 5 • State Reducers • Agentic AI Knowledge Base
+    </footer>
+
+</body>
+</html>

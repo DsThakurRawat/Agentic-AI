@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curriculum | Agentic AI Masterclass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        campusx: '#ff4b4b',
+                        advanced: '#a855f7',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                fixed radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0, transparent 50%),
+                fixed radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .module-card {
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .module-card:hover {
+            transform: scale(1.01);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+        .step-number {
+            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .roadmap-line {
+            position: absolute;
+            left: 24px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, rgba(56, 189, 248, 0.2), transparent);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-8 py-6 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="p-2 bg-brand-400/10 rounded-lg border border-brand-400/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                </a>
+                <h1 class="text-2xl font-display font-bold tracking-tight">Enterprise <span class="text-brand-400">Syllabus</span></h1>
+            </div>
+            <div class="flex gap-4">
+                <span class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <span class="w-2 h-2 rounded-full bg-campusx"></span> CampusX
+                </span>
+                <span class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    <span class="w-2 h-2 rounded-full bg-advanced"></span> Advanced
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto py-20 px-8 relative">
+        
+        <div class="mb-20 text-center">
+            <h2 class="text-4xl md:text-6xl font-display font-extrabold mb-6 tracking-tighter leading-tight">
+                Your Roadmap to <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-advanced">Agentic Autonomy</span>
+            </h2>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
+                A definitive reference guide integrating the core CampusX curriculum with official LangGraph enterprise specification standards.
+            </p>
+        </div>
+
+        <div class="space-y-32 relative">
+            
+            <!-- Module 1 -->
+            <section>
+                <div class="flex items-center gap-4 mb-12">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-400/10 flex items-center justify-center border border-brand-400/20 text-brand-400 font-display font-bold text-xl">01</div>
+                    <h3 class="text-3xl font-display font-bold">Foundations & Core Paradigm</h3>
+                </div>
+                <div class="grid gap-6 ml-6 border-l-2 border-white/5 pl-10">
+                    <!-- Step 1 -->
+                    <div class="glass p-6 rounded-2xl module-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-white">Generative AI vs. Agentic AI</h4>
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 bg-campusx/10 text-campusx rounded-md border border-campusx/20">CampusX</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Transitioning from zero-shot textual completion models to iterative, reasoning systems. Understanding agency boundaries.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="glass p-6 rounded-2xl module-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-white">LangChain vs. LangGraph</h4>
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 bg-campusx/10 text-campusx rounded-md border border-campusx/20">CampusX</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Architectural tradeoffs between static linear DAGs (LCEL) and cyclic execution graphs capable of self-correction.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="glass p-6 rounded-2xl module-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-white">Schema Contracts & Pydantic Validation</h4>
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 bg-advanced/10 text-advanced rounded-md border border-advanced/20">Advanced</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Defining global message stream contracts utilizing custom Pydantic BaseModels for robust execution bounds.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 2 -->
+            <section>
+                <div class="flex items-center gap-4 mb-12">
+                    <div class="w-12 h-12 rounded-2xl bg-advanced/10 flex items-center justify-center border border-advanced/20 text-advanced font-display font-bold text-xl">02</div>
+                    <h3 class="text-3xl font-display font-bold">Essential Workflow Topologies</h3>
+                </div>
+                <div class="grid gap-6 ml-6 border-l-2 border-white/5 pl-10">
+                    <div class="glass p-6 rounded-2xl module-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-white">Parallel Workflows (Fan-Out / Fan-In)</h4>
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 bg-campusx/10 text-campusx rounded-md border border-campusx/20">CampusX</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Utilizing custom state reducers to aggregate multi-model scoring outcomes simultaneously without clobbering.</p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl module-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-white">Evaluator-Optimizer Loops</h4>
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 bg-campusx/10 text-campusx rounded-md border border-campusx/20">CampusX</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Recursive generation where validator models provide structured feedback until rigorous bounds are satisfied.</p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl module-card border-brand-400/20">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-white">Dynamic Child Node Spawning (Send API)</h4>
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 bg-advanced/10 text-advanced rounded-md border border-advanced/20">Official Docs</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed">The official standard pattern for Map-Reduce architectures. Emitting arrays of Send packets inside routing handlers.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 3 -->
+            <section>
+                <div class="flex items-center gap-4 mb-12">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-400/10 flex items-center justify-center border border-brand-400/20 text-brand-400 font-display font-bold text-xl">03</div>
+                    <h3 class="text-3xl font-display font-bold">Persistence & Storage Interfaces</h3>
+                </div>
+                <div class="grid gap-6 ml-6 border-l-2 border-white/5 pl-10">
+                    <div class="glass p-6 rounded-2xl module-card">
+                        <h4 class="text-lg font-bold text-white mb-2">Time Travel & Checkpointing</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">Binding persistent MemorySavers to serialize Superstep snapshots and trigger historical forks for debugging.</p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl module-card">
+                        <h4 class="text-lg font-bold text-white mb-2">Streaming & Real-time UIs</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">Extracting granular stream event tokens from running graph invocations to render ChatGPT-like real-time feedback.</p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl module-card border-advanced/20">
+                        <h4 class="text-lg font-bold text-white mb-2">Enterprise Postgres Checkpointers</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">Scaling to highly concurrent production environments leveraging native asynchronous database pooling configurations.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="mt-40 text-center pb-20">
+            <a href="index.html" class="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-brand-400 text-slate-950 font-bold hover:scale-105 transition-transform shadow-xl shadow-brand-400/20">
+                Launch Documentation
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+        </div>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-widest">
+        Agentic AI Masterclass • Building the Future of Autonomous Intelligence
+    </footer>
+
+</body>
+</html>

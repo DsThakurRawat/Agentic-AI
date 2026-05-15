@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Workflows | Agentic AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0ea5e9',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#bc13fe',
+                tertiaryColor: '#020617'
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                        },
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.05) 0, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .code-block {
+            background: #010409;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #e6edf3;
+        }
+        .token.keyword { color: #ff7b72; }
+        .token.string { color: #a5d6ff; }
+        .token.comment { color: #8b949e; }
+        .token.function { color: #d2a8ff; }
+        
+        .active-tab {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-8 py-4 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../../index.html" class="p-2 bg-brand-400/20 rounded-lg border border-brand-400/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                </a>
+                <span class="text-xl font-display font-bold tracking-tight">Module 2: <span class="text-brand-400">LLM Workflows</span></span>
+            </div>
+            <nav class="flex gap-6">
+                <a href="../../index.html" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Nexus Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-16 px-8">
+        
+        <!-- Intro Section -->
+        <div class="mb-20">
+            <h1 class="text-5xl md:text-6xl font-display font-extrabold mb-8 tracking-tight">
+                Structural <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Orchestration Topologies</span>
+            </h1>
+            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
+                LangGraph acts as a programmable compiler for multi-stage applications. Developers map control flow logic directly onto explicit design topologies based on computational requirements.
+            </p>
+        </div>
+
+        <!-- Topology Gallery -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+            <!-- Topology 1: Chaining -->
+            <div class="glass p-8 rounded-3xl group">
+                <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">Topology A</div>
+                <h3 class="text-xl font-display font-bold mb-4">Prompt Chaining</h3>
+                <div class="mermaid mb-6 opacity-60 group-hover:opacity-100 transition-opacity">
+                    graph LR
+                        A([S]) --> B[Plan] --> C[Expand] --> D([E])
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">Linear additive string payload overrides where upstream planner nodes emit initial structures.</p>
+            </div>
+
+            <!-- Topology 2: Routing -->
+            <div class="glass p-8 rounded-3xl group">
+                <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">Topology B</div>
+                <h3 class="text-xl font-display font-bold mb-4">Dynamic Routing</h3>
+                <div class="mermaid mb-6 opacity-60 group-hover:opacity-100 transition-opacity">
+                    graph TD
+                        A[Classify] --> R{?}
+                        R --> B[Tech]
+                        R --> C[Bill]
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">Scalar conditional literal mappings targeting independent downstream nodes based on triage.</p>
+            </div>
+
+            <!-- Topology 3: Parallel -->
+            <div class="glass p-8 rounded-3xl group">
+                <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">Topology C</div>
+                <h3 class="text-xl font-display font-bold mb-4">Fan-Out / Fan-In</h3>
+                <div class="mermaid mb-6 opacity-60 group-hover:opacity-100 transition-opacity">
+                    graph TD
+                        A[S] --> B[W1]
+                        A --> C[W2]
+                        B --> D[Join]
+                        C --> D
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">Concurrent execution channels aggregated via custom state reducers to avoid clobbering.</p>
+            </div>
+        </section>
+
+        <!-- Technical Deep Dive -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
+                <span class="text-brand-400">01</span>
+                Code Implementations
+            </h2>
+            
+            <div class="glass rounded-3xl overflow-hidden">
+                <div class="flex border-b border-white/10 bg-black/20">
+                    <button onclick="switchTab('chain')" id="btn-chain" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] active-tab transition-all">Example 1: Chaining</button>
+                    <button onclick="switchTab('route')" id="btn-route" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">Example 2: Routing</button>
+                </div>
+                
+                <div class="p-8">
+                    <!-- Example 1 -->
+                    <div id="content-chain" class="block space-y-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-bold text-white">Multi-Stage Transformation</h4>
+                            <span class="px-2 py-1 rounded bg-brand-400/10 text-brand-400 text-[10px] font-bold uppercase">Planner-Author</span>
+                        </div>
+                        <div class="code-block">
+<pre><code><span class="token keyword">class</span> <span class="token function">ChainingState</span>(TypedDict):
+    user_topic: str
+    structural_outline: Optional[str]
+    final_output_body: Optional[str]
+
+<span class="token keyword">def</span> <span class="token function">outline_planning_node</span>(state: ChainingState):
+    <span class="token comment"># Construct structural markdown maps</span>
+    <span class="token keyword">return</span> {"structural_outline": "1. Intro..."}
+
+<span class="token keyword">def</span> <span class="token function">content_expansion_node</span>(state: ChainingState):
+    <span class="token comment"># Expand outline into finalized body content</span>
+    <span class="token keyword">return</span> {"final_output_body": "Expanded content..."}</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Example 2 -->
+                    <div id="content-route" class="hidden space-y-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-bold text-white">Semantic Support Router</h4>
+                            <span class="px-2 py-1 rounded bg-neon-purple/10 text-neon-purple text-[10px] font-bold uppercase">Triage-Switch</span>
+                        </div>
+                        <div class="code-block">
+<pre><code><span class="token keyword">def</span> <span class="token function">routing_switch_interception</span>(state: RoutingState) -> Literal["tech", "bill"]:
+    <span class="token keyword">if</span> state["classification_tag"] == "Technical":
+        <span class="token keyword">return</span> "resolve_technical"
+    <span class="token keyword">return</span> "resolve_billing"
+
+<span class="token comment"># Register conditional switching interceptor</span>
+graph.add_conditional_edges(
+    "triage",
+    routing_switch_interception,
+    {"resolve_technical": "resolve_technical", "resolve_billing": "resolve_billing"}
+)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-[0.4em] opacity-40">
+        Module 2 • LLM Workflows • Agentic AI Knowledge Base
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            document.getElementById('content-chain').classList.add('hidden');
+            document.getElementById('content-route').classList.add('hidden');
+            document.getElementById('btn-chain').classList.remove('active-tab');
+            document.getElementById('btn-route').classList.remove('active-tab');
+            document.getElementById('btn-chain').classList.add('text-slate-500');
+            document.getElementById('btn-route').classList.add('text-slate-500');
+            
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active-tab');
+            document.getElementById('btn-' + tabId).classList.remove('text-slate-500');
+        }
+    </script>
+</body>
+</html>

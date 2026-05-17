@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Agent Landscape Comparison Matrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                            gold: '#ffd700',
+                            emerald: '#00ff66',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                        'neon-gold': '0 0 15px rgba(255, 215, 0, 0.25)',
+                        'neon-emerald': '0 0 15px rgba(0, 255, 102, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(15, 23, 42, 0.65);
+        }
+        .glow-card-gold:hover {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.12);
+            border-color: rgba(255, 215, 0, 0.25);
+        }
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.12);
+            border-color: rgba(188, 19, 254, 0.25);
+        }
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.12);
+            border-color: rgba(0, 242, 255, 0.25);
+        }
+        .glow-card-emerald:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.12);
+            border-color: rgba(0, 255, 102, 0.25);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .table-wrapper {
+            display: none;
+        }
+        .table-wrapper.active {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased font-sans text-slate-200">
+
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-gold via-neon-purple via-neon-blue to-neon-emerald shadow-lg"></div>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-6 py-16 relative z-10">
+
+        <!-- Header -->
+        <header class="text-center mb-16 flex flex-col items-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-gold/30 bg-neon-gold/5 text-neon-gold text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+                <span class="w-2 h-2 rounded-full bg-neon-gold"></span> SRE Engineering Analysis
+            </div>
+            <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+                SRE Agent <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-gold via-neon-purple via-neon-blue to-neon-emerald">Landscape Matrix</span>
+            </h1>
+            <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed">
+                A high-fidelity comparative review analyzing local Go daemons, autonomic multi-agent LangGraph loops, RL synthetic RCA sandboxes, and self-healing cloud operator systems.
+            </p>
+        </header>
+
+        <!-- Project Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <!-- P1 -->
+            <div class="glass p-8 rounded-3xl glow-card-gold flex flex-col justify-between border-t-4 border-neon-gold">
+                <div>
+                    <span class="text-xs font-bold text-neon-gold uppercase tracking-widest block mb-2">Project 01</span>
+                    <h3 class="text-xl font-display font-bold mb-3 flex items-center gap-2">
+                        SRE-Agent <span class="px-2 py-0.5 text-[10px] bg-neon-gold/10 text-neon-gold rounded border border-neon-gold/20 font-mono">Go</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">A localized, high-performance monitoring daemon compiled natively. Collects metrics via loaded shared object (.so) plugins and evaluates windows.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">Go 1.11</span>
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">pprof</span>
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">Goroutines</span>
+                </div>
+            </div>
+
+            <!-- P2 -->
+            <div class="glass p-8 rounded-3xl glow-card-purple flex flex-col justify-between border-t-4 border-neon-purple">
+                <div>
+                    <span class="text-xs font-bold text-neon-purple uppercase tracking-widest block mb-2">Project 02</span>
+                    <h3 class="text-xl font-display font-bold mb-3 flex items-center gap-2">
+                        Agentic-SRE <span class="px-2 py-0.5 text-[10px] bg-neon-purple/10 text-neon-purple rounded border border-neon-purple/20 font-mono">Python</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Autonomous multi-agent orchestration loop designed to ingest AWS CloudWatch alerts, investigate repository code via GitHub MCP, and deliver diagnostics to Slack.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">LangGraph</span>
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">CloudWatch</span>
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">MCP</span>
+                </div>
+            </div>
+
+            <!-- P3 -->
+            <div class="glass p-8 rounded-3xl glow-card-blue flex flex-col justify-between border-t-4 border-neon-blue">
+                <div>
+                    <span class="text-xs font-bold text-neon-blue uppercase tracking-widest block mb-2">Project 03</span>
+                    <h3 class="text-xl font-display font-bold mb-3 flex items-center gap-2">
+                        OpenSRE <span class="px-2 py-0.5 text-[10px] bg-neon-blue/10 text-neon-blue rounded border border-neon-blue/20 font-mono">Framework</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">An open reinforcement learning and incident investigation framework with scored synthetic RCA suites, episodic memory, and Neo4j topological graph mapping.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">FastAPI</span>
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">Neo4j</span>
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">Redis</span>
+                </div>
+            </div>
+
+            <!-- P4 -->
+            <div class="glass p-8 rounded-3xl glow-card-emerald flex flex-col justify-between border-t-4 border-neon-emerald">
+                <div>
+                    <span class="text-xs font-bold text-neon-emerald uppercase tracking-widest block mb-2">Project 04</span>
+                    <h3 class="text-xl font-display font-bold mb-3 flex items-center gap-2">
+                        Cloud-SRE <span class="px-2 py-0.5 text-[10px] bg-neon-emerald/10 text-neon-emerald rounded border border-neon-emerald/20 font-mono">Operator</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Autonomous multi-cloud operator with dynamic prompt generation, 4-layer pattern classification, and a unified code generation pipeline to automatically create GitHub PRs.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">Pydantic</span>
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">Hyx</span>
+                    <span class="px-2 py-0.5 text-[9px] bg-white/5 rounded text-slate-400 font-medium">Autonomic PR</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5 mb-12">
+            <button onclick="switchTab('arch-philosophy')" id="btn-arch-philosophy" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-gold to-neon-purple text-white shadow-lg">
+                🏛️ Architecture & Strategy
+            </button>
+            <button onclick="switchTab('data-intelligence')" id="btn-data-intelligence" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ Data & Reasoning
+            </button>
+            <button onclick="switchTab('remediation-resilience')" id="btn-remediation-resilience" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                🛡️ Remediation & Resilience
+            </button>
+            <button onclick="switchTab('deployment-techstack')" id="btn-deployment-techstack" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Tech Stack & Deploy
+            </button>
+        </div>
+
+        <!-- Tab 1: Architecture & Strategy -->
+        <div id="tab-content-arch-philosophy" class="table-wrapper active glass p-4 md:p-8 rounded-3xl overflow-x-auto custom-scrollbar">
+            <table class="w-full min-w-[800px] border-collapse text-left text-xs md:text-sm">
+                <thead>
+                    <tr class="border-b border-white/10">
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-slate-400 w-[20%]">Engineering Dimension</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-gold w-[20%]">SRE-Agent (Go)</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-purple w-[20%]">Agentic-SRE (Python)</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-blue w-[20%]">OpenSRE Framework</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-emerald w-[20%]">Cloud-SRE Operator</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr>
+                        <td class="py-6 px-4">
+                            <div class="font-bold text-slate-200">Core Paradigm</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Philosophy</div>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-gold/5">
+                            <span class="px-2 py-0.5 text-[9px] font-bold bg-neon-gold/10 text-neon-gold rounded border border-neon-gold/20 uppercase">Deterministic</span>
+                            <p class="text-slate-300 text-xs mt-2 leading-relaxed">Native compiled daemon executing high-performance metric collection loops. Zero external reasoning runtime.</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-purple/5">
+                            <span class="px-2 py-0.5 text-[9px] font-bold bg-neon-purple/10 text-neon-purple rounded border border-neon-purple/20 uppercase">Multi-Agent Loop</span>
+                            <p class="text-slate-300 text-xs mt-2 leading-relaxed">Orchestrates specialized, autonomous LLM agents to trace anomalies from alerts down to repository files and code structures.</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-blue/5">
+                            <span class="px-2 py-0.5 text-[9px] font-bold bg-neon-blue/10 text-neon-blue rounded border border-neon-blue/20 uppercase">RL/Eval Framework</span>
+                            <p class="text-slate-300 text-xs mt-2 leading-relaxed">An open reinforcement learning environment for SRE agents. Focuses on scored synthetic simulations and sandboxes.</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-emerald/5">
+                            <span class="px-2 py-0.5 text-[9px] font-bold bg-neon-emerald/10 text-neon-emerald rounded border border-neon-emerald/20 uppercase">Self-Healing</span>
+                            <p class="text-slate-300 text-xs mt-2 leading-relaxed">Enterprise-grade autonomous monitoring and self-healing system with end-to-end automated log-to-PR code remediation.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-6 px-4">
+                            <div class="font-bold text-slate-200">Control Loop</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Pipeline</div>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Ticker-Driven Goroutines</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Dynamic shared object plugins (.so) run inside dedicated, non-blocking goroutines managed by a Unix signal handler.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">LangGraph Orchestration</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">State-machine loop that walks through: 1) Observe logs, 2) Reason service boundaries, 3) Inspect code via MCP, 4) Notify.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Event-Driven REST/Shell</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Fires on inbound alert payloads (e.g. Datadog, Slack, webhooks) and initiates an automated multi-step investigation pipeline.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">4-Layer Analytical Pipeline</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Log stream is compiled into time windows, evaluated by smart threshold engines, classified by pattern matching, and triaged.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 2: Data & Reasoning -->
+        <div id="tab-content-data-intelligence" class="table-wrapper glass p-4 md:p-8 rounded-3xl overflow-x-auto custom-scrollbar">
+            <table class="w-full min-w-[800px] border-collapse text-left text-xs md:text-sm">
+                <thead>
+                    <tr class="border-b border-white/10">
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-slate-400 w-[20%]">Engineering Dimension</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-gold w-[20%]">SRE-Agent (Go)</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-purple w-[20%]">Agentic-SRE (Python)</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-blue w-[20%]">OpenSRE Framework</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-emerald w-[20%]">Cloud-SRE Operator</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr>
+                        <td class="py-6 px-4">
+                            <div class="font-bold text-slate-200">Data Ingestion</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Supported Inputs</div>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-gold/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-2">Hardware & Sys Metrics</span>
+                            <ul class="list-disc list-inside space-y-1 text-xs text-slate-400">
+                                <li>gopsutil virtual memory</li>
+                                <li>Per-core CPU percentage</li>
+                                <li>Interface net IOCounters</li>
+                                <li>Dynamic partition disk</li>
+                            </ul>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-purple/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-2">Cloud & Repos</span>
+                            <ul class="list-disc list-inside space-y-1 text-xs text-slate-400">
+                                <li>AWS CloudWatch logs</li>
+                                <li>Inbound JSON Alerts</li>
+                                <li>GitHub Code Repos</li>
+                                <li>Slack Channels</li>
+                            </ul>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-blue/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-2">Multi-Signal Telemetry</span>
+                            <ul class="list-disc list-inside space-y-1 text-xs text-slate-400">
+                                <li>Grafana (Loki, Tempo)</li>
+                                <li>Datadog Log streams</li>
+                                <li>Elasticsearch, Splunk</li>
+                                <li>Kubernetes Pod Events</li>
+                            </ul>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-emerald/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-2">Multi-Cloud Logs</span>
+                            <ul class="list-disc list-inside space-y-1 text-xs text-slate-400">
+                                <li>GCP Pub/Sub Streams</li>
+                                <li>EKS / GKE Container Logs</li>
+                                <li>AWS CloudWatch Logs</li>
+                                <li>Structured File Systems</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-6 px-4">
+                            <div class="font-bold text-slate-200">Cognitive Core</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">AI Reasoning</div>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Deterministic Pure Math</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">No LLM integration. Compares metrics against boundaries, and evaluates alert flags natively at microsecond speed.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Unified Agent Agentic Loop</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Utilizes structured outputs to evaluate system architecture, parse stack traces, and read code blocks dynamically.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Episodic & Neo4j Engine</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Combines LLM agents with a Neo4j topological knowledge graph for blast-radius analysis and Redis-backed episodic memory.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Dynamic Meta-Prompting</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Orchestrates small, fast classification models to assemble dynamic context, feeding details into multi-turn planning LLMs.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 3: Remediation & Resilience -->
+        <div id="tab-content-remediation-resilience" class="table-wrapper glass p-4 md:p-8 rounded-3xl overflow-x-auto custom-scrollbar">
+            <table class="w-full min-w-[800px] border-collapse text-left text-xs md:text-sm">
+                <thead>
+                    <tr class="border-b border-white/10">
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-slate-400 w-[20%]">Engineering Dimension</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-gold w-[20%]">SRE-Agent (Go)</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-purple w-[20%]">Agentic-SRE (Python)</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-blue w-[20%]">OpenSRE Framework</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-emerald w-[20%]">Cloud-SRE Operator</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr>
+                        <td class="py-6 px-4">
+                            <div class="font-bold text-slate-200">Remediation</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Action Engine</div>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-gold/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Alert Delivery Only</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Sends alerts to local files or remote TCP sockets. Bypasses active remediation loops entirely to protect host integrity.</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-purple/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Slack Diagnostics Reports</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Compiles thorough diagnostic logs, stack traces, and proposed code diff fixes, routing them directly to active Slack channels.</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-blue/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Runbook Operations</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Parses loaded runbook documents to execute script-level operations (restarting pods, deploying config rollbacks).</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-emerald/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Syntactical PR Engine</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Compiles syntactically verified code fixes directly into local files and pushes autonomous Pull Requests straight to GitHub.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-6 px-4">
+                            <div class="font-bold text-slate-200">Resilience</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Fault Tolerance</div>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">OS Signal Catchers</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Catches standard Unix shutdown interrupts to cleanly close monitoring logs, sockets, and loaded plugin structures.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Interactive Setup Wizard</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Features robust initial CLI checks validating AWS permissions, Slack tokens, and LLM configuration before loop launch.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Synthetic Sandboxing</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Provides isolated synthetic RDS and Kubernetes environments to safely benchmark and test agent remediation decisions.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Hyx Circuit Breaking</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Enterprise resilience including circuit breaking, backpressure throttling, graceful degradation, and rate checks.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 4: Tech Stack & Deploy -->
+        <div id="tab-content-deployment-techstack" class="table-wrapper glass p-4 md:p-8 rounded-3xl overflow-x-auto custom-scrollbar">
+            <table class="w-full min-w-[800px] border-collapse text-left text-xs md:text-sm">
+                <thead>
+                    <tr class="border-b border-white/10">
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-slate-400 w-[20%]">Engineering Dimension</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-gold w-[20%]">SRE-Agent (Go)</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-purple w-[20%]">Agentic-SRE (Python)</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-blue w-[20%]">OpenSRE Framework</th>
+                        <th class="py-4 px-4 font-display font-bold uppercase tracking-wider text-neon-emerald w-[20%]">Cloud-SRE Operator</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr>
+                        <td class="py-6 px-4">
+                            <div class="font-bold text-slate-200">Tech Stack</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Framework & Base</div>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-gold/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Go 1.11 / CGO Plugins</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Native Go compilation, leveraging Go routines, ticker channels, and raw CGO dynamic shared plugins (.so).</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-purple/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Python 3.13 / LangGraph</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Modern Python 3.13, UV environment engine, LangGraph core, Pydantic type models, and Slack APIs.</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-blue/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">FastAPI / Neo4j / Redis</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">FastAPI service layers, Neo4j graph databases, Redis state caching, LiteLLM adapters, and Docker.</p>
+                        </td>
+                        <td class="py-6 px-4 bg-neon-emerald/5">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Python 3.12 / Hyx</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Python 3.12, Hyx resilience library, LiteLLM, structured logs adapters, and Pydantic validation schemas.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-6 px-4">
+                            <div class="font-bold text-slate-200">Deployment</div>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Hosting</div>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Systemd & Light Docker</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Runs natively on Linux hosts via a systemd daemon service, or within light Alpine containers.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Local Shell or AWS ECS</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Runs as an interactive CLI tool locally, or deployed as a task container on AWS ECS clusters.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">Docker Compose / EKS</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Standard multi-service Docker-compose files, and GKE/EKS Helm deployment templates.</p>
+                        </td>
+                        <td class="py-6 px-4">
+                            <span class="font-semibold text-slate-300 text-xs block mb-1">GCP Cloud Run / ECS</span>
+                            <p class="text-slate-400 text-xs leading-relaxed">Fully automated deployment scripts to GCP Cloud Run, AWS ECS Fargate, or Kubernetes namespaces.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Detailed Engineering Analysis Section -->
+        <section class="glass p-8 md:p-12 rounded-3xl mt-16 relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+            
+            <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                <span class="w-2.5 h-8 bg-neon-gold rounded-full"></span>
+                SRE Architectural Deep-Dive & Trade-offs
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="space-y-6 text-slate-300 leading-relaxed text-sm">
+                    <h3 class="text-xl font-display font-bold text-neon-gold flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-neon-gold rounded-full"></span>
+                        1. Local Go Daemon vs. LLM Reasoning Layers
+                    </h3>
+                    <p class="text-xs">
+                        <strong>SRE-Agent (Go)</strong> is engineered to sit at the absolute foundation of server environments. Running natively, it consumes virtually zero CPU and memory, capturing OS signals and hardware metrics at microsecond frequencies. It represents a bulletproof, deterministic layer of alerting that will continue executing even if external networks or LLM APIs suffer a complete outage.
+                    </p>
+                    <p class="text-xs text-slate-400">
+                        In contrast, <strong>Agentic-SRE, OpenSRE, and Cloud-SRE</strong> function at the top of the operations stack. Rather than collecting raw disk bits directly, they consume aggregated telemetry from central backends (CloudWatch, Prometheus, Grafana Loki) and activate Large Language Models (LLMs) to diagnose cascade failures, reason across service graphs, and write code adjustments.
+                    </p>
+                </div>
+
+                <div class="space-y-6 text-slate-300 leading-relaxed text-sm">
+                    <h3 class="text-xl font-display font-bold text-neon-emerald flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-neon-emerald rounded-full"></span>
+                        2. Benchmarking (OpenSRE) vs. Active Operations (Cloud-SRE)
+                    </h3>
+                    <p class="text-xs">
+                        The primary architectural divide between the two complex systems lies in their core operational goals:
+                    </p>
+                    <ul class="space-y-3 pl-2 text-xs">
+                        <li class="flex items-start gap-2.5">
+                            <span class="text-neon-blue font-bold">OpenSRE:</span>
+                            <span>A specialized testing sandbox. It maps deep topological service graphs (Neo4j) and utilizes episodic memory caches to benchmark the accuracy of SRE diagnostic algorithms against synthetic RDF fault loops.</span>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <span class="text-neon-emerald font-bold">Cloud-SRE:</span>
+                            <span>A battle-tested production operator. It implements strict Hyx resilience circuit breakers and exponential backoffs to protect LLM runtimes, focusing on automated syntactical code verification and direct GitHub Pull Request creation.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapter Navigation Footer -->
+        <footer class="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+            <a href="planing-agents/planning_agents_theory.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold hover:bg-white/10 hover:border-white/20 hover:-translate-x-1 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Chapter 22: Planning Agents</span>
+            </a>
+            
+            <a href="index.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-400/10 border border-brand-400/20 text-brand-400 text-xs font-semibold hover:bg-brand-400/20 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <span>Master Hub</span>
+            </a>
+            
+            <button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold opacity-50 cursor-not-allowed">
+                <span>Terminal Chapter</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </footer>
+
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            const wrappers = document.querySelectorAll('.table-wrapper');
+            wrappers.forEach(w => w.classList.remove('active'));
+
+            // Deactivate all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => {
+                b.classList.remove('bg-gradient-to-r', 'from-neon-gold', 'to-neon-purple', 'text-white', 'shadow-lg');
+                b.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-white/5');
+            });
+
+            // Show current tab content
+            const activeWrapper = document.getElementById('tab-content-' + tabId);
+            if (activeWrapper) {
+                activeWrapper.classList.add('active');
+            }
+
+            // Activate clicked button
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-white/5');
+                activeBtn.classList.add('bg-gradient-to-r', 'from-neon-gold', 'to-neon-purple', 'text-white', 'shadow-lg');
+            }
+        }
+    </script>
+</body>
+</html>

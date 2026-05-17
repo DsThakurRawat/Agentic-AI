@@ -3,27 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAG Encyclopedia | Master Guide</title>
+    <title>RAG Encyclopedia | LangGraph Masterclass</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'dark',
-            securityLevel: 'loose',
-            themeVariables: {
-                primaryColor: '#0ea5e9',
-                primaryTextColor: '#fff',
-                primaryBorderColor: '#38bdf8',
-                lineColor: '#38bdf8',
-                secondaryColor: '#bc13fe',
-                tertiaryColor: '#020617'
-            }
-        });
-    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -31,16 +15,26 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        brand: {
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                        },
                         neon: {
                             blue: '#00f2ff',
                             purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                            emerald: '#00ff66',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
                         }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                        'neon-emerald': '0 0 15px rgba(0, 255, 102, 0.25)',
                     }
                 }
             }
@@ -50,331 +44,300 @@
         body {
             background-color: #020617;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.05) 0, transparent 50%);
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
             color: #f8fafc;
         }
         .glass {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
+        }
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
+        }
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
+        }
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         .code-block {
-            background: #010409;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            overflow-x: auto;
-            color: #e6edf3;
-        }
-        .token.keyword { color: #ff7b72; }
-        .token.function { color: #d2a8ff; }
-        .token.comment { color: #8b949e; }
-        
-        .active-tab {
-            background: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
-            border-bottom: 2px solid #38bdf8;
-        }
-        .highlight-card {
-            border-left: 4px solid #38bdf8;
-            background: linear-gradient(90deg, rgba(56, 189, 248, 0.1) 0%, transparent 100%);
+            font-family: 'JetBrains Mono', monospace;
+            background: #090d1a;
+            border: 1px solid rgba(255,255,255,0.03);
         }
     </style>
 </head>
-<body class="antialiased font-sans">
+<body class="antialiased font-sans text-slate-200">
 
-    <!-- Header -->
-    <header class="glass sticky top-0 z-50 px-8 py-4 border-b border-white/5">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <a href="../index.html" class="p-2 bg-brand-400/20 rounded-lg border border-brand-400/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-                </a>
-                <span class="text-xl font-display font-bold tracking-tight">RAG <span class="text-brand-400">Encyclopedia</span></span>
-            </div>
-            <nav class="flex items-center gap-6">
-                <a href="#why" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Why RAG?</a>
-                <a href="#naive" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Naive</a>
-                <a href="#advanced" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Advanced</a>
-                <a href="#agentic" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Agentic</a>
-                <span class="w-px h-4 bg-white/10"></span>
-                <a href="Advance-Rag-corrective-rag/corrective_rag_theory.html" class="text-xs font-bold uppercase tracking-widest text-brand-400 hover:text-white hover:shadow-neon-blue/20 transition-all border border-brand-400/30 bg-brand-400/5 px-3 py-1 rounded-full">CRAG Masterclass</a>
-                <a href="Advance-self-rag-main/self_rag_theory.html" class="text-xs font-bold uppercase tracking-widest text-neon-purple hover:text-white hover:shadow-neon-purple/20 transition-all border border-neon-purple/30 bg-neon-purple/5 px-3 py-1 rounded-full">Self-RAG Masterclass</a>
-            </nav>
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
+
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-blue/30 bg-neon-blue/5 text-neon-blue text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-blue"></span> Knowledge Retrieval Foundations
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            RAG <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">Encyclopedia</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+            A high-fidelity taxonomy mapping the spectrum of dynamic grounding architectures, from linear Naive retrieval up to complex state-machine routing loops.
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5">
+            <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg">
+                📚 technical theory
+            </button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ Semantic Vector Space Simulator
+            </button>
+            <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Implementation Blueprints
+            </button>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto py-16 px-8">
-        
-        <!-- Intro -->
-        <div class="mb-20">
-            <h1 class="text-5xl md:text-7xl font-display font-extrabold mb-8 tracking-tight text-white">
-                The Anatomy of <br/>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Modern RAG Systems</span>
-            </h1>
-            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
-                RAG isn't just a tool; it's an architecture for **Dynamic Grounding**. It solves the "Stale Knowledge" problem by providing LLMs with an external, searchable memory.
-            </p>
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
+
+        <!-- ==================== TAB: THEORY ==================== -->
+        <div id="tab-content-theory" class="space-y-16">
+            
+            <!-- Section 1: The Core Idea -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Section 1: Parametric vs Non-Parametric Knowledge
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            Traditional LLMs depend entirely on **Parametric Knowledge**—meaning the facts stored in their static weights computed during pre-training. This limits their context window and causes hallucinations when queries require real-time updates.
+                        </p>
+                        <p class="border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400">
+                            "RAG establishes a Non-Parametric memory lane, providing target vector context directly inside the dynamic prompt."
+                        </p>
+                        <p>
+                            By translating text chunks into spatial coordinate tensors (embeddings), semantic search retrieves context corresponding closely to the user's inquiry, preventing generic pre-trained responses.
+                        </p>
+                    </div>
+
+                    <!-- Diagram placeholder -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Grounding Pipeline</h4>
+                        <div class="flex justify-center">
+                            <svg width="340" height="200" viewBox="0 0 340 200" class="w-full max-w-[340px]">
+                                <rect x="10" y="80" width="80" height="40" rx="6" fill="#090d1a" stroke="#00f2ff" stroke-width="1.5" />
+                                <text x="50" y="105" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">User Query</text>
+                                
+                                <path d="M 90 100 H 150" stroke="#bc13fe" stroke-width="1.5" />
+
+                                <rect x="150" y="80" width="80" height="40" rx="6" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                <text x="190" y="105" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Vector Index</text>
+
+                                <path d="M 230 100 H 290" stroke="#ff007f" stroke-width="1.5" />
+                                
+                                <rect x="290" y="80" width="40" height="40" rx="6" fill="#090d1a" stroke="#ff007f" stroke-width="1.5" />
+                                <text x="310" y="105" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">LLM</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
-        <!-- Section 0: The Core Idea -->
-        <section id="idea" class="mb-32">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div>
-                    <h2 class="text-3xl font-display font-bold mb-8 flex items-center gap-3 text-white">
-                        <span class="text-brand-400">00</span>
-                        The Science of Retrieval
-                    </h2>
-                    <div class="space-y-6 text-slate-400 leading-relaxed">
-                        <div class="space-y-4">
-                            <h4 class="text-white font-bold text-lg">Parametric vs. Non-Parametric</h4>
-                            <p>
-                                <strong>Parametric Knowledge:</strong> This is the knowledge stored in the LLM's weights (parameters). It's like a person's long-term memory. It's fast but gets outdated quickly and is hard to correct.
-                            </p>
-                            <p>
-                                <strong>Non-Parametric Knowledge:</strong> This is the external data (PDFs, Databases, Web) that RAG provides. It's like a person's library or notebook. It's infinitely scalable and always up-to-date.
-                            </p>
+        <!-- ==================== TAB: SIMULATOR ==================== -->
+        <div id="tab-content-simulator" class="hidden space-y-12">
+            <div class="glass p-6 md:p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-4">Semantic Vector Space & KNN Simulator</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    Explore how text chunks are represented as multi-dimensional coordinate vectors. Pick a query, project it into the spatial grid, and visualize how semantic distance yields the nearest neighbors!
+                </p>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end mb-8 bg-slate-950/60 p-6 rounded-2xl border border-white/5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Select Query Concept</label>
+                        <select id="sim-vector-query" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="agents">"Autonomous multi-agent swarms"</option>
+                            <option value="css">"Sleek vanilla CSS animations"</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="projectVectorSpace()" id="btn-project-vector" class="w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Project Query Vector
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Visual Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- 2D Spatial Grid (8 Cols) -->
+                    <div class="lg:col-span-8 bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex flex-col justify-between h-[450px]">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">2D Semantic Coordinate Plane</h4>
+                        
+                        <div class="flex-1 flex items-center justify-center p-2 relative overflow-hidden">
+                            <svg width="500" height="300" viewBox="0 0 500 300" class="w-full h-full max-h-[280px]">
+                                <!-- Grid lines -->
+                                <line x1="50" y1="20" x2="50" y2="280" stroke="rgba(255,255,255,0.05)" />
+                                <line x1="150" y1="20" x2="150" y2="280" stroke="rgba(255,255,255,0.05)" />
+                                <line x1="250" y1="20" x2="250" y2="280" stroke="rgba(255,255,255,0.05)" />
+                                <line x1="350" y1="20" x2="350" y2="280" stroke="rgba(255,255,255,0.05)" />
+                                <line x1="450" y1="20" x2="450" y2="280" stroke="rgba(255,255,255,0.05)" />
+                                
+                                <line x1="20" y1="50" x2="480" y2="50" stroke="rgba(255,255,255,0.05)" />
+                                <line x1="20" y1="150" x2="480" y2="150" stroke="rgba(255,255,255,0.05)" />
+                                <line x1="20" y1="250" x2="480" y2="250" stroke="rgba(255,255,255,0.05)" />
+
+                                <!-- Document vectors (Fixed) -->
+                                <!-- Agents cluster (Bottom Left) -->
+                                <circle id="doc-node-1" cx="100" cy="220" r="8" fill="#bc13fe" opacity="0.8" />
+                                <text x="100" y="240" fill="#a855f7" font-family="Outfit" font-size="7" text-anchor="middle">Doc: Orchestration swarms</text>
+
+                                <circle id="doc-node-2" cx="120" cy="200" r="8" fill="#bc13fe" opacity="0.8" />
+                                <text x="120" y="190" fill="#a855f7" font-family="Outfit" font-size="7" text-anchor="middle">Doc: LLM state machines</text>
+
+                                <!-- Styling cluster (Top Right) -->
+                                <circle id="doc-node-3" cx="380" cy="80" r="8" fill="#ff007f" opacity="0.8" />
+                                <text x="380" y="70" fill="#ec4899" font-family="Outfit" font-size="7" text-anchor="middle">Doc: Responsive CSS cards</text>
+
+                                <circle id="doc-node-4" cx="400" cy="110" r="8" fill="#ff007f" opacity="0.8" />
+                                <text x="400" y="130" fill="#ec4899" font-family="Outfit" font-size="7" text-anchor="middle">Doc: Web UI components</text>
+
+                                <!-- Query vector particle -->
+                                <circle id="query-particle" cx="250" cy="150" r="10" fill="#00f2ff" opacity="0" />
+                                <text id="query-label" x="250" y="135" fill="#00f2ff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold" opacity="0">Query Vector</text>
+
+                                <!-- Connection lines to KNN -->
+                                <line id="knn-line-1" x1="250" y1="150" x2="250" y2="150" stroke="#00f2ff" stroke-width="1.5" stroke-dasharray="3" opacity="0" />
+                                <line id="knn-line-2" x1="250" y1="150" x2="250" y2="150" stroke="#00f2ff" stroke-width="1.5" stroke-dasharray="3" opacity="0" />
+                            </svg>
                         </div>
                         
-                        <div class="p-6 glass rounded-2xl border-l-4 border-neon-purple bg-neon-purple/5">
-                            <h4 class="font-bold text-white mb-2">In-Context Learning (ICL)</h4>
-                            <p class="text-sm">
-                                The miracle of RAG is based on <strong>In-Context Learning</strong>. This is the ability of an LLM to "learn" or adapt to new information provided within the prompt itself, without any permanent changes to its weights. We are essentially using the LLM's attention mechanism to focus on the provided context.
-                            </p>
+                        <!-- Console Output Panel -->
+                        <div class="h-[120px] bg-slate-900 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-y-auto custom-scrollbar space-y-1.5" id="sim-console">
+                            <span class="text-slate-500">[System]: Standing by. Select query and click "Project Query Vector".</span>
                         </div>
+                    </div>
+                    
+                    <!-- Metrics Monitor Panel (4 Cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        <!-- Retrieval list -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex-1 overflow-y-auto custom-scrollbar max-h-[210px]">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Semantic KNN Matches</h4>
+                            <div class="space-y-4 font-mono text-xs" id="retrieval-results">
+                                <div class="text-slate-600 italic">No contexts loaded.</div>
+                            </div>
+                        </div>
+
+                        <!-- final answer -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 h-[210px] overflow-y-auto custom-scrollbar flex flex-col font-mono text-xs">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Augmented Context prompt</h4>
+                            <div class="flex-1 text-xs text-slate-400 space-y-3" id="augmented-prompt-view">
+                                <div class="text-slate-600 italic text-center h-full flex items-center justify-center font-sans">
+                                    No inputs parsed.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: CODE ==================== -->
+        <div id="tab-content-code" class="hidden space-y-12">
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-6">Production RAG Topologies</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                    View templates for handling text splitting and local vector index generation.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left nav -->
+                    <div class="flex flex-col gap-2 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
+                        <button onclick="switchCodeTab('code-naive-rag')" id="btn-code-naive-rag" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
+                            1. Naive RAG Script
+                        </button>
+                        <button onclick="switchCodeTab('code-splitter-config')" id="btn-code-splitter-config" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            2. Text Splitter Config
+                        </button>
+                    </div>
+
+                    <!-- Code viewer -->
+                    <div class="lg:col-span-3">
                         
-                        <p>
-                            RAG essentially shifts the burden of **Factual Accuracy** from the model's weights to the retrieval engine, allowing the model to focus purely on its core strength: <strong>Reasoning and Synthesis</strong>.
-                        </p>
-                    </div>
-                </div>
-                <div class="glass p-12 rounded-3xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 opacity-10">
-                        <svg width="200" height="200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                    </div>
-                    <div class="mermaid">
-                        graph TD
-                            A[User Query] --> B[Encoder]
-                            B --> C{Semantic Space}
-                            D[(Vector Database)] --> C
-                            C -- "Nearest Neighbors" --> E[Context]
-                            E --> F[Augmented Prompt]
-                            F -- "In-Context Learning" --> G[LLM]
-                            G --> H[Final Response]
-                            
-                            style G fill:#bc13fe,stroke:#fff
-                            style D fill:#1e293b,stroke:#38bdf8
-                    </div>
-                    <p class="text-[10px] text-center text-slate-500 mt-6 uppercase tracking-widest text-white">Figure 1: The Principle of In-Context Grounding</p>
-                </div>
-            </div>
-        </section>
+                        <!-- Naive RAG -->
+                        <div id="code-content-code-naive-rag" class="code-tab-content space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Naive Vector Database Retrieval</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
 
-        <!-- Section 1: Why RAG? -->
-        <section id="why" class="mb-32">
-            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3 text-white">
-                <span class="text-brand-400">01</span>
-                Solving the Three Pillars of Failure
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass p-8 rounded-3xl highlight-card">
-                    <h3 class="text-xl font-bold mb-4 text-brand-400">1. Knowledge Cutoff</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">
-                        Models are frozen in time (e.g., Oct 2023). RAG allows them to answer questions about events that happened 5 minutes ago by fetching fresh news or internal docs.
-                    </p>
-                </div>
-                <div class="glass p-8 rounded-3xl highlight-card border-l-neon-purple">
-                    <h3 class="text-xl font-bold mb-4 text-neon-purple">2. Data Privacy</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">
-                        Uploading private data to OpenAI for fine-tuning is a security risk. RAG keeps your data in your local Vector DB (like FAISS) and only sends the relevant snippets.
-                    </p>
-                </div>
-                <div class="glass p-8 rounded-3xl highlight-card">
-                    <h3 class="text-xl font-bold mb-4 text-brand-400">3. Hallucination Control</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">
-                        When an LLM doesn't know an answer, it guesses. In RAG, we tell the model: <em>"Use ONLY the provided context. If it's not there, say you don't know."</em>
-                    </p>
-                </div>
-            </div>
-        </section>
+# Initialize local FAISS vector index
+embeddings = OpenAIEmbeddings()
+db = FAISS.from_documents(chunks, embeddings)
 
-        <!-- Section 2: How it works (The Goated Visualization) -->
-        <section id="how" class="mb-32">
-            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3 text-white text-center justify-center">
-                <span class="text-brand-400">02</span>
-                The End-to-End RAG Architecture
-            </h2>
-            
-            <!-- GOATED VISUALIZATION CONTAINER -->
-            <div class="glass p-12 rounded-[3rem] mb-16 border border-brand-400/20 relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-brand-400 to-neon-purple rounded-[3rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                <div class="relative">
-                    <div class="mermaid">
-                        graph TD
-                            subgraph "1. Data Ingestion (ETL Phase)"
-                                Source([WWW / Local PDF]) --> Loader[Document Loader]
-                                Loader --> Splitter[Text Splitter]
-                                Splitter --> C1[Chunk 1]
-                                Splitter --> C2[Chunk 2]
-                                Splitter --> C3[Chunk 3]
-                            end
+# Retrieve k nearest neighbors
+retriever = db.as_retriever(search_kwargs={"k": 2})
+                                </pre>
+                            </div>
+                        </div>
 
-                            subgraph "2. Vectorization (The Embedding Phase)"
-                                C1 --> Embed[Embedding Model]
-                                C2 --> Embed
-                                C3 --> Embed
-                                Embed --> Vectors[Vector Representations]
-                                Vectors --> Store[(Vector Store / DB)]
-                            end
+                        <!-- Splitter -->
+                        <div id="code-content-code-splitter-config" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Recursive Character Text Splitting</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-                            subgraph "3. Retrieval & Augmentation"
-                                UserQuery([User Query]) --> Retriever[Semantic Retriever]
-                                Store -- "Similarity Search" --> Retriever
-                                Retriever --> Context[Most Relevant Chunks]
-                                UserQuery --> Builder[Prompt Builder]
-                                Context --> Builder
-                            end
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500,
+    chunk_overlap=50,
+    separators=["\n\n", "\n", " ", ""]
+)
+chunks = splitter.split_documents(raw_docs)
+                                </pre>
+                            </div>
+                        </div>
 
-                            subgraph "4. Generation"
-                                Builder --> Prompt[Augmented Prompt]
-                                Prompt --> LLM[LLM Reasoning Engine]
-                                LLM --> Response([Final Answer])
-                            end
-
-                            style Source fill:#1e293b,stroke:#38bdf8,stroke-width:2px
-                            style Store fill:#0ea5e9,stroke:#fff,stroke-width:2px
-                            style LLM fill:#bc13fe,stroke:#fff,stroke-width:2px
-                            style UserQuery fill:#38bdf8,stroke:#fff
-                            style Response fill:#10b981,stroke:#fff
                     </div>
                 </div>
             </div>
-
-            <!-- Detailed Stage Explanation (Better than Faculty) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Step 1 -->
-                <div class="glass p-6 rounded-2xl hover:border-brand-400/50 transition-colors">
-                    <div class="text-brand-400 font-bold text-xs mb-4 uppercase tracking-[0.2em]">01. Ingestion</div>
-                    <h5 class="text-white font-bold mb-2">The Splitter</h5>
-                    <p class="text-[11px] text-slate-500 leading-relaxed">
-                        LLMs have finite attention. We use <strong>Recursive Splitters</strong> to break documents into chunks that preserve semantic boundaries (paragraphs, sentences) rather than just character counts.
-                    </p>
-                </div>
-                <!-- Step 2 -->
-                <div class="glass p-6 rounded-2xl hover:border-brand-400/50 transition-colors">
-                    <div class="text-neon-purple font-bold text-xs mb-4 uppercase tracking-[0.2em]">02. Embeddings</div>
-                    <h5 class="text-white font-bold mb-2">Vector Space</h5>
-                    <p class="text-[11px] text-slate-500 leading-relaxed">
-                        We transform text into <strong>Tensor Embeddings</strong>. This projects words into a multi-dimensional map where "King" and "Queen" are mathematically closer than "King" and "Apple".
-                    </p>
-                </div>
-                <!-- Step 3 -->
-                <div class="glass p-6 rounded-2xl hover:border-brand-400/50 transition-colors">
-                    <div class="text-brand-400 font-bold text-xs mb-4 uppercase tracking-[0.2em]">03. Retrieval</div>
-                    <h5 class="text-white font-bold mb-2">Semantic Search</h5>
-                    <p class="text-[11px] text-slate-500 leading-relaxed">
-                        Unlike SQL (Exact Match), we use <strong>K-Nearest Neighbors (KNN)</strong> to find the most meaningful context, even if the user uses different words than the document.
-                    </p>
-                </div>
-                <!-- Step 4 -->
-                <div class="glass p-6 rounded-2xl hover:border-brand-400/50 transition-colors">
-                    <div class="text-neon-purple font-bold text-xs mb-4 uppercase tracking-[0.2em]">04. Synthesis</div>
-                    <h5 class="text-white font-bold mb-2">In-Context Logic</h5>
-                    <p class="text-[11px] text-slate-500 leading-relaxed">
-                        The LLM doesn't just "read" the context; it performs <strong>Attention-based Synthesis</strong>, cross-referencing the query with the retrieved snippets to produce a grounded response.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: Code Walkthrough -->
-        <section id="code" class="mb-32">
-            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3 text-white">
-                <span class="text-brand-400">03</span>
-                Implementation Walkthrough
-            </h2>
-            
-            <!-- Naive RAG Code -->
-            <div class="mb-16">
-                <h4 class="text-xl font-bold mb-6 text-white">1. The Naive RAG Script</h4>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="code-block">
-<pre><code><span class="token keyword">def</span> <span class="token function">implement_naive_rag</span>(documents, query):
-    <span class="token comment"># 1. Recursive splitting to preserve context</span>
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=<span class="token number">500</span>, chunk_overlap=<span class="token number">50</span>
-    )
-    texts = splitter.create_documents(documents)
-    
-    <span class="token comment"># 2. Local vector storage (FAISS)</span>
-    vs = FAISS.from_documents(texts, embeddings)
-    retriever = vs.as_retriever()
-    
-    <span class="token comment"># 3. Augmenting the prompt</span>
-    chain = (
-        {<span class="token string">"context"</span>: retriever, <span class="token string">"question"</span>: RunnablePassthrough()}
-        | prompt | llm | StrOutputParser()
-    )
-    <span class="token keyword">return</span> chain.invoke(query)</code></pre>
-                    </div>
-                    <div class="glass p-8 rounded-3xl flex flex-col justify-center">
-                        <h5 class="text-brand-400 font-bold mb-4 uppercase tracking-widest text-xs">How this code works:</h5>
-                        <ul class="space-y-4 text-sm text-slate-400">
-                            <li class="flex items-start gap-2">
-                                <span class="text-brand-400">➜</span>
-                                <span>The <code>RecursiveCharacterTextSplitter</code> ensures that paragraphs aren't split mid-sentence.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-brand-400">➜</span>
-                                <span><code>FAISS</code> (Facebook AI Similarity Search) builds an efficient index for fast retrieval.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-brand-400">➜</span>
-                                <span>The <code>RunnablePassthrough</code> allows the question to flow directly into the prompt alongside the retrieved context.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Agentic RAG Code -->
-            <div>
-                <h4 class="text-xl font-bold mb-6 text-white">2. The Agentic (LangGraph) Pattern</h4>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="glass p-8 rounded-3xl flex flex-col justify-center order-2 lg:order-1">
-                        <h5 class="text-neon-purple font-bold mb-4 uppercase tracking-widest text-xs">Why use LangGraph for RAG?</h5>
-                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
-                            Naive RAG is linear. Agentic RAG is **Cyclical**. In the code below, we don't just "Retrieve and Generate"—we define a state machine that can grade its own performance.
-                        </p>
-                        <ul class="space-y-4 text-xs text-slate-500">
-                            <li><strong>Stateful Routing:</strong> Decide if a web search is needed based on local retrieval scores.</li>
-                            <li><strong>Self-Correction:</strong> If the LLM generates an answer not found in the context, re-run the loop.</li>
-                        </ul>
-                    </div>
-                    <div class="code-block order-1 lg:order-2">
-<pre><code><span class="token keyword">def</span> <span class="token function">build_agentic_rag_graph</span>():
-    workflow = StateGraph(AgenticRAGState)
-    
-    <span class="token comment"># Define specialized nodes</span>
-    workflow.add_node(<span class="token string">"retrieve"</span>, retrieve_node)
-    workflow.add_node(<span class="token string">"grade_docs"</span>, grade_documents_node)
-    workflow.add_node(<span class="token string">"generate"</span>, generate_node)
-    
-    <span class="token comment"># Define the flow</span>
-    workflow.add_edge(START, <span class="token string">"retrieve"</span>)
-    workflow.add_edge(<span class="token string">"retrieve"</span>, <span class="token string">"grade_docs"</span>)
-    workflow.add_conditional_edges(
-        <span class="token string">"grade_docs"</span>, 
-        decide_next_step <span class="token comment"># Logic-based routing</span>
-    )</code></pre>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </div>
 
     </main>
 
@@ -382,5 +345,164 @@
         Agentic AI RAG Encyclopedia • Master Your Data
     </footer>
 
+    <!-- INTERACTIVE SIMULATOR SCRIPTS -->
+    <script>
+        function switchTab(tabId) {
+            const tabs = ['theory', 'simulator', 'code'];
+            tabs.forEach(id => {
+                const el = document.getElementById('tab-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+                }
+            });
+        }
+
+        function switchCodeTab(tabId) {
+            const codeTabs = ['code-naive-rag', 'code-splitter-config'];
+            codeTabs.forEach(id => {
+                const el = document.getElementById('code-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all";
+                }
+            });
+        }
+
+        async function projectVectorSpace() {
+            const query = document.getElementById('sim-vector-query').value;
+            const btn = document.getElementById('btn-project-vector');
+            const consoleEl = document.getElementById('sim-console');
+            const resultsEl = document.getElementById('retrieval-results');
+            const promptEl = document.getElementById('augmented-prompt-view');
+            const p = document.getElementById('query-particle');
+            const label = document.getElementById('query-label');
+            const line1 = document.getElementById('knn-line-1');
+            const line2 = document.getElementById('knn-line-2');
+            
+            btn.disabled = true;
+            consoleEl.innerHTML = "";
+            resultsEl.innerHTML = `<div class="text-slate-600 italic">Computing distances...</div>`;
+            promptEl.innerHTML = `<div class="text-slate-600 italic">Augmenting context...</div>`;
+            
+            const log = (msg, type = 'info') => {
+                let cls = 'text-slate-400';
+                if (type === 'success') cls = 'text-emerald-400';
+                if (type === 'warning') cls = 'text-neon-blue';
+                consoleEl.innerHTML += `<div class="${cls}">[Vector Index]: ${msg}</div>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            };
+
+            log("Translating query concept string into vector embeddings.", 'info');
+            await new Promise(r => setTimeout(r, 400));
+            
+            // Set query vector spatial coordinate target based on selection
+            // Agents cluster target: (110, 210)
+            // CSS cluster target: (390, 95)
+            let tx = 110, ty = 210;
+            if (query === 'css') {
+                tx = 390;
+                ty = 95;
+            }
+            
+            p.setAttribute("cx", "250");
+            p.setAttribute("cy", "150");
+            p.setAttribute("opacity", "1");
+            label.setAttribute("opacity", "1");
+            
+            let start = null;
+            const duration = 800;
+            const animate = (timestamp) => {
+                if (!start) start = timestamp;
+                const progress = (timestamp - start) / duration;
+                
+                const cx = 250 + progress * (tx - 250);
+                const cy = 150 + progress * (ty - 150);
+                p.setAttribute("cx", cx.toString());
+                p.setAttribute("cy", cy.toString());
+                label.setAttribute("x", cx.toString());
+                label.setAttribute("y", (cy - 15).toString());
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(animate);
+                }
+            };
+            window.requestAnimationFrame(animate);
+            
+            await new Promise(r => setTimeout(r, 800));
+            
+            log(`Query vector successfully projected at coordinate: [${tx}, ${ty}]`, 'warning');
+            log("Querying FAISS database using Cosine Similarity Metric.", 'info');
+            await new Promise(r => setTimeout(r, 400));
+
+            let matches = [];
+            if (query === 'agents') {
+                matches = [
+                    { title: "Doc: LLM state machines", score: "Cosine Distance: 0.12" },
+                    { title: "Doc: Orchestration swarms", score: "Cosine Distance: 0.18" }
+                ];
+                
+                // Draw KNN lines in SVG
+                line1.setAttribute("x1", tx.toString());
+                line1.setAttribute("y1", ty.toString());
+                line1.setAttribute("x2", "120");
+                line1.setAttribute("y2", "200");
+                line1.setAttribute("opacity", "1");
+
+                line2.setAttribute("x1", tx.toString());
+                line2.setAttribute("y1", ty.toString());
+                line2.setAttribute("x2", "100");
+                line2.setAttribute("y2", "220");
+                line2.setAttribute("opacity", "1");
+                
+            } else {
+                matches = [
+                    { title: "Doc: Responsive CSS cards", score: "Cosine Distance: 0.08" },
+                    { title: "Doc: Web UI components", score: "Cosine Distance: 0.15" }
+                ];
+
+                line1.setAttribute("x1", tx.toString());
+                line1.setAttribute("y1", ty.toString());
+                line1.setAttribute("x2", "380");
+                line1.setAttribute("y2", "80");
+                line1.setAttribute("opacity", "1");
+
+                line2.setAttribute("x1", tx.toString());
+                line2.setAttribute("y1", ty.toString());
+                line2.setAttribute("x2", "400");
+                line2.setAttribute("y2", "110");
+                line2.setAttribute("opacity", "1");
+            }
+
+            resultsEl.innerHTML = "";
+            matches.forEach(m => {
+                resultsEl.innerHTML += `
+                    <div class="p-2.5 bg-slate-900 border border-white/5 rounded-xl font-mono text-xs flex justify-between items-center">
+                        <span class="text-slate-300 font-bold">${m.title}</span>
+                        <span class="text-emerald-400 font-bold">${m.score}</span>
+                    </div>
+                `;
+            });
+
+            promptEl.innerHTML = `
+                <div class="space-y-2 leading-relaxed bg-slate-900 p-4 rounded-xl border border-white/5 font-mono text-[10px]">
+                    <div><span class="text-slate-500">System Prompt:</span></div>
+                    <div><span class="text-slate-400">Answer queries using ONLY the retrieved facts:</span></div>
+                    <div class="text-neon-blue">"${matches[0].title}" and "${matches[1].title}"</div>
+                </div>
+            `;
+
+            log("Nearest neighbors retrieved. Augmented context prompt hydrated successfully.", 'success');
+            btn.disabled = false;
+        }
+    </script>
 </body>
 </html>

@@ -3,27 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What is LangGraph? | Agentic AI</title>
+    <title>What is LangGraph? | LangGraph Masterclass</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'dark',
-            securityLevel: 'loose',
-            themeVariables: {
-                primaryColor: '#0ea5e9',
-                primaryTextColor: '#fff',
-                primaryBorderColor: '#38bdf8',
-                lineColor: '#38bdf8',
-                secondaryColor: '#bc13fe',
-                tertiaryColor: '#020617'
-            }
-        });
-    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -31,16 +15,26 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        brand: {
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                        },
                         neon: {
                             blue: '#00f2ff',
                             purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                            emerald: '#00ff66',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
                         }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                        'neon-emerald': '0 0 15px rgba(0, 255, 102, 0.25)',
                     }
                 }
             }
@@ -50,247 +44,401 @@
         body {
             background-color: #020617;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(188, 19, 254, 0.05) 0, transparent 50%);
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
             color: #f8fafc;
         }
         .glass {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
+        }
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
+        }
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
+        }
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         .code-block {
-            background: #010409;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            overflow-x: auto;
-            color: #e6edf3;
-        }
-        .token.keyword { color: #ff7b72; }
-        .token.string { color: #a5d6ff; }
-        .token.comment { color: #8b949e; }
-        .token.function { color: #d2a8ff; }
-        
-        .active-tab {
-            background: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
-            border-bottom: 2px solid #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            background: #090d1a;
+            border: 1px solid rgba(255,255,255,0.03);
         }
     </style>
 </head>
-<body class="antialiased font-sans">
+<body class="antialiased font-sans text-slate-200">
 
-    <!-- Header -->
-    <header class="glass sticky top-0 z-50 px-8 py-4 border-b border-white/5">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <a href="../../index.html" class="p-2 bg-brand-400/20 rounded-lg border border-brand-400/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-                </a>
-                <span class="text-xl font-display font-bold tracking-tight">Module 1: <span class="text-brand-400">What is LangGraph?</span></span>
-            </div>
-            <nav class="flex gap-6">
-                <a href="../../index.html" class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Nexus Home</a>
-            </nav>
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
+
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-blue/30 bg-neon-blue/5 text-neon-blue text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-blue"></span> Module 1: State Machines
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            What is <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">LangGraph?</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+            Learn how LangGraph treats complex agent flows not as black-box sequential scripts, but as fully observable, resilient, state-machine cyclic graphs.
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5">
+            <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg">
+                📚 technical theory
+            </button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ Superstep Graph Simulator
+            </button>
+            <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Implementation Blueprints
+            </button>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto py-16 px-8">
-        
-        <!-- Hero Section -->
-        <div class="mb-20">
-            <h1 class="text-5xl md:text-6xl font-display font-extrabold mb-8 tracking-tight leading-tight">
-                Stateful, Cyclic <br/>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Multi-Agent Systems</span>
-            </h1>
-            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl mb-12">
-                LangGraph is an open-source framework developed by **LangChain AI** to construct multi-agent architectures where complex LLM logic is treated as a highly controllable and observable **State Machine**.
-            </p>
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
+
+        <!-- ==================== TAB: THEORY ==================== -->
+        <div id="tab-content-theory" class="space-y-16">
             
-            <!-- Key Pillars Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass p-8 rounded-3xl border-l-4 border-brand-400">
-                    <h3 class="text-lg font-bold mb-3">Resilience</h3>
-                    <p class="text-sm text-slate-400">Native self-correction loops ensure that if a tool fails, the system iterates back to a recovery state instead of crashing.</p>
+            <!-- Section 1: Stateful Paradigms -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Section 1: The Cyclic Superstep Architecture
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            Traditional LLM tools (like linear chains or sequential pipelines) operate as Directed Acyclic Graphs (DAGs). While simple, they fail when an agent encounters unexpected outputs or tool execution crashes.
+                        </p>
+                        <p class="border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400">
+                            "LangGraph shifts the paradigm by introducing cyclical architectures controlled by global state schemas."
+                        </p>
+                        <p>
+                            Execution is divided into discrete **Supersteps**. Within each superstep, nodes compute updates to the global state simultaneously. These updates are merged using reducer functions, making the graph completely robust to race conditions and parallelism.
+                        </p>
+                    </div>
+
+                    <!-- Flow Diagram -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">LCEL (Linear) vs LangGraph (Cyclic)</h4>
+                        <div class="space-y-4 text-xs font-mono text-slate-300">
+                            <div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl">
+                                ⛓️ LCEL: Prompt ➔ Model ➔ Output
+                            </div>
+                            <div class="p-2.5 bg-slate-900 border border-neon-blue/30 rounded-xl">
+                                🔄 LangGraph: Node ➔ Edge ➔ Router ➔ [Self-Correction Loop]
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="glass p-8 rounded-3xl border-l-4 border-neon-purple">
-                    <h3 class="text-lg font-bold mb-3">State Retention</h3>
-                    <p class="text-sm text-slate-400">Shared memory and execution audit histories are persisted across distributed tasks with thread-safe list reducers.</p>
+            </section>
+        </div>
+
+        <!-- ==================== TAB: SIMULATOR ==================== -->
+        <div id="tab-content-simulator" class="hidden space-y-12">
+            <div class="glass p-6 md:p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-4">Superstep Execution Simulator</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    Trace how a stateful agent transitions through execution supersteps. Click "Trigger Next Superstep" to execute the agent, watch active pathways glow, and monitor state mutations inside the local memory frame!
+                </p>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end mb-8 bg-slate-950/60 p-6 rounded-2xl border border-white/5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Workflow Target</label>
+                        <select id="sim-graph-type" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="cyclical">Self-Correction Agent Cycle (Nodes: Generate -> Grade -> Recalc)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="triggerSuperstep()" id="btn-next-step" class="w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Trigger Next Superstep
+                        </button>
+                    </div>
                 </div>
-                <div class="glass p-8 rounded-3xl border-l-4 border-white/20">
-                    <h3 class="text-lg font-bold mb-3">Time Travel</h3>
-                    <p class="text-sm text-slate-400">Interrogate and fork execution histories at any "Superstep" boundary using built-in persistence layers.</p>
+
+                <!-- Simulation Visual Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Graph Plotter (7 Cols) -->
+                    <div class="lg:col-span-7 bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex flex-col justify-between h-[450px]">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Interactive Execution Graph Map</h4>
+                        
+                        <div class="flex-1 flex items-center justify-center p-2 relative overflow-hidden">
+                            <svg width="400" height="240" viewBox="0 0 400 240" class="w-full h-full max-h-[220px]">
+                                <!-- Graph nodes -->
+                                <!-- Start Node -->
+                                <circle id="node-start" cx="50" cy="120" r="20" fill="#090d1a" stroke="#334155" stroke-width="2" />
+                                <text x="50" y="123" fill="#fff" font-family="Outfit" font-size="7" text-anchor="middle" font-weight="bold">START</text>
+
+                                <!-- Agent Node -->
+                                <circle id="node-agent" cx="160" cy="120" r="22" fill="#090d1a" stroke="#334155" stroke-width="2" />
+                                <text x="160" y="123" fill="#fff" font-family="Outfit" font-size="7" text-anchor="middle" font-weight="bold">Agent</text>
+
+                                <!-- Grade Node -->
+                                <circle id="node-grade" cx="270" cy="120" r="22" fill="#090d1a" stroke="#334155" stroke-width="2" />
+                                <text x="270" y="123" fill="#fff" font-family="Outfit" font-size="7" text-anchor="middle" font-weight="bold">Grade</text>
+
+                                <!-- End Node -->
+                                <circle id="node-end" cx="370" cy="120" r="20" fill="#090d1a" stroke="#334155" stroke-width="2" />
+                                <text x="370" y="123" fill="#fff" font-family="Outfit" font-size="7" text-anchor="middle" font-weight="bold">END</text>
+
+                                <!-- Connecting Edges -->
+                                <line id="edge-1" x1="70" y1="120" x2="138" y2="120" stroke="#334155" stroke-width="1.5" />
+                                <line id="edge-2" x1="182" y1="120" x2="248" y2="120" stroke="#334155" stroke-width="1.5" />
+                                <line id="edge-3" x1="292" y1="120" x2="350" y2="120" stroke="#334155" stroke-width="1.5" />
+                                
+                                <!-- Cycle Loop Edge -->
+                                <path id="edge-loop" d="M 270 98 Q 215 50 160 98" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="3" />
+                            </svg>
+                        </div>
+                        
+                        <!-- Console Output Panel -->
+                        <div class="h-[120px] bg-slate-900 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-y-auto custom-scrollbar space-y-1.5" id="sim-console">
+                            <span class="text-slate-500">[System]: Standing by. Click "Trigger Next Superstep" to invoke graph.</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Side Inspector Panel (5 Cols) -->
+                    <div class="lg:col-span-5 flex flex-col gap-6">
+                        <!-- State Monitor Card -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 h-full overflow-y-auto custom-scrollbar min-h-[350px]">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">State Schema variable inspect</h4>
+                            <div class="space-y-4 text-xs font-mono" id="sim-inspector">
+                                <div class="h-full flex items-center justify-center text-center italic text-slate-600 font-sans">
+                                    Graph idle. Trigger next superstep.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- Visualization Section -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
-                <span class="text-brand-400">01</span>
-                Visual Architecture Comparison
-            </h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div class="glass p-8 rounded-3xl">
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6">Traditional DAG Pipeline (LCEL)</h4>
-                    <div class="mermaid">
-                        graph TD
-                            P1[Input Payload] --> P2[Embeddings/Retriever]
-                            P2 --> P3[LLM Synthesis]
-                            P3 --> P4[Final String Return]
-                            style P1 fill:#1e293b,stroke:#334155
-                            style P2 fill:#1e293b,stroke:#334155
-                            style P3 fill:#1e293b,stroke:#334155
-                            style P4 fill:#0ea5e9,stroke:#38bdf8
+        <!-- ==================== TAB: CODE ==================== -->
+        <div id="tab-content-code" class="hidden space-y-12">
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-6">Production Graph Initializations</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                    View templates for compile graph states and conditional routing structures.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left nav -->
+                    <div class="flex flex-col gap-2 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
+                        <button onclick="switchCodeTab('code-graph-compile')" id="btn-code-graph-compile" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
+                            1. Stateful Graph Compile
+                        </button>
                     </div>
-                </div>
-                <div class="glass p-8 rounded-3xl border-brand-400/20 shadow-xl shadow-brand-400/5">
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-brand-400 mb-6">LangGraph Cyclic Architecture</h4>
-                    <div class="mermaid">
-                        graph TD
-                            S([START]) --> N1[State Machine Node]
-                            N1 --> N2[Tool Call Execution]
-                            N2 --> R{Validation Router}
-                            R -- Refine --> N1
-                            R -- Consensus Pass --> E([END])
-                            style S fill:#0ea5e9,stroke:#38bdf8
-                            style E fill:#bc13fe,stroke:#a855f7
-                            style R fill:#1e293b,stroke:#38bdf8
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Comparative Paradigms -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
-                <span class="text-brand-400">02</span>
-                The Paradigm Shift
-            </h2>
-            <div class="overflow-x-auto glass rounded-3xl">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="border-b border-white/10">
-                            <th class="px-8 py-6 font-bold uppercase tracking-widest text-slate-500">Dimension</th>
-                            <th class="px-8 py-6 font-bold uppercase tracking-widest text-slate-400">LCEL (DAGs)</th>
-                            <th class="px-8 py-6 font-bold uppercase tracking-widest text-brand-400">LangGraph (Cycles)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-slate-300">
-                        <tr class="border-b border-white/5">
-                            <td class="px-8 py-6 font-bold">Topology</td>
-                            <td class="px-8 py-6">Linear pipelines</td>
-                            <td class="px-8 py-6">Stateful networks & Subgraphs</td>
-                        </tr>
-                        <tr class="border-b border-white/5">
-                            <td class="px-8 py-6 font-bold">Memory</td>
-                            <td class="px-8 py-6">Transient buffers</td>
-                            <td class="px-8 py-6">Global immutable typed dictionaries</td>
-                        </tr>
-                        <tr class="border-b border-white/5">
-                            <td class="px-8 py-6 font-bold">Persistence</td>
-                            <td class="px-8 py-6">Single trigger execution</td>
-                            <td class="px-8 py-6">Continuous loops across "Supersteps"</td>
-                        </tr>
-                        <tr>
-                            <td class="px-8 py-6 font-bold">Recovery</td>
-                            <td class="px-8 py-6">External logic wrappers</td>
-                            <td class="px-8 py-6">Native checkpoints & Time Travel</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                    <!-- Code viewer -->
+                    <div class="lg:col-span-3">
+                        
+                        <!-- Graph Compile -->
+                        <div id="code-content-code-graph-compile" class="code-tab-content space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">StateGraph Definition</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+from typing import TypedDict, Optional
+from langgraph.graph import StateGraph, START, END
 
-        <!-- Code Implementation Section -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
-                <span class="text-brand-400">03</span>
-                Technical Implementation
-            </h2>
-            
-            <div class="glass rounded-3xl overflow-hidden">
-                <!-- Tab Headers -->
-                <div class="flex border-b border-white/10 bg-black/20">
-                    <button onclick="switchTab('ex1')" id="btn-ex1" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] active-tab transition-all">Ex 1: Linear Transformation</button>
-                    <button onclick="switchTab('ex2')" id="btn-ex2" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">Ex 2: Recursive Loop</button>
-                </div>
-                
-                <!-- Tab Content -->
-                <div class="p-8">
-                    <!-- Example 1 -->
-                    <div id="content-ex1" class="block space-y-6">
-                        <p class="text-sm text-slate-400 leading-relaxed">
-                            This example showcases a linear `StateGraph` where data is transformed through nodes while maintaining an immutable shared state dictionary.
-                        </p>
-                        <div class="code-block">
-<pre><code><span class="token keyword">class</span> <span class="token function">LinearState</span>(TypedDict):
-    raw_query: str
-    enriched_flag: bool
-    summary_output: Optional[str]
+class AgentState(TypedDict):
+    input_query: str
+    generation: Optional[str]
+    is_valid: bool
 
-<span class="token keyword">def</span> <span class="token function">enrichment_processor</span>(state: LinearState) -> dict:
-    <span class="token comment"># Simulate context enrichment step</span>
-    <span class="token keyword">return</span> {"enriched_flag": True}
-
-<span class="token comment"># Compile graph</span>
-graph = StateGraph(LinearState)
-graph.add_node("enrich", enrichment_processor)
-graph.add_edge(START, "enrich")
-graph.compile()</code></pre>
+workflow = StateGraph(AgentState)
+workflow.add_node("agent", agent_node)
+workflow.add_edge(START, "agent")
+                                </pre>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Example 2 -->
-                    <div id="content-ex2" class="hidden space-y-6">
-                        <p class="text-sm text-slate-400 leading-relaxed">
-                            A dynamic recursive agent loop that uses conditional edges to trigger self-correction based on evaluation logic.
-                        </p>
-                        <div class="code-block">
-<pre><code><span class="token keyword">def</span> <span class="token function">loop_router_condition</span>(state: AgentState) -> Literal["reasoner_agent", "end"]:
-    <span class="token keyword">if</span> state["current_attempt"] >= state["max_attempts"]:
-        <span class="token keyword">return</span> "end"
-    <span class="token keyword">else</span>:
-        <span class="token keyword">return</span> "reasoner_agent"
-
-<span class="token comment"># Register dynamic loop routing</span>
-graph.add_conditional_edges(
-    "reasoner_agent",
-    loop_router_condition,
-    {"reasoner_agent": "reasoner_agent", "end": END}
-)</code></pre>
-                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
     </main>
 
-    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-[0.4em] opacity-40">
-        Module 1 • What is LangGraph • Agentic AI Knowledge Base
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.4em]">
+        Agentic AI Module 1 • What is LangGraph Foundations
     </footer>
 
+    <!-- INTERACTIVE SIMULATOR SCRIPTS -->
     <script>
         function switchTab(tabId) {
-            // Hide all contents
-            document.getElementById('content-ex1').classList.add('hidden');
-            document.getElementById('content-ex2').classList.add('hidden');
+            const tabs = ['theory', 'simulator', 'code'];
+            tabs.forEach(id => {
+                const el = document.getElementById('tab-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+                }
+            });
+        }
+
+        function switchCodeTab(tabId) {
+            const codeTabs = ['code-graph-compile'];
+            codeTabs.forEach(id => {
+                const el = document.getElementById('code-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all";
+                }
+            });
+        }
+
+        // State Machine Superstep Registry
+        let currentSuperstep = 0;
+        let globalState = {
+            query: "Analyze log metrics",
+            generation: "None",
+            grade_valid: "None",
+            attempts: 0
+        };
+
+        function triggerSuperstep() {
+            const consoleEl = document.getElementById('sim-console');
+            const inspectorEl = document.getElementById('sim-inspector');
             
-            // Remove active classes
-            document.getElementById('btn-ex1').classList.remove('active-tab');
-            document.getElementById('btn-ex2').classList.remove('active-tab');
-            document.getElementById('btn-ex1').classList.add('text-slate-500');
-            document.getElementById('btn-ex2').classList.add('text-slate-500');
-            
-            // Show target
-            document.getElementById('content-' + tabId).classList.remove('hidden');
-            document.getElementById('btn-' + tabId).classList.add('active-tab');
-            document.getElementById('btn-' + tabId).classList.remove('text-slate-500');
+            // Clean up old active highlights
+            const nodes = ['start', 'agent', 'grade', 'end'];
+            nodes.forEach(n => {
+                const el = document.getElementById('node-' + n);
+                el.setAttribute("stroke", "#334155");
+                el.style.filter = "none";
+            });
+            document.getElementById('edge-1').setAttribute("stroke", "#334155");
+            document.getElementById('edge-2').setAttribute("stroke", "#334155");
+            document.getElementById('edge-3').setAttribute("stroke", "#334155");
+            document.getElementById('edge-loop').setAttribute("stroke", "#334155");
+
+            const log = (msg, type = 'info') => {
+                let cls = 'text-slate-400';
+                if (type === 'success') cls = 'text-emerald-400';
+                if (type === 'warning') cls = 'text-neon-blue';
+                consoleEl.innerHTML += `<div class="${cls}">[Superstep ${currentSuperstep}]: ${msg}</div>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            };
+
+            if (currentSuperstep === 0) {
+                currentSuperstep = 1;
+                log("Graph invoked. Initialization node executed.", 'info');
+                
+                document.getElementById('node-start').setAttribute("stroke", "#00f2ff");
+                document.getElementById('node-start').style.filter = "drop-shadow(0 0 10px rgba(0, 242, 255, 0.7))";
+                document.getElementById('edge-1').setAttribute("stroke", "#00f2ff");
+
+                globalState = {
+                    query: "Analyze log metrics",
+                    generation: "None",
+                    grade_valid: "None",
+                    attempts: 0
+                };
+            } else if (currentSuperstep === 1) {
+                currentSuperstep = 2;
+                log("Executing Node: Agent. Parsing query state variables.", 'warning');
+                
+                document.getElementById('node-agent').setAttribute("stroke", "#bc13fe");
+                document.getElementById('node-agent').style.filter = "drop-shadow(0 0 10px rgba(188, 19, 254, 0.7))";
+                document.getElementById('edge-2').setAttribute("stroke", "#bc13fe");
+
+                globalState.generation = "Draft 1: Fetching database credentials...";
+                globalState.attempts = 1;
+            } else if (currentSuperstep === 2) {
+                currentSuperstep = 3;
+                log("Executing Node: Grade. Grading response parameters.", 'warning');
+                
+                document.getElementById('node-grade').setAttribute("stroke", "#ff007f");
+                document.getElementById('node-grade').style.filter = "drop-shadow(0 0 10px rgba(255, 0, 127, 0.7))";
+                
+                globalState.grade_valid = "Failed (Missing exact log index parameters)";
+                
+                // Show loop path
+                document.getElementById('edge-loop').setAttribute("stroke", "#ff007f");
+            } else if (currentSuperstep === 3) {
+                currentSuperstep = 4;
+                log("Self-Correction Loop triggered. Routing back to Node: Agent.", 'info');
+                
+                document.getElementById('node-agent').setAttribute("stroke", "#bc13fe");
+                document.getElementById('node-agent').style.filter = "drop-shadow(0 0 10px rgba(188, 19, 254, 0.7))";
+                document.getElementById('edge-2').setAttribute("stroke", "#bc13fe");
+
+                globalState.generation = "Draft 2: Querying elastic index parameters. Output matches exact bounds.";
+                globalState.attempts = 2;
+            } else if (currentSuperstep === 4) {
+                currentSuperstep = 5;
+                log("Re-executing Node: Grade. Consensus score passed.", 'success');
+                
+                document.getElementById('node-grade').setAttribute("stroke", "#ff007f");
+                document.getElementById('node-grade').style.filter = "drop-shadow(0 0 10px rgba(255, 0, 127, 0.7))";
+                document.getElementById('edge-3').setAttribute("stroke", "#00ff66");
+
+                globalState.grade_valid = "Success";
+            } else if (currentSuperstep === 5) {
+                currentSuperstep = 0; // Reset
+                log("Graph lifecycle END. Final state values validated.", 'success');
+                
+                document.getElementById('node-end').setAttribute("stroke", "#00ff66");
+                document.getElementById('node-end').style.filter = "drop-shadow(0 0 10px rgba(0, 255, 102, 0.7))";
+            }
+
+            // Sync inspector state view
+            inspectorEl.innerHTML = `
+                <div class="space-y-3 leading-relaxed">
+                    <div><span class="text-slate-500">global_state = {</span></div>
+                    <div class="pl-4"><span class="text-slate-400">"query":</span> <span class="text-neon-blue">"${globalState.query}"</span>,</div>
+                    <div class="pl-4"><span class="text-slate-400">"generation":</span> <span class="text-slate-300">"${globalState.generation}"</span>,</div>
+                    <div class="pl-4"><span class="text-slate-400">"grade_valid":</span> <span class="text-neon-pink">"${globalState.grade_valid}"</span>,</div>
+                    <div class="pl-4"><span class="text-slate-400">"attempts":</span> <span class="text-neon-purple font-bold">${globalState.attempts}</span></div>
+                    <div><span class="text-slate-500">}</span></div>
+                </div>
+            `;
         }
     </script>
 </body>

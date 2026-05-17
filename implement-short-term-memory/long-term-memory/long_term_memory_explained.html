@@ -1,173 +1,493 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Long-Term Memory | Agentic AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>Postgres LTM Mechanics | LangGraph Masterclass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                            emerald: '#00ff66',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                        'neon-emerald': '0 0 15px rgba(0, 255, 102, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #3b82f6;
-            --secondary: #10b981;
-            --accent: #8b5cf6;
-            --bg: #020617;
-            --card-bg: rgba(15, 23, 42, 0.8);
-            --text: #f8fafc;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding: 3rem;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
+            color: #f8fafc;
         }
-
-        .header { text-align: center; margin-bottom: 4rem; }
-        h1 { font-size: 3.5rem; font-weight: 800; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .architecture-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            width: 100%;
-            max-width: 1200px;
-            position: relative;
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* The Central Brain (DB) */
-        .central-brain {
-            grid-column: 2;
-            background: var(--card-bg);
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 4rem auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
-            z-index: 10;
-            animation: pulse 4s infinite ease-in-out;
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
         }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 50px rgba(59, 130, 246, 0.3); }
-            50% { transform: scale(1.05); box-shadow: 0 0 80px rgba(59, 130, 246, 0.5); }
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
         }
-
-        .brain-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-        .brain-label { font-weight: 800; letter-spacing: 2px; color: var(--primary); font-size: 0.8rem; }
-
-        /* Threads */
-        .thread-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 2rem;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s;
-            position: relative;
-            backdrop-filter: blur(10px);
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
         }
-
-        .thread-card:hover { transform: translateY(-10px); border-color: var(--primary); }
-
-        .tag { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; background: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 0.3rem 0.8rem; border-radius: 10px; margin-bottom: 1rem; display: inline-block; }
-        
-        h2 { font-size: 1.5rem; margin-bottom: 1rem; }
-        .msg-preview { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #94a3b8; }
-
-        /* Sync Lines */
-        .sync-line {
-            position: absolute;
-            top: -100px;
-            left: 50%;
-            width: 2px;
-            height: 100px;
-            background: linear-gradient(to top, var(--primary), transparent);
-            z-index: 1;
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
         }
-
-        .data-particle {
-            position: absolute;
+        .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
-            background: var(--secondary);
-            border-radius: 50%;
-            top: 0;
-            left: -2px;
-            animation: flowUp 2s infinite linear;
         }
-
-        @keyframes flowUp {
-            0% { top: 100px; opacity: 0; }
-            50% { opacity: 1; }
-            100% { top: 0; opacity: 0; }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
         }
-
-        .grid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(#1e293b 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
-            opacity: 0.3;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            background: #090d1a;
+            border: 1px solid rgba(255,255,255,0.03);
         }
     </style>
 </head>
-<body>
-    <div class="grid-bg"></div>
+<body class="antialiased font-sans text-slate-200">
 
-    <div class="header">
-        <p style="color: var(--secondary); font-weight: 800; letter-spacing: 4px;">ADVANCED ARCHITECTURE</p>
-        <h1>Long-Term Memory</h1>
-    </div>
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
 
-    <div class="central-brain">
-        <div class="brain-icon">🧠</div>
-        <div class="brain-label">PERSISTENT DB</div>
-        <div style="font-size: 0.6rem; color: #64748b; margin-top: 5px;">SQLite / Postgres</div>
-    </div>
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-blue/30 bg-neon-blue/5 text-neon-blue text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-blue"></span> Persistent Memory Architecture
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            Postgres <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">Memory Mechanics</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+            A comprehensive, high-fidelity engineering manual detailing Postgres semantic profile stores, cross-thread synchronization, and reflection memory pipelines.
+        </p>
 
-    <div class="architecture-container">
-        <!-- Thread 1 -->
-        <div class="thread-card">
-            <div class="sync-line"><div class="data-particle"></div></div>
-            <div class="tag">Thread A</div>
-            <h2>Tech Talk</h2>
-            <p class="msg-preview">"How does LangGraph handle LTM?"</p>
-            <div style="margin-top: 1rem; font-size: 0.7rem; color: var(--secondary);">✔ Session Saved</div>
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5">
+            <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg">
+                📚 Conceptual Architecture
+            </button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ DB Profile Sync Simulator
+            </button>
+            <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Schema Blueprints
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENT MAIN -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
+
+        <!-- ==================== TAB: THEORY ==================== -->
+        <div id="tab-content-theory" class="space-y-16">
+            
+            <!-- Section 1: The LTM Blueprint -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Section 1: The Central Persistent Store Paradigm
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            Unlike short-term thread partitioning (which isolates conversation histories inside specific thread tokens), **Long-Term Memory (LTM)** leverages a centralized database schema to save preferences, concepts, and metadata cross-session.
+                        </p>
+                        <p class="border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400">
+                            "LTM allows the agent to recognize the user's name, coding preferences, and projects even if the user starts a fresh thread."
+                        </p>
+                        <p>
+                            This is executed via structural reflection runs: during a conversation, memory nodes parse chat lines, extract structured user configurations, and write them to a persistent Postgres table.
+                        </p>
+                    </div>
+
+                    <!-- Flow Diagram -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Cross-Thread Memory Sync</h4>
+                        <div class="flex justify-center">
+                            <svg width="340" height="200" viewBox="0 0 340 200" class="w-full max-w-[340px]">
+                                <!-- Central Brain (Postgres) -->
+                                <circle cx="170" cy="50" r="30" fill="#090d1a" stroke="#00f2ff" stroke-width="2" />
+                                <text x="170" y="53" fill="#fff" font-family="Outfit" font-size="7" text-anchor="middle" font-weight="bold">Postgres LTM</text>
+
+                                <!-- Thread A -->
+                                <rect x="30" y="130" width="70" height="45" rx="6" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                <text x="65" y="150" fill="#fff" font-family="Outfit" font-size="7" text-anchor="middle">Thread A</text>
+                                <text x="65" y="160" fill="#64748b" font-family="JetBrains Mono" font-size="5" text-anchor="middle">"Loves Py"</text>
+
+                                <!-- Thread B -->
+                                <rect x="240" y="130" width="70" height="45" rx="6" fill="#090d1a" stroke="#ff007f" stroke-width="1.5" />
+                                <text x="275" y="150" fill="#fff" font-family="Outfit" font-size="7" text-anchor="middle">Thread B</text>
+                                <text x="275" y="160" fill="#64748b" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Loaded "Loves Py"</text>
+
+                                <!-- Paths -->
+                                <path d="M 65 130 Q 110 90 140 70" stroke="#bc13fe" stroke-width="1.5" stroke-dasharray="3" fill="none" />
+                                <path d="M 170 80 Q 220 100 275 130" stroke="#ff007f" stroke-width="1.5" fill="none" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
-        <!-- Thread 2 -->
-        <div class="thread-card">
-            <div class="sync-line" style="height: 120px; top: -120px;"><div class="data-particle" style="animation-delay: 0.5s;"></div></div>
-            <div class="tag" style="background: rgba(16, 185, 129, 0.2); color: var(--secondary);">Thread B</div>
-            <h2>Travel Plans</h2>
-            <p class="msg-preview">"I'm going to Tokyo in October."</p>
-            <div style="margin-top: 1rem; font-size: 0.7rem; color: var(--secondary);">✔ Facts Extracted</div>
+        <!-- ==================== TAB: SIMULATOR ==================== -->
+        <div id="tab-content-simulator" class="hidden space-y-12">
+            <div class="glass p-6 md:p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-4">Central Brain Profile Sync Simulator</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    Simulate real-time cross-thread long term memory retrieval. Write a preference inside Thread A, save it to the central database, then swap to Thread B to observe immediate memory hydration.
+                </p>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-8 bg-slate-950/60 p-6 rounded-2xl border border-white/5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Input Preference (Thread A)</label>
+                        <input type="text" id="sim-input" value="Enjoys clean vanilla CSS, hates bulky frameworks" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm focus:outline-none focus:border-neon-blue transition-all" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Viewing Thread</label>
+                        <select id="sim-active-thread" onchange="switchViewingThread()" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="A">Thread A (Active Entry)</option>
+                            <option value="B">Thread B (Fresh Conversation)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="syncMemoryToCentralDb()" id="btn-sync-db" class="w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Sync Memory to DB
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Visual Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Graph Diagram (8 Cols) -->
+                    <div class="lg:col-span-8 bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex flex-col justify-between h-[450px]">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Central Database Architecture</h4>
+                        
+                        <div class="flex-1 flex items-center justify-center p-2 relative overflow-hidden">
+                            <!-- Graphical representation of central Postgres DB and thread modules -->
+                            <svg width="600" height="240" viewBox="0 0 600 240" class="w-full h-full max-h-[220px]">
+                                <!-- Sync paths -->
+                                <path id="sync-wire-a" d="M 120 150 Q 200 90 280 80" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="sync-wire-b" d="M 480 150 Q 400 90 320 80" stroke="#334155" stroke-width="2" fill="none" />
+
+                                <!-- Central Database Node -->
+                                <g>
+                                    <circle cx="300" cy="70" r="35" fill="#090d1a" stroke="#00f2ff" stroke-width="2" />
+                                    <text x="300" y="73" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Postgres DB</text>
+                                    <text x="300" y="83" fill="#00f2ff" font-family="JetBrains Mono" font-size="5" text-anchor="middle">LTM Central</text>
+                                </g>
+
+                                <!-- Thread A Node -->
+                                <g>
+                                    <rect x="70" y="150" width="100" height="50" rx="8" fill="#090d1a" stroke="#bc13fe" stroke-width="2" />
+                                    <text x="120" y="175" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Thread A</text>
+                                    <text x="120" y="185" fill="#bc13fe" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Isolated State</text>
+                                </g>
+
+                                <!-- Thread B Node -->
+                                <g>
+                                    <rect x="430" y="150" width="100" height="50" rx="8" fill="#090d1a" stroke="#ff007f" stroke-width="2" />
+                                    <text x="480" y="175" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Thread B</text>
+                                    <text x="480" y="185" fill="#ff007f" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Isolated State</text>
+                                </g>
+
+                                <!-- Sync particle -->
+                                <circle id="db-particle" cx="120" cy="150" r="6" fill="#00f2ff" opacity="0" />
+                            </svg>
+                        </div>
+                        
+                        <!-- Console Output Panel -->
+                        <div class="h-[120px] bg-slate-900 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-y-auto custom-scrollbar space-y-1.5" id="sim-console">
+                            <span class="text-slate-500">[System]: Standing by. Input preference and click "Sync Memory to DB".</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Metrics Monitor Panel (4 Cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        <!-- Database Records -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex-1 overflow-y-auto custom-scrollbar max-h-[210px]">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Postgres LTM Table</h4>
+                            <div class="space-y-4 font-mono text-xs" id="db-records-container">
+                                <div class="text-slate-600 italic">No records committed.</div>
+                            </div>
+                        </div>
+
+                        <!-- Active thread state -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 h-[210px] overflow-y-auto custom-scrollbar flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Active Thread Hydration</h4>
+                            <div class="flex-1 text-xs text-slate-400 space-y-3" id="active-thread-view">
+                                <div class="text-slate-600 italic text-center h-full flex items-center justify-center">
+                                    No memory profile loaded in thread.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
 
-        <!-- Thread 3 -->
-        <div class="thread-card">
-            <div class="sync-line"><div class="data-particle" style="animation-delay: 1s;"></div></div>
-            <div class="tag" style="background: rgba(139, 92, 246, 0.2); color: var(--accent);">Thread C</div>
-            <h2>Deep Thoughts</h2>
-            <p class="msg-preview">"What is AI consciousness?"</p>
-            <div style="margin-top: 1rem; font-size: 0.7rem; color: var(--secondary);">✔ Vectors Indexed</div>
-        </div>
-    </div>
+        <!-- ==================== TAB: CODE ==================== -->
+        <div id="tab-content-code" class="hidden space-y-12">
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-6">Production Postgres Schemas</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                    View production-grade schemas for configuring the centralized memory table.
+                </p>
 
-    <div style="margin-top: 4rem; max-width: 800px; background: rgba(255,255,255,0.02); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
-        <h3 style="margin-bottom: 1rem; color: var(--primary);">Why this matters?</h3>
-        <p style="color: #94a3b8;">Short-term memory dies when the thread ends. Long-term memory lives in a <strong>Cross-Thread Database</strong>. This allows the agent to recognize you across different topics and recall your preferences even if you start a "New Chat".</p>
-    </div>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left nav -->
+                    <div class="flex flex-col gap-2 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
+                        <button onclick="switchCodeTab('code-postgres-schema')" id="btn-code-postgres-schema" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
+                            1. Postgres Schema Setup
+                        </button>
+                        <button onclick="switchCodeTab('code-reflection-node')" id="btn-code-reflection-node" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            2. Async Reflection Node
+                        </button>
+                    </div>
+
+                    <!-- Code viewer -->
+                    <div class="lg:col-span-3">
+                        
+                        <!-- Schema -->
+                        <div id="code-content-code-postgres-schema" class="code-tab-content space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">SQL Table Schemas</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+CREATE TABLE user_profile_memory (
+    user_id VARCHAR(255) PRIMARY KEY,
+    preferences JSONB DEFAULT '{}'::jsonb,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Reflection Node -->
+                        <div id="code-content-code-reflection-node" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Async Profile Extraction</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+# Structured profile extraction schema
+class ProfileSchema(BaseModel):
+    user_id: str
+    loves_technologies: List[str]
+    dislikes_technologies: List[str]
+
+async def sync_profile_to_db(state: AgentState):
+    # Extracts new entities and commits them dynamically to DB
+    pass
+                                </pre>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.4em]">
+        Agentic AI Long Term Memory Manual • Autonomy & Integration
+    </footer>
+
+    <!-- INTERACTIVE SIMULATOR SCRIPTS -->
+    <script>
+        function switchTab(tabId) {
+            const tabs = ['theory', 'simulator', 'code'];
+            tabs.forEach(id => {
+                const el = document.getElementById('tab-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+                }
+            });
+        }
+
+        function switchCodeTab(tabId) {
+            const codeTabs = ['code-postgres-schema', 'code-reflection-node'];
+            codeTabs.forEach(id => {
+                const el = document.getElementById('code-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all";
+                }
+            });
+        }
+
+        let databaseRecords = [];
+
+        async function syncMemoryToCentralDb() {
+            const value = document.getElementById('sim-input').value;
+            const btn = document.getElementById('btn-sync-db');
+            const consoleEl = document.getElementById('sim-console');
+            const recordsEl = document.getElementById('db-records-container');
+            const p = document.getElementById('db-particle');
+            
+            btn.disabled = true;
+            consoleEl.innerHTML = "";
+            
+            const log = (msg, type = 'info') => {
+                let cls = 'text-slate-400';
+                if (type === 'success') cls = 'text-emerald-400';
+                if (type === 'warning') cls = 'text-neon-blue';
+                consoleEl.innerHTML += `<div class="${cls}">[LTM Sync]: ${msg}</div>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            };
+
+            log("Starting async reflection node pipeline.", 'info');
+            
+            // Sync particle animation
+            p.setAttribute("cx", "120");
+            p.setAttribute("cy", "150");
+            p.setAttribute("opacity", "1");
+            
+            let start = null;
+            const duration = 600;
+            const animate = (timestamp) => {
+                if (!start) start = timestamp;
+                const progress = (timestamp - start) / duration;
+                
+                // Curve calculation towards central db (300, 70)
+                const cx = 120 + progress * 180;
+                const cy = 150 - progress * 80;
+                p.setAttribute("cx", cx.toString());
+                p.setAttribute("cy", cy.toString());
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(animate);
+                } else {
+                    p.setAttribute("opacity", "0");
+                }
+            };
+            window.requestAnimationFrame(animate);
+            
+            await new Promise(r => setTimeout(r, 600));
+            
+            log("Extracting profile entities via OpenAI json schema parser.", 'warning');
+            await new Promise(r => setTimeout(r, 400));
+            
+            databaseRecords = [{
+                user_id: 'usr_8829',
+                profile_extracted: value,
+                synced_at: new Date().toLocaleTimeString()
+            }];
+            
+            recordsEl.innerHTML = `
+                <div class="p-3 bg-slate-900 border border-white/5 rounded-xl font-mono text-xs leading-relaxed space-y-1">
+                    <div><span class="text-slate-500">user_id:</span> <span class="text-slate-300">"usr_8829"</span></div>
+                    <div><span class="text-slate-500">pref:</span> <span class="text-neon-blue font-bold">"${value}"</span></div>
+                    <div><span class="text-slate-500">timestamp:</span> <span class="text-slate-400">${databaseRecords[0].synced_at}</span></div>
+                </div>
+            `;
+            
+            log("Postgres central transaction successfully committed.", 'success');
+            btn.disabled = false;
+            
+            switchViewingThread();
+        }
+
+        function switchViewingThread() {
+            const thread = document.getElementById('sim-active-thread').value;
+            const viewEl = document.getElementById('active-thread-view');
+            const wireA = document.getElementById('sync-wire-a');
+            const wireB = document.getElementById('sync-wire-b');
+            
+            if (thread === 'A') {
+                wireA.style.stroke = "#bc13fe";
+                wireB.style.stroke = "#334155";
+                
+                viewEl.innerHTML = `
+                    <div class="h-full flex flex-col justify-center space-y-2 bg-slate-900/50 p-4 rounded-xl border border-white/5">
+                        <span class="text-neon-purple font-bold text-[10px] uppercase tracking-wider block">Thread A Context</span>
+                        <p class="text-slate-300 leading-relaxed font-mono">Profile state synchronized. Local variables loaded into memory frame.</p>
+                    </div>
+                `;
+            } else {
+                wireA.style.stroke = "#334155";
+                wireB.style.stroke = "#ff007f";
+                
+                if (databaseRecords.length > 0) {
+                    viewEl.innerHTML = `
+                        <div class="h-full flex flex-col justify-center space-y-2 bg-slate-900/50 p-4 rounded-xl border border-white/5">
+                            <span class="text-neon-pink font-bold text-[10px] uppercase tracking-wider block">Thread B Context (Fresh Session)</span>
+                            <p class="text-slate-300 leading-relaxed font-mono">Hydrated from Postgres DB: <span class="text-neon-blue font-bold">"${databaseRecords[0].profile_extracted}"</span></p>
+                        </div>
+                    `;
+                } else {
+                    viewEl.innerHTML = `
+                        <div class="h-full flex flex-col justify-center text-center italic text-slate-600 font-sans">
+                            No records committed. Execute Thread A sync first to observe Thread B hydration.
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        switchViewingThread();
+    </script>
 </body>
 </html>

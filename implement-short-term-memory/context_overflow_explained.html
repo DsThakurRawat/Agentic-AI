@@ -1,151 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theory: The Context Overflow Problem</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>Context Overflow Theory | LangGraph Masterclass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                            emerald: '#00ff66',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                        'neon-emerald': '0 0 15px rgba(0, 255, 102, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #6366f1;
-            --secondary: #a855f7;
-            --accent: #ec4899;
-            --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text: #f8fafc;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.8;
-            padding: 4rem;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
+            color: #f8fafc;
         }
-
-        .container { max-width: 1000px; margin: 0 auto; }
-
-        h1 { font-size: 4rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2rem; }
-        h2 { font-size: 2.2rem; color: var(--primary); margin: 3rem 0 1rem 0; border-left: 5px solid var(--secondary); padding-left: 1rem; }
-        
-        .theory-block {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 2rem;
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .formula {
-            background: #020617;
-            padding: 2rem;
-            border-radius: 12px;
-            font-family: 'JetBrains Mono', monospace;
-            text-align: center;
-            font-size: 1.2rem;
-            color: var(--accent);
-            margin: 2rem 0;
-            border: 1px dashed var(--accent);
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
         }
-
-        code { background: #000; color: var(--secondary); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
-
-        .token-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            margin: 1rem 0;
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
         }
-
-        .token-box {
-            background: rgba(99, 102, 241, 0.2);
-            border: 1px solid var(--primary);
-            padding: 10px;
-            text-align: center;
-            border-radius: 8px;
-            font-size: 0.8rem;
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
         }
-
-        .math-list { list-style: none; }
-        .math-list li::before { content: "∑ "; color: var(--secondary); font-weight: 800; margin-right: 10px; }
-
-        .warning-pill {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-weight: 800;
-            display: inline-block;
-            margin-bottom: 1rem;
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
+        }
+        .formula-box {
+            background: #090d1a;
+            border: 1px dashed rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.05);
         }
     </style>
 </head>
-<body>
+<body class="antialiased font-sans text-slate-200">
 
-    <div class="container">
-        <header>
-            <div class="warning-pill">CORE LLM CONSTRAINT</div>
-            <h1>Context Overflow Theory</h1>
-            <p style="font-size: 1.2rem; color: #94a3b8;">Why "Unlimited Memory" is physically impossible in current Transformer architectures.</p>
-        </header>
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
 
-        <section class="section">
-            <h2>1. The Tokenization Layer</h2>
-            <div class="theory-block">
-                <p>LLMs do not read words; they read **Tokens**. A token is a numerical representation of a chunk of characters. On average, 1000 tokens ≈ 750 words.</p>
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-pink/30 bg-neon-pink/5 text-neon-pink text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-pink"></span> Transformer Scaling Bounds
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            Context <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">Overflow Theory</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-6">
+            Explore why "Unlimited Memory" is a physical and mathematical impossibility in modern Attention-based Transformer architectures, and how quadratic sequence length bounds create hard token constraints.
+        </p>
+        <div class="flex gap-4">
+            <a href="context_overflow_solutions.html" class="px-5 py-2.5 rounded-xl border border-neon-blue/30 bg-neon-blue/5 text-neon-blue font-bold text-xs tracking-wider uppercase hover:bg-neon-blue/15 transition-all">
+                ⚡ Try STM Simulator
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTENT MAIN -->
+    <main class="max-w-4xl mx-auto px-6 pb-24 space-y-16 relative z-10">
+        
+        <!-- Section 1: The Tokenization Layer -->
+        <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+            
+            <h2 class="text-2xl font-display font-bold mb-6 flex items-center gap-3">
+                <span class="w-2 h-6 bg-neon-blue rounded-full"></span>
+                01. The Tokenization Boundary
+            </h2>
+            
+            <div class="space-y-4 text-slate-300 text-sm leading-relaxed">
+                <p>
+                    Large Language Models (LLMs) do not read text directly. They ingest **Tokens**—numerical indices matching sub-word patterns extracted by statistical tokenizers (like Byte-Pair Encoding).
+                </p>
                 
-                <div class="token-grid">
-                    <div class="token-box">Agentic [452]</div>
-                    <div class="token-box">AI [98]</div>
-                    <div class="token-box">is [12]</div>
-                    <div class="token-box">great [567]</div>
+                <!-- Tokenization visual -->
+                <div class="bg-slate-950/80 p-5 rounded-2xl border border-white/5 space-y-3 font-mono text-xs">
+                    <h4 class="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Sub-Word Splitting Example:</h4>
+                    <div class="flex flex-wrap gap-2 text-center text-slate-200">
+                        <div class="px-3 py-2 bg-neon-blue/10 border border-neon-blue/30 rounded-lg flex-1">
+                            "Agentic"
+                            <span class="block text-[10px] text-slate-500 mt-0.5">[4321]</span>
+                        </div>
+                        <div class="px-3 py-2 bg-neon-purple/10 border border-neon-purple/30 rounded-lg flex-1">
+                            " AI"
+                            <span class="block text-[10px] text-slate-500 mt-0.5">[299]</span>
+                        </div>
+                        <div class="px-3 py-2 bg-neon-pink/10 border border-neon-pink/30 rounded-lg flex-1">
+                            " memory"
+                            <span class="block text-[10px] text-slate-500 mt-0.5">[875]</span>
+                        </div>
+                    </div>
                 </div>
 
-                <p>In Short-Term Memory, every turn of the conversation adds more tokens to the "History". This is a linear growth: <code>O(N)</code> where N is the number of messages.</p>
+                <p>
+                    In Short-Term Memory, every turn of the conversation adds more tokens to the context log. This is a linear growth <code>O(N)</code> where N is the total token count of all conversation states. Without an active pruning mechanism, conversational history will eventually breach context limits, generating fatal overflow exceptions.
+                </p>
             </div>
         </section>
 
-        <section class="section">
-            <h2>2. The Quadratic Scaling Problem</h2>
-            <div class="theory-block">
-                <p>Most LLMs use the <strong>Self-Attention Mechanism</strong>. To understand the context, every token looks at every other token in the sequence. This means the computational cost grows <strong>quadratically</strong> (N²).</p>
-                
-                <div class="formula">
-                    Cost = (Tokens)<sup>2</sup>
+        <!-- Section 2: The Quadratic Self-Attention Mechanism -->
+        <section class="glass p-8 md:p-12 rounded-3xl glow-card-purple relative overflow-hidden">
+            <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-neon-purple/5 blur-3xl pointer-events-none"></div>
+            
+            <h2 class="text-2xl font-display font-bold mb-6 flex items-center gap-3">
+                <span class="w-2 h-6 bg-neon-purple rounded-full"></span>
+                02. The Quadratic Complexity Bottleneck
+            </h2>
+            
+            <div class="space-y-4 text-slate-300 text-sm leading-relaxed">
+                <p>
+                    Modern Transformers utilize the **Self-Attention Mechanism**. To understand context, every single input token is compared mathematically against every other token in the active matrix sequence.
+                </p>
+
+                <!-- Formula -->
+                <div class="p-6 rounded-2xl formula-box text-center space-y-2">
+                    <span class="text-slate-500 uppercase tracking-widest text-[9px] font-bold block">Attention Computational Cost</span>
+                    <span class="text-2xl font-display font-extrabold text-neon-blue">O(N²)</span>
+                    <p class="text-[10px] text-slate-400 font-mono">Cost escalates quadratically with Sequence Length (N)</p>
                 </div>
 
-                <p>Because of this math, providers (OpenAI, Anthropic) set a hard limit called the <strong>Context Window</strong> to prevent their servers from melting down.</p>
+                <p>
+                    Because memory and compute scale quadratically, providers (like OpenAI or Anthropic) establish strict **Context Windows** (e.g. 128k for GPT-4o). These bounds prevent excessive hardware workloads from overloading computing nodes.
+                </p>
             </div>
         </section>
 
-        <section class="section">
-            <h2>3. The Context Window Equation</h2>
-            <div class="theory-block">
-                <p>The total capacity is shared between your **Input** and the model's **Output**. If your input (STM) is too large, there is no "room" left for the model to think.</p>
+        <!-- Section 3: The Shared Context Equation -->
+        <section class="glass p-8 md:p-12 rounded-3xl glow-card-pink relative overflow-hidden">
+            <h2 class="text-2xl font-display font-bold mb-6 flex items-center gap-3">
+                <span class="w-2 h-6 bg-neon-pink rounded-full"></span>
+                03. The Context Window Equation
+            </h2>
+            
+            <div class="space-y-4 text-slate-300 text-sm leading-relaxed">
+                <p>
+                    The Context Window is a shared resource split across **Input Tokens** and **Output Tokens**. If your conversation history (Short-Term Memory) consumes almost the entire window, the LLM will cut off or fail to respond.
+                </p>
 
-                <ul class="math-list" style="margin: 2rem 0;">
-                    <li><code>Prompt_Tokens</code> (Your instructions)</li>
-                    <li><code>History_Tokens</code> (The STM messages)</li>
-                    <li><code>Completion_Tokens</code> (The AI's actual response)</li>
-                </ul>
-
-                <div class="formula" style="border-color: var(--secondary); color: var(--secondary);">
-                    Total ≤ Max_Context_Limit
+                <div class="p-6 bg-slate-950/80 rounded-2xl border border-white/5 space-y-4 font-mono text-xs">
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Prompt Instructions:</span>
+                        <span class="text-neon-blue">5,000 Tokens</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Conversation History (STM):</span>
+                        <span class="text-neon-purple">120,000 Tokens</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Available Completion Space:</span>
+                        <span class="text-neon-pink font-bold">3,000 Tokens Limit!</span>
+                    </div>
+                    <div class="text-center text-[10px] text-slate-500 pt-2">
+                        Equation: Prompt + STM + Completion ≤ Max_Context_Window
+                    </div>
                 </div>
 
-                <p>For example, if <code>GPT-4o</code> has a 128k limit, but you send 127.9k tokens of history, the model can only generate a few words before it "hits the wall" and cuts off.</p>
+                <p>
+                    If the total token sequence reaches the window ceiling, the LLM generates a truncate error or immediately stops generating output mid-sentence.
+                </p>
             </div>
         </section>
 
-        <section class="section">
-            <h2>4. Symptom: The "Lost in the Middle" Effect</h2>
-            <div class="theory-block">
-                <p>Even before an overflow error happens, long context causes performance issues. Studies show that LLMs are great at remembering the <strong>Start</strong> and <strong>End</strong> of a prompt, but they often forget the middle. This is why trimming and summarization are not just for saving space—they are for <strong>Accuracy</strong>.</p>
+        <!-- Section 4: Lost in the Middle Phenomenon -->
+        <section class="glass p-8 md:p-12 rounded-3xl relative overflow-hidden">
+            <h2 class="text-2xl font-display font-bold mb-6 flex items-center gap-3">
+                <span class="w-2 h-6 bg-slate-600 rounded-full"></span>
+                04. The "Lost in the Middle" Sensation
+            </h2>
+            
+            <div class="space-y-4 text-slate-300 text-sm leading-relaxed">
+                <p>
+                    Research demonstrates that LLMs exhibit optimal recall at the **start** and **end** of prompt blocks, whereas facts located in the **middle** are frequently overlooked.
+                </p>
+                <p>
+                    Managing Short-Term Memory via trimming or summarization isn't merely about saving processing costs—it directly preserves the **factual accuracy** of the agent by limiting irrelevant noise and centering attention on the core message.
+                </p>
             </div>
         </section>
-    </div>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.4em]">
+        Agentic AI Context Overflow Theory
+    </footer>
 
 </body>
 </html>

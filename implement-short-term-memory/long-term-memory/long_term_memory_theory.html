@@ -1,262 +1,736 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangGraph LTM: The BaseStore Deep-Dive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>Long-Term Memory Masterclass | BaseStore & Postgres</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                            emerald: '#00ff66',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                        'neon-emerald': '0 0 15px rgba(0, 255, 102, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #3b82f6;
-            --secondary: #10b981;
-            --accent: #f59e0b;
-            --bg: #020617;
-            --card: #0f172a;
-            --border: #1e293b;
-            --text: #f8fafc;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.8;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
+            color: #f8fafc;
         }
-
-        /* Sidebar Navigation */
-        .sidebar {
-            position: fixed;
-            left: 0; top: 0; bottom: 0;
-            width: 300px;
-            background: var(--card);
-            border-right: 1px solid var(--border);
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto;
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .sidebar h3 { font-size: 0.8rem; letter-spacing: 2px; color: #64748b; margin-top: 2rem; }
-        .sidebar a { color: #94a3b8; text-decoration: none; font-size: 0.95rem; transition: 0.2s; }
-        .sidebar a:hover { color: var(--primary); padding-left: 5px; }
-
-        /* Main Content */
-        main { margin-left: 300px; padding: 4rem; max-width: 1200px; }
-
-        .hero { margin-bottom: 6rem; }
-        .hero h1 { font-size: 4rem; font-weight: 800; margin-bottom: 1rem; }
-        .hero p { font-size: 1.2rem; color: #94a3b8; max-width: 800px; }
-
-        .section { margin-bottom: 8rem; }
-        .section h2 { font-size: 2.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
-
-        .concept-card {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 2.5rem;
-            border: 1px solid var(--border);
-            margin-bottom: 2rem;
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
         }
-
-        .highlight-box {
-            background: rgba(59, 130, 246, 0.1);
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0 12px 12px 0;
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
         }
-
-        /* Technical Diagrams (CSS Grid based) */
-        .diagram-container {
-            background: #000;
-            padding: 2rem;
-            border-radius: 16px;
-            margin: 2rem 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
         }
-
-        .node-box {
-            border: 2px solid var(--primary);
-            padding: 1rem 2rem;
-            border-radius: 8px;
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .code-block {
             font-family: 'JetBrains Mono', monospace;
-            position: relative;
+            background: #090d1a;
+            border: 1px solid rgba(255,255,255,0.03);
         }
-
-        .arrow-down { width: 2px; height: 40px; background: var(--border); position: relative; }
-        .arrow-down::after { content: "▼"; position: absolute; bottom: -10px; left: -6px; color: var(--border); }
-
-        /* Code Blocks */
-        pre {
-            background: #020617;
-            padding: 1.5rem;
-            border-radius: 12px;
-            overflow-x: auto;
-            border: 1px solid var(--border);
-            margin: 1.5rem 0;
+        .node-active {
+            filter: drop-shadow(0 0 10px rgba(188, 19, 254, 0.8));
+            stroke: #bc13fe !important;
+            stroke-width: 3px !important;
         }
-
-        code { font-family: 'JetBrains Mono', monospace; color: var(--secondary); font-size: 0.9rem; }
-
-        .fact-table {
-            width: 100%;
-            margin-top: 1rem;
-            border-collapse: collapse;
-        }
-        .fact-table th { color: var(--primary); text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
-        .fact-table td { padding: 0.5rem; font-size: 0.9rem; color: #cbd5e1; }
-
-        /* Namespacing Visualizer */
-        .namespace-tree {
-            font-family: 'JetBrains Mono', monospace;
-            padding-left: 20px;
-            border-left: 1px dashed #334155;
-        }
-        .tree-item { margin: 10px 0; }
-        .tree-key { color: var(--accent); }
-        .tree-val { color: var(--secondary); }
     </style>
 </head>
-<body>
+<body class="antialiased font-sans text-slate-200">
 
-    <aside class="sidebar">
-        <h2 style="color: var(--primary)">LTM DOCS</h2>
-        
-        <h3>FUNDAMENTALS</h3>
-        <a href="#intro">Introduction to LTM</a>
-        <a href="#store-vs-checkpointer">Store vs Checkpointer</a>
-        
-        <h3>THE BASESTORE</h3>
-        <a href="#basestore-api">BaseStore Interface</a>
-        <a href="#namespaces">Namespacing Concepts</a>
-        
-        <h3>OPERATIONS</h3>
-        <a href="#crud">CRUD Operations</a>
-        <a href="#search">Semantic Search</a>
-        
-        <h3>PRACTICAL</h3>
-        <a href="#implementation">Implementation Guide</a>
-    </aside>
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
 
-    <main>
-        <div class="hero" id="intro">
-            <p style="color: var(--secondary); font-weight: 800; letter-spacing: 2px;">TECHNICAL DEEP-DIVE</p>
-            <h1>Long-Term Memory Mechanics</h1>
-            <p>Moving beyond simple chat history to a persistent, searchable knowledge layer using the <strong>LangGraph BaseStore</strong> architecture.</p>
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-purple/30 bg-neon-purple/5 text-neon-purple text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-purple"></span> Persistent State & Memory
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            Long-Term <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">Agent Memory</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+            A comprehensive engineering masterclass exploring LangGraph's BaseStore architecture. Learn how to extract, index, and retrieve user semantic context across distinct sessions, solving the cross-thread transient memory boundary.
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5">
+            <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg">
+                📚 Technical Theory
+            </button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ Cross-Thread Simulator
+            </button>
+            <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Implementation Blueprint
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
+
+        <!-- ==================== TAB: THEORY ==================== -->
+        <div id="tab-content-theory" class="space-y-16">
+            
+            <!-- Section 1: Episodic vs Semantic Memory -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Section 1: The Memory Taxonomy: Episodic vs. Semantic
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            In autonomous agent engineering, a major architectural pitfall is treating conversation history as the sole memory source. When a thread ends, or is reset due to context limits, the agent's memory of that user disappears. This is **transient episodic memory**.
+                        </p>
+                        <p class="border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400">
+                            "Without a cross-thread persistence layer, starting a 'New Chat' forces the agent to re-introduce itself, re-learn user preferences, and repeat context collection loops."
+                        </p>
+                        <p>
+                            To achieve persistent personalization, we split memory into two core subsystems:
+                        </p>
+                        <ul class="space-y-3 pl-2">
+                            <li class="flex items-start gap-2.5">
+                                <svg class="w-5 h-5 text-neon-blue mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span><strong>Episodic (Checkpointer)</strong> – Tied directly to a <code>thread_id</code>. Saves the linear message log, active execution checkpoints, and temporary node states. Access is isolated strictly within the single active thread.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <svg class="w-5 h-5 text-neon-blue mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span><strong>Semantic (BaseStore)</strong> – Tied to an open-ended, structured <code>namespace</code> (e.g. <code>("users", user_id)</code>). Persistent and completely cross-thread, allowing the agent to immediately inherit context across distinct conversation lifetimes.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Comparison Diagram -->
+                    <div class="space-y-4">
+                        <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Transient Episodic Boundary</h4>
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="flex justify-between w-full gap-4">
+                                    <div class="px-3 py-1.5 bg-slate-900 border border-red-500/20 text-red-400 rounded-lg text-[10px] font-mono text-center flex-1">
+                                        Thread A (Active Chat)
+                                        <div class="text-[8px] text-slate-500 mt-1">Saves Chat Logs</div>
+                                    </div>
+                                    <div class="px-3 py-1.5 bg-slate-900 border border-red-500/20 text-red-400 rounded-lg text-[10px] font-mono text-center flex-1">
+                                        Thread B (New Chat)
+                                        <div class="text-[8px] text-slate-500 mt-1">Zero Context of Thread A</div>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-500 text-center italic">Checkpointer isolates states within distinct threads.</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950/80 p-6 rounded-2xl border border-neon-blue/20 shadow-neon-blue/5 space-y-4">
+                            <h4 class="text-xs font-bold text-neon-blue uppercase tracking-widest text-center">BaseStore Semantic Integration</h4>
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="flex justify-between w-full gap-4 items-center">
+                                    <div class="px-3 py-2 bg-slate-900 border border-neon-blue/40 text-neon-blue rounded-lg text-[10px] font-mono text-center flex-1">
+                                        Thread A (Session 1)
+                                        <div class="text-[8px] text-emerald-400 mt-1">Upserts to Store</div>
+                                    </div>
+                                    <div class="w-4 h-0.5 bg-slate-700"></div>
+                                    <div class="px-3 py-2 bg-slate-900 border border-neon-purple/40 text-neon-purple rounded-lg text-[10px] font-mono text-center flex-grow-0">
+                                        🗄️ BaseStore
+                                    </div>
+                                    <div class="w-4 h-0.5 bg-slate-700"></div>
+                                    <div class="px-3 py-2 bg-slate-900 border border-neon-blue/40 text-neon-blue rounded-lg text-[10px] font-mono text-center flex-1">
+                                        Thread B (Session 2)
+                                        <div class="text-[8px] text-emerald-400 mt-1">Reads from Store</div>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 text-center italic">Cross-thread namespaces map unified persistent profiles.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: BaseStore API & Namespaces -->
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Namespace Hierarchy -->
+                <div class="glass p-8 rounded-3xl glow-card-purple flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-neon-purple mb-6 shadow-neon-purple/10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">Hierarchical Namespacing</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Namespaces inside `BaseStore` act as isolated folders using **tuples of strings** to group keys. This layout lets you segment memories at granular organizational layers (e.g. scoping data to specific organizations, individual users, or unique tasks).
+                        </p>
+                        
+                        <div class="bg-slate-950/50 p-5 rounded-2xl border border-white/5 space-y-4 mb-6">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Example Namespace Structures:</h4>
+                            <ul class="space-y-2 text-xs text-slate-300 font-mono">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-neon-purple">📁</span>
+                                    <span><strong>("users", user_id)</strong><br/><span class="text-[10px] text-slate-500 font-sans block mt-0.5">Isolates specific user preferences, bio, and style guides.</span></span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-neon-purple">📁</span>
+                                    <span><strong>("orgs", org_id, "policies")</strong><br/><span class="text-[10px] text-slate-500 font-sans block mt-0.5">Enforces shared compliance checks across an entire company.</span></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="border-t border-white/5 pt-4 text-xs font-mono text-neon-purple uppercase tracking-wider">
+                        Resolves: Multi-Tenant Leakage & Strict Compliance Boundaries
+                    </div>
+                </div>
+
+                <!-- BaseStore Operations -->
+                <div class="glass p-8 rounded-3xl glow-card-pink flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-neon-pink/10 border border-neon-pink/20 flex items-center justify-center text-neon-pink mb-6 shadow-neon-pink/10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">Core CRUD Interface</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            The `BaseStore` provides an extremely simple upsert interface. Whether backed by a mock `InMemoryStore` during unit testing, or a persistent `PostgresStore` in production, your agent logic relies on identical semantic calls.
+                        </p>
+                        
+                        <div class="bg-slate-950/50 p-5 rounded-2xl border border-white/5 space-y-4 mb-6">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">API Methods Blueprint:</h4>
+                            <ul class="space-y-2 text-xs text-slate-300 font-mono">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-pink"></span>
+                                    <span><strong>store.put(ns, key, dict_val)</strong> – Atomic upsert.</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-pink"></span>
+                                    <span><strong>store.get(ns, key)</strong> – Atomic fetch.</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-pink"></span>
+                                    <span><strong>store.search(ns_prefix, query)</strong> – Vector similarity lookup.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="border-t border-white/5 pt-4 text-xs font-mono text-neon-pink uppercase tracking-wider">
+                        Extensible: SQLiteStore, PostgresStore, InMemoryStore
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Extraction Node & Reflective Summarization -->
+            <section class="glass p-8 md:p-12 rounded-3xl relative">
+                <h2 class="text-3xl font-display font-bold mb-8">
+                    Deep-Dive: Reflective Summarization & Fact Duplication
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm">
+                        <p>
+                            Directly storing raw user messages leads to index contamination. If a user states their favorite coding language is Python multiple times, a naive database write will create duplicate fact keys.
+                        </p>
+                        <p>
+                            To prevent this, our architecture deploys a background **Memory Extraction Node** triggered asynchronously at step boundaries.
+                        </p>
+                        <div class="p-5 bg-[#090d1a] border border-white/5 rounded-2xl space-y-3">
+                            <h4 class="text-xs font-bold text-neon-blue uppercase tracking-widest font-mono">Structured Profile Schema</h4>
+                            <pre class="text-[11px] text-emerald-400 font-mono overflow-x-auto leading-relaxed">
+from pydantic import BaseModel, Field
+
+class UserProfile(BaseModel):
+    name: str = Field(description="User's preferred name")
+    interests: List[str] = Field(default_factory=list, description="Extracted coding/personal interests")
+    custom_rules: List[str] = Field(default_factory=list, description="Style guidelines or rules explicitly set")
+                            </pre>
+                        </div>
+                        <p>
+                            The extraction node uses <code>llm.with_structured_output(UserProfile)</code>, fetching the existing profile from <code>store.get()</code>, merging newly stated facts with current records, and rewriting a clean, deduplicated profile back to the Postgres Store. This keeps the database clean and context windows small!
+                        </p>
+                    </div>
+
+                    <!-- Flow Diagram -->
+                    <div class="bg-slate-950/80 p-6 md:p-8 rounded-2xl border border-white/5 space-y-6">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Reflective Extraction Lifecycle</h4>
+                        
+                        <div class="flex justify-center">
+                            <svg width="340" height="260" viewBox="0 0 340 260" class="w-full max-w-[340px]">
+                                <!-- Central Store -->
+                                <rect x="120" y="200" width="100" height="40" rx="6" fill="#090d1a" stroke="#00f2ff" stroke-width="2" />
+                                <text x="170" y="224" fill="#00f2ff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">BaseStore (Postgres)</text>
+                                
+                                <!-- Nodes -->
+                                <circle cx="50" cy="50" r="22" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                <text x="50" y="53" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle">User Talk</text>
+
+                                <rect x="120" y="30" width="100" height="40" rx="8" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                <text x="170" y="50" fill="#fff" font-family="Inter" font-size="8" text-anchor="middle" font-weight="bold">Extraction Node</text>
+                                <text x="170" y="60" fill="#a1a1aa" font-family="JetBrains Mono" font-size="6" text-anchor="middle">LLM Extractor</text>
+
+                                <rect x="250" y="110" width="80" height="40" rx="8" fill="#090d1a" stroke="#ff007f" stroke-width="1.5" />
+                                <text x="290" y="130" fill="#fff" font-family="Inter" font-size="8" text-anchor="middle" font-weight="bold">Merge & Deduplicate</text>
+
+                                <!-- Paths -->
+                                <path d="M 72 50 H 120" stroke="#bc13fe" stroke-width="1.5" />
+                                <path d="M 220 50 H 290 V 110" stroke="#bc13fe" stroke-width="1.5" />
+                                <path d="M 290 150 V 220 H 220" stroke="#ff007f" stroke-width="1.5" />
+                                <path d="M 120 220 H 50 V 72" stroke="#00f2ff" stroke-width="1.5" stroke-dasharray="3" />
+                                <text x="80" y="150" fill="#00f2ff" font-family="JetBrains Mono" font-size="7">Read Profile</text>
+                                <text x="250" y="180" fill="#ff007f" font-family="JetBrains Mono" font-size="7">Save upsert</text>
+                            </svg>
+                        </div>
+                        
+                        <div class="text-xs text-slate-400 leading-relaxed border-t border-white/5 pt-4">
+                            <strong>Step-by-Step Operations:</strong>
+                            <ol class="list-decimal list-inside space-y-1 mt-2">
+                                <li>The user chats inside the active thread.</li>
+                                <li>The extraction node triggers and reads the existing profile from the store namespace.</li>
+                                <li>The LLM merges newly stated preferences with the existing Pydantic schema.</li>
+                                <li>The deduplicated object upserts back to Postgres, making it instantly available to other threads!</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
-        <section class="section" id="store-vs-checkpointer">
-            <h2>1. Store vs. Checkpointer</h2>
-            <div class="concept-card">
-                <p>One of the most common mistakes is confusing <strong>Persistence</strong> (Checkpointers) with <strong>Memory</strong> (Stores). Let's define them technically:</p>
-                
-                <div class="highlight-box">
-                    <strong>Checkpointer (Episodic Memory):</strong> Tied to a <code>thread_id</code>. It saves the state of a single conversation. If User A talks to Agent B, only they can see this state.
-                </div>
-                
-                <div class="highlight-box" style="border-left-color: var(--secondary);">
-                    <strong>BaseStore (Semantic Memory):</strong> Tied to a <code>namespace</code>. It is cross-thread. Information stored here (like a user's birthday or preferences) can be accessed by ANY agent in ANY thread.
+        <!-- ==================== TAB: SIMULATOR ==================== -->
+        <div id="tab-content-simulator" class="hidden space-y-12">
+            <div class="glass p-6 md:p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-4">Cross-Thread LTM Simulator</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    Test the cross-thread memory capabilities of the BaseStore. Start a conversation in Thread A to store a preference, then witness how a completely different Thread B immediately recalls it!
+                </p>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-8 bg-slate-950/60 p-6 rounded-2xl border border-white/5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 1: Converse inside Thread A</label>
+                        <select id="sim-input-a" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="name_python">User: "Hey, my name is Divyansh and I love coding in Python!"</option>
+                            <option value="name_rust">User: "Hey, my name is Arsh and I prefer Rust development!"</option>
+                            <option value="rules_dark">User: "Please format all code using dark-mode templates only."</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 2: Trigger Thread B Query</label>
+                        <select id="sim-query-b" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="ask_name">User B: "Hey, do you know my name and coding preference?"</option>
+                            <option value="ask_style">User B: "How should we style the upcoming code block?"</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="runLTMSimulation()" id="btn-run-sim" class="w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Run Cross-Thread Test
+                        </button>
+                    </div>
                 </div>
 
-                <div class="diagram-container">
-                    <div class="node-box">LangGraph Engine</div>
-                    <div style="display: flex; gap: 4rem;">
-                        <div style="text-align: center;">
-                            <div class="arrow-down"></div>
-                            <div class="node-box" style="border-color: var(--accent)">SqliteSaver<br><small>(Thread ID)</small></div>
+                <!-- Simulation Visual Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Graph Diagram (8 Cols) -->
+                    <div class="lg:col-span-8 bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex flex-col justify-between h-[500px]">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">BaseStore Multi-Thread State Graph</h4>
+                        
+                        <div class="flex-1 flex items-center justify-center p-2">
+                            <svg width="600" height="340" viewBox="0 0 600 340" class="w-full h-full max-h-[320px]">
+                                <!-- Paths -->
+                                <path id="path-a-store" d="M 120 80 H 300 V 135" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-store-b" d="M 300 205 V 260 H 120" stroke="#334155" stroke-width="2" stroke-dasharray="4" fill="none" />
+                                
+                                <!-- Thread A Box -->
+                                <g id="node-thread-a">
+                                    <rect x="20" y="40" width="100" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="70" y="65" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Thread A</text>
+                                    <text x="70" y="78" fill="#bc13fe" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Input Session 1</text>
+                                </g>
+
+                                <!-- BaseStore Database -->
+                                <g id="node-db">
+                                    <rect x="220" y="135" width="160" height="70" rx="10" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="300" y="165" fill="#fff" font-family="Outfit" font-size="10" text-anchor="middle" font-weight="bold">Persistent BaseStore</text>
+                                    <text x="300" y="180" fill="#00f2ff" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Namespace: ("users", "u1")</text>
+                                </g>
+
+                                <!-- Thread B Box -->
+                                <g id="node-thread-b">
+                                    <rect x="20" y="240" width="100" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="70" y="265" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Thread B</text>
+                                    <text x="70" y="278" fill="#ff007f" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Input Session 2</text>
+                                </g>
+                            </svg>
                         </div>
-                        <div style="text-align: center;">
-                            <div class="arrow-down"></div>
-                            <div class="node-box" style="border-color: var(--secondary)">BaseStore<br><small>(Namespace)</small></div>
+                        
+                        <!-- Console Output Panel -->
+                        <div class="h-[120px] bg-slate-900 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-y-auto custom-scrollbar space-y-1.5" id="sim-console">
+                            <span class="text-slate-500">[System]: Standing by. Select scenarios and click "Run Cross-Thread Test".</span>
+                        </div>
+                    </div>
+                    
+                    <!-- State Monitor Panel (4 Cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        <!-- State Monitor Card -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex-1 overflow-y-auto custom-scrollbar max-h-[240px]">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">BaseStore JSON Cache</h4>
+                            <div class="space-y-3 font-mono text-xs" id="state-monitor">
+                                <div><span class="text-slate-500">profile:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">interests:</span> <span class="text-slate-300">[]</span></div>
+                                <div><span class="text-slate-500">custom_rules:</span> <span class="text-slate-300">[]</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Final Answer preview -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 h-[240px] overflow-y-auto custom-scrollbar flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Thread B Synthesis</h4>
+                            <div class="flex-1 text-xs text-slate-400 space-y-3" id="answer-preview">
+                                <div class="h-full flex items-center justify-center text-center italic text-slate-600">
+                                    Thread B's localized response will print here.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section class="section" id="basestore-api">
-            <h2>2. The BaseStore Interface</h2>
-            <div class="concept-card">
-                <p>The <code>BaseStore</code> is an abstract interface that provides the blueprint for long-term storage. Whether you use <code>InMemoryStore</code> or <code>PostgresStore</code>, the operations are identical:</p>
-                
-                <pre><code>from langchain_core.stores import BaseStore
+        <!-- ==================== TAB: CODE ==================== -->
+        <div id="tab-content-code" class="hidden space-y-12">
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-6">Production BaseStore Blueprints</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                    View production-grade templates for postgres LTM configurations inside LangGraph architectures.
+                </p>
 
-# CORE OPERATIONS:
-# .put(namespace, key, value)   -> Create/Edit
-# .get(namespace, key)          -> Retrieve
-# .delete(namespace, key)       -> Remove
-# .search(query)                -> Semantic Lookup (if supported)</code></pre>
-
-                <p>In LangGraph, this is often implemented as an <code>InMemoryStore</code> for development and a specialized DB-backed store for production.</p>
-            </div>
-        </section>
-
-        <section class="section" id="namespaces">
-            <h2>3. Namespacing & Hierarchy</h2>
-            <div class="concept-card">
-                <p>Think of Namespaces as **Folders** in a file system (like Google Drive). A namespace is a <strong>tuple of strings</strong> that allows you to isolate memory for different users or entities.</p>
-                
-                <div class="namespace-tree">
-                    <div class="tree-item">📁 <span class="tree-key">("users", "u1")</span></div>
-                    <div class="namespace-tree">
-                        <div class="tree-item">📄 <span class="tree-key">"profile"</span>: <span class="tree-val">{"name": "Divyansh", "role": "Dev"}</span></div>
-                        <div class="tree-item">📄 <span class="tree-key">"prefs"</span>: <span class="tree-val">{"theme": "dark"}</span></div>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left nav -->
+                    <div class="flex flex-col gap-2 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
+                        <button onclick="switchCodeTab('code-store-setup')" id="btn-code-store-setup" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
+                            1. Store Initialization
+                        </button>
+                        <button onclick="switchCodeTab('code-node-extract')" id="btn-code-node-extract" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            2. Profile Extraction Node
+                        </button>
+                        <button onclick="switchCodeTab('code-node-fetch')" id="btn-code-node-fetch" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            3. State Reading Node
+                        </button>
                     </div>
-                    <div class="tree-item">📁 <span class="tree-key">("users", "u2")</span></div>
-                    <div class="namespace-tree">
-                        <div class="tree-item">📄 <span class="tree-key">"profile"</span>: <span class="tree-val">{"name": "Alice"}</span></div>
-                    </div>
-                </div>
 
-                <div class="highlight-box">
-                    <strong>Key Insight:</strong> By using <code>("users", user_id)</code> as a namespace, you ensure that User A's long-term memories never leak into User B's conversation.
-                </div>
-            </div>
-        </section>
+                    <!-- Code viewer -->
+                    <div class="lg:col-span-3">
+                        
+                        <!-- Setup -->
+                        <div id="code-content-code-store-setup" class="code-tab-content space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">PostgresStore Initialization Blueprint</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+from langgraph.store.postgres import PostgresStore
+from langgraph.checkpoint.postgres import PostgresSaver
 
-        <section class="section" id="crud">
-            <h2>4. CRUD Operations in Depth</h2>
-            <div class="concept-card">
-                <h3>CREATE / EDIT (The <code>.put</code> method)</h3>
-                <p>The <code>put</code> method is an "upsert". If the key exists, it edits. If not, it creates.</p>
-                <pre><code>store.put(("users", "u1"), "bio", {"content": "Likes Python"})</code></pre>
+# Establish active database pool
+pool = ConnectionPool(conninfo="postgresql://user:pass@localhost:5432/dbname")
 
-                <h3>SEARCH (Semantic Lookup)</h3>
-                <p>This is where Long-Term Memory becomes "Agentic". We can search for relevant past memories using natural language queries.</p>
-                <pre><code># Find anything related to 'preferences'
-results = store.search(("users", "u1"), query="What does the user like?")</code></pre>
-            </div>
-        </section>
+# BaseStore persistent semantic storage
+store = PostgresStore(pool)
+store.setup()  # Set up relational schema tables
 
-        <section class="section" id="implementation">
-            <h2>5. Advanced Implementation Strategy</h2>
-            <div class="concept-card">
-                <p>To implement this in a real-world LangGraph agent, follow this pattern:</p>
-                <ol style="margin-left: 2rem;">
-                    <li><strong>Inject Store:</strong> Pass the store into the <code>StateGraph</code> during compilation.</li>
-                    <li><strong>Read in Node:</strong> Use <code>config["configurable"]["store"]</code> to access memory.</li>
-                    <li><strong>Update in Reflection:</strong> Use a background node to summarize and <code>.put</code> data back into the store.</li>
-                </ol>
-                
-                <pre><code>def my_node(state, config):
+# Checkpointer episodic state storage
+checkpointer = PostgresSaver(pool)
+checkpointer.setup()
+
+# Compile Master Graph with both memory modules
+app = workflow.compile(checkpointer=checkpointer, store=store)
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Extraction -->
+                        <div id="code-content-code-node-extract" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Semantic Background Extractor Node</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+def extract_memories(state: State, config: RunnableConfig):
     store = config["configurable"]["store"]
     user_id = config["configurable"]["user_id"]
-    
-    # Retrieve LTM
-    memories = store.get(("users", user_id), "profile")
-    # ... use memories in prompt ...</code></pre>
+    namespace = ("users", user_id)
+
+    # 1. Fetch current profile
+    current = store.get(namespace, "profile")
+    profile = current.value if current else {"interests": [], "custom_rules": []}
+
+    # 2. Extract facts from recent dialogue
+    extractor = llm.with_structured_output(UserProfile)
+    raw_extraction = extractor.invoke([
+        SystemMessage(content=EXTRACTION_SYSTEM),
+        HumanMessage(content=f"Recent Messages: {state['messages'][-5:]}")
+    ])
+
+    # 3. Merge Pydantic structures & Deduplicate
+    updated_interests = list(set(profile["interests"] + raw_extraction.interests))
+    updated_rules = list(set(profile["custom_rules"] + raw_extraction.custom_rules))
+
+    # 4. Save upsert back to PostgresStore
+    store.put(namespace, "profile", {
+        "interests": updated_interests,
+        "custom_rules": updated_rules
+    })
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Read Node -->
+                        <div id="code-content-code-node-fetch" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">LTM Hydrator Node</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+def hydrate_ltm_context(state: State, config: RunnableConfig):
+    store = config["configurable"]["store"]
+    user_id = config["configurable"]["user_id"]
+    namespace = ("users", user_id)
+
+    # Fetch LTM Profile
+    record = store.get(namespace, "profile")
+    if record:
+        profile_content = (
+            f"User Interests: {record.value['interests']}\n"
+            f"User Guidelines: {record.value['custom_rules']}"
+        )
+    else:
+        profile_content = "No long-term profile active."
+
+    # Inject LTM context directly into system instructions
+    system_instruction = SYSTEM_BASE.format(ltm_context=profile_content)
+    return {"system_instruction": system_instruction}
+                                </pre>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
 
     </main>
 
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.4em]">
+        Agentic AI LTM masterclass • Alignment & Autonomy
+    </footer>
+
+    <!-- INTERACTIVE SIMULATOR SCRIPTS -->
+    <script>
+        function switchTab(tabId) {
+            const tabs = ['theory', 'simulator', 'code'];
+            tabs.forEach(id => {
+                const el = document.getElementById('tab-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+                }
+            });
+        }
+
+        function switchCodeTab(tabId) {
+            const codeTabs = ['code-store-setup', 'code-node-extract', 'code-node-fetch'];
+            codeTabs.forEach(id => {
+                const el = document.getElementById('code-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all";
+                }
+            });
+        }
+
+        // JS Simulated state machine
+        async function runLTMSimulation() {
+            const inputA = document.getElementById('sim-input-a').value;
+            const queryB = document.getElementById('sim-query-b').value;
+            const btn = document.getElementById('btn-run-sim');
+            const consoleEl = document.getElementById('sim-console');
+            const monitorEl = document.getElementById('state-monitor');
+            const previewEl = document.getElementById('answer-preview');
+            
+            btn.disabled = true;
+            btn.textContent = "Simulating Flow...";
+            consoleEl.innerHTML = "";
+            previewEl.innerHTML = `<div class="h-full flex items-center justify-center text-center italic text-slate-600">Simulating Thread B query...</div>`;
+            
+            const logConsole = (msg, type = 'info') => {
+                let colorClass = 'text-slate-400';
+                if (type === 'success') colorClass = 'text-emerald-400';
+                if (type === 'error') colorClass = 'text-neon-pink';
+                if (type === 'warning') colorClass = 'text-neon-blue';
+                consoleEl.innerHTML += `<div class="${colorClass}">[StateNode]: ${msg}</div>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            };
+
+            const resetVisuals = () => {
+                document.querySelector('#node-thread-a rect').style.stroke = "#475569";
+                document.querySelector('#node-db rect').style.stroke = "#475569";
+                document.querySelector('#node-thread-b rect').style.stroke = "#475569";
+                document.getElementById('path-a-store').style.stroke = "#334155";
+                document.getElementById('path-store-b').style.stroke = "#334155";
+            };
+
+            const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+            resetVisuals();
+
+            // STEP 1: Execute inside Thread A
+            logConsole("Thread A activated with user dialogue.", 'info');
+            document.querySelector('#node-thread-a rect').style.stroke = "#bc13fe";
+            document.querySelector('#node-thread-a rect').style.filter = "drop-shadow(0 0 8px rgba(188, 19, 254, 0.5))";
+            await wait(800);
+
+            // Animate Thread A to DB
+            document.getElementById('path-a-store').style.stroke = "#bc13fe";
+            document.getElementById('path-a-store').style.strokeDasharray = "6";
+            document.getElementById('path-a-store').style.animation = "dash 1s linear infinite";
+            logConsole("Triggering background Memory Extraction Node...", 'warning');
+            await wait(1000);
+
+            // Upsert profile
+            document.querySelector('#node-db rect').style.stroke = "#00f2ff";
+            document.querySelector('#node-db rect').style.filter = "drop-shadow(0 0 10px rgba(0, 242, 255, 0.6))";
+            
+            let extractedProfile = {
+                profile: "Active User Profile Loaded",
+                interests: [],
+                custom_rules: []
+            };
+
+            if (inputA === 'name_python') {
+                extractedProfile.interests = ["Python coding", "Agent development"];
+                extractedProfile.profile = "Divyansh";
+            } else if (inputA === 'name_rust') {
+                extractedProfile.interests = ["Rust development", "Memory safety"];
+                extractedProfile.profile = "Arsh";
+            } else if (inputA === 'rules_dark') {
+                extractedProfile.custom_rules = ["Dark-mode formatting only"];
+            }
+
+            monitorEl.innerHTML = `
+                <div><span class="text-slate-500">profile:</span> <span class="text-slate-300">"${extractedProfile.profile}"</span></div>
+                <div><span class="text-slate-500">interests:</span> <span class="text-slate-300">${JSON.stringify(extractedProfile.interests)}</span></div>
+                <div><span class="text-slate-500">custom_rules:</span> <span class="text-slate-300">${JSON.stringify(extractedProfile.custom_rules)}</span></div>
+            `;
+            logConsole("Extracted profile upserted successfully inside Postgres BaseStore (cross-thread)!", 'success');
+            await wait(800);
+
+            // Transition to Thread B
+            logConsole("Thread A closed. Opening dynamic Thread B session...", 'info');
+            document.querySelector('#node-thread-a rect').style.stroke = "#475569";
+            document.querySelector('#node-thread-a rect').style.filter = "none";
+            document.getElementById('path-a-store').style.stroke = "#334155";
+            document.getElementById('path-a-store').style.animation = "none";
+            await wait(800);
+
+            logConsole("Thread B query received: " + document.getElementById('sim-query-b').options[document.getElementById('sim-query-b').selectedIndex].text, 'info');
+            document.querySelector('#node-thread-b rect').style.stroke = "#ff007f";
+            document.querySelector('#node-thread-b rect').style.filter = "drop-shadow(0 0 8px rgba(255, 0, 127, 0.5))";
+            await wait(800);
+
+            // Fetch LTM
+            document.getElementById('path-store-b').style.stroke = "#ff007f";
+            document.getElementById('path-store-b').style.strokeDasharray = "6";
+            document.getElementById('path-store-b').style.animation = "dash 1s linear infinite";
+            logConsole("Retrieving semantic LTM context from space key...", 'warning');
+            await wait(1000);
+
+            // Formulate Output
+            let finalAnswer = "";
+            if (queryB === 'ask_name') {
+                if (extractedProfile.profile !== 'Active User Profile Loaded') {
+                    finalAnswer = `Hello ${extractedProfile.profile}! I see you coding in ${extractedProfile.interests[0]}. How can I help you today?`;
+                } else {
+                    finalAnswer = "Hello! I don't see any active name profile in LTM databases. What should I call you?";
+                }
+            } else if (queryB === 'ask_style') {
+                if (extractedProfile.custom_rules.length > 0) {
+                    finalAnswer = `Applying LTM custom rules: ${extractedProfile.custom_rules[0]} applied. Assembling code blocks using dark templates!`;
+                } else {
+                    finalAnswer = "Applying standard default style rules. No specific LTM preferences detected.";
+                }
+            }
+
+            previewEl.innerHTML = `
+                <div class="h-full flex flex-col justify-center space-y-3">
+                    <span class="text-neon-emerald font-bold text-xs uppercase tracking-widest block">Cross-Thread Output</span>
+                    <p class="text-slate-300 font-medium text-xs md:text-sm bg-slate-900 p-4 rounded-xl border border-white/5 leading-relaxed">${finalAnswer}</p>
+                </div>
+            `;
+            logConsole("Thread B response compiled successfully utilizing cross-thread PostgresStore profile context!", 'success');
+
+            btn.disabled = false;
+            btn.textContent = "Run Cross-Thread Test";
+        }
+    </script>
 </body>
 </html>

@@ -1,251 +1,260 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STM Solutions | Agentic AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>STM Solutions Simulator | LangGraph Masterclass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                            emerald: '#00ff66',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                        'neon-emerald': '0 0 15px rgba(0, 255, 102, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #6366f1;
-            --secondary: #a855f7;
-            --accent: #f59e0b;
-            --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text: #f8fafc;
-            --danger: #ef4444;
-            --success: #22c55e;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            overflow-x: hidden;
-            padding: 2rem;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
+            color: #f8fafc;
         }
-
-        .container { max-width: 1200px; margin: 0 auto; }
-
-        header { text-align: center; margin-bottom: 3rem; }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .solution-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
         }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 2.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .mode-selector {
-            display: flex;
-            background: #020617;
-            padding: 0.5rem;
-            border-radius: 15px;
-            gap: 0.5rem;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 0.8rem;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            background: transparent;
-            color: #94a3b8;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .mode-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
         .visual-bucket {
             background: #020617;
-            border-radius: 20px;
-            height: 400px;
-            border: 2px solid #334155;
+            border-radius: 24px;
+            height: 420px;
+            border: 2px solid #1e293b;
             position: relative;
             padding: 1.5rem;
             display: flex;
             flex-direction: column-reverse;
-            gap: 10px;
+            gap: 12px;
             overflow: hidden;
         }
-
         .token-line {
             position: absolute;
-            top: 20%;
+            top: 25%;
             left: 0;
             width: 100%;
-            border-top: 2px dashed var(--danger);
+            border-top: 2px dashed #ff007f;
             z-index: 5;
-            opacity: 0.5;
+            opacity: 0.6;
         }
-
         .token-line::after {
-            content: "CRITICAL OVERFLOW LIMIT";
+            content: "CRITICAL OVERFLOW BOUND";
             position: absolute;
-            right: 10px;
+            right: 15px;
             top: -20px;
-            font-size: 0.6rem;
-            color: var(--danger);
+            font-size: 0.65rem;
+            color: #ff007f;
+            font-weight: bold;
             font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.1em;
         }
-
         .msg {
             width: 100%;
             padding: 1rem;
             border-radius: 12px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-
-        .msg-standard { background: linear-gradient(90deg, #334155, #1e293b); border: 1px solid #475569; }
-        .msg-summary { background: linear-gradient(90deg, #92400e, #d97706); border: 1px solid var(--accent); color: white; }
-        .msg-danger { background: var(--danger); color: white; }
+        .msg-standard { background: linear-gradient(90deg, #1e293b, #0f172a); border: 1px solid rgba(255,255,255,0.05); }
+        .msg-summary { background: linear-gradient(90deg, #bc13fe, #ff007f); border: 1px solid #bc13fe; color: white; }
+        .msg-danger { background: #ff007f; color: white; }
 
         @keyframes popIn {
             from { transform: scale(0.8) translateY(20px); opacity: 0; }
             to { transform: scale(1) translateY(0); opacity: 1; }
         }
-
-        .controls { display: flex; gap: 1rem; }
-
-        button.action {
-            flex: 1;
-            padding: 1rem;
-            border-radius: 15px;
-            border: none;
-            background: var(--primary);
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        button.action:hover { transform: translateY(-2px); filter: brightness(1.2); }
-
-        .desc-box h3 { color: var(--primary); margin-bottom: 0.5rem; }
-        .desc-box p { color: #94a3b8; font-size: 0.95rem; }
-        
-        .status-badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-        .status-safe { background: rgba(34, 197, 94, 0.2); color: var(--success); }
-        .status-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
     </style>
 </head>
-<body>
+<body class="antialiased font-sans text-slate-200">
 
-    <div class="container">
-        <header>
-            <h1>STM Solutions Simulator</h1>
-            <p>Visualizing <strong>Filter</strong> vs <strong>Summarize</strong> strategies</p>
-        </header>
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
 
-        <div class="solution-grid">
-            <div class="card">
-                <div class="mode-selector">
-                    <button class="mode-btn active" onclick="setMode('naive')">Naive</button>
-                    <button class="mode-btn" onclick="setMode('filter')">Filter (Trim)</button>
-                    <button class="mode-btn" onclick="setMode('summarize')">Summarize</button>
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-blue/30 bg-neon-blue/5 text-neon-blue text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-blue"></span> Interactive Simulator
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            STM Solutions <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">Simulator</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-6">
+            Witness how different Short-Term Memory models (Naive, Trimming, and Summarization) process conversational context limits in real-time.
+        </p>
+        <div class="flex gap-4">
+            <a href="context_overflow_explained.html" class="px-5 py-2.5 rounded-xl border border-neon-purple/30 bg-neon-purple/5 text-neon-purple font-bold text-xs tracking-wider uppercase hover:bg-neon-purple/15 transition-all">
+                📚 View Overflow Theory
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTENT GRID -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            
+            <!-- Controls Card -->
+            <div class="glass p-8 rounded-3xl flex flex-col justify-between space-y-8">
+                
+                <!-- Selector -->
+                <div class="space-y-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Select Pruning Strategy</span>
+                    <div class="flex bg-slate-950/80 p-1.5 rounded-2xl border border-white/5 gap-2">
+                        <button class="flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white" id="btn-mode-naive" onclick="setMode('naive')">
+                            Naive (No Solution)
+                        </button>
+                        <button class="flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white" id="btn-mode-filter" onclick="setMode('filter')">
+                            Filter (Trim)
+                        </button>
+                        <button class="flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white" id="btn-mode-summarize" onclick="setMode('summarize')">
+                            Summarize
+                        </button>
+                    </div>
                 </div>
 
-                <div class="desc-box">
-                    <h3 id="mode-title">Naive Mode (No Solution)</h3>
-                    <p id="mode-desc">Every message is kept. This will eventually hit the context limit and crash your Agent.</p>
+                <!-- Description -->
+                <div class="bg-slate-950/60 p-6 rounded-2xl border border-white/5 space-y-2">
+                    <h3 class="text-lg font-display font-bold text-neon-blue" id="mode-title">Naive Mode (No Solution)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed" id="mode-desc">Every message is kept. This will eventually hit the context limit and crash your Agent.</p>
                 </div>
 
-                <div class="controls">
-                    <button class="action" onclick="addMessage()">Add Message (+500 Tokens)</button>
-                    <button class="action" style="background:#334155" onclick="reset()">Clear</button>
+                <!-- Button operations -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="py-4 px-6 bg-gradient-to-r from-neon-blue to-neon-purple rounded-2xl text-xs font-bold uppercase tracking-wider hover:shadow-neon-blue/20 transition-all text-white" onclick="addMessage()">
+                        Add Message (+500T)
+                    </button>
+                    <button class="py-4 px-6 bg-slate-900 border border-white/10 rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-all text-slate-300" onclick="resetSim()">
+                        Clear Stack
+                    </button>
                 </div>
 
-                <div style="display:flex; justify-content: space-between; align-items: center;">
-                    <span>Bucket Status:</span>
-                    <span id="status" class="status-badge status-safe">Safe</span>
+                <!-- Status indicator -->
+                <div class="flex justify-between items-center border-t border-white/5 pt-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Bucket Status</span>
+                    <span id="status" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                        Safe
+                    </span>
                 </div>
+
             </div>
 
-            <div class="card" style="padding: 1rem;">
+            <!-- Visualization Card -->
+            <div class="glass p-8 rounded-3xl flex flex-col justify-center">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Context Stack Visualizer</h4>
+                
                 <div class="visual-bucket" id="bucket">
                     <div class="token-line"></div>
                 </div>
             </div>
-        </div>
-    </div>
 
+        </div>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.4em]">
+        Agentic AI STM Simulator • Memory Optimization
+    </footer>
+
+    <!-- SIMULATOR CORE LOGIC -->
     <script>
         let mode = 'naive';
         let messages = [];
-        let tokenCount = 0;
         const bucket = document.getElementById('bucket');
         const status = document.getElementById('status');
         const modeTitle = document.getElementById('mode-title');
         const modeDesc = document.getElementById('mode-desc');
 
         const config = {
-            naive: { title: "Naive Mode", desc: "No memory management. Context grows until it crashes." },
-            filter: { title: "Filter (Trimming)", desc: "Oldest messages are deleted automatically to stay below the limit." },
-            summarize: { title: "Summarization", desc: "Old messages are condensed into a single 'Summary' block to save space." }
+            naive: { 
+                title: "Naive Mode (No Solution)", 
+                desc: "No memory pruning active. Messages continue accumulating in the LLM's prompt window until a sequence boundary is crossed, causing a complete server overflow failure." 
+            },
+            filter: { 
+                title: "Trimming (Rolling Window)", 
+                desc: "Automatically discards the oldest messages when the queue length reaches the threshold. Maintains a strict O(1) buffer size at the cost of losing old context." 
+            },
+            summarize: { 
+                title: "Reflective Summarization", 
+                desc: "Compresses historical conversations into a single, structured summary block. Keeps relevant concepts alive without taking up massive token space." 
+            }
         };
 
         function setMode(m) {
             mode = m;
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText.toLowerCase().includes(m));
+            ['naive', 'filter', 'summarize'].forEach(id => {
+                const btn = document.getElementById('btn-mode-' + id);
+                if (id === m) {
+                    btn.className = "flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+                } else {
+                    btn.className = "flex-1 py-3 px-4 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white";
+                }
             });
             modeTitle.innerText = config[m].title;
             modeDesc.innerText = config[m].desc;
-            reset();
+            resetSim();
         }
 
         function addMessage() {
-            // Solution Logic
             if (mode === 'filter' && messages.length >= 4) {
-                messages.shift(); // Remove oldest
+                messages.shift();
                 render();
             }
 
             if (mode === 'summarize' && messages.length >= 4) {
-                // Collapse into summary
-                messages = [{ type: 'summary', text: 'COLLAPSED SUMMARY OF 4 MSGS' }];
+                messages = [{ type: 'summary', text: 'SUMMARY: Converged preceding chat nodes' }];
                 render();
             }
 
-            messages.push({ type: 'standard', text: `MSG #${messages.length + 1} (500T)` });
+            messages.push({ type: 'standard', text: `MSG #${messages.length + 1} (500 Tokens)` });
             
             if (messages.length > 5) {
                 messages[messages.length-1].type = 'danger';
@@ -259,23 +268,26 @@
             messages.forEach(m => {
                 const el = document.createElement('div');
                 el.className = `msg msg-${m.type}`;
-                el.innerHTML = `<span>${m.text}</span> <small>${m.type === 'summary' ? '★' : ''}</small>`;
+                el.innerHTML = `<span>${m.text}</span> <small>${m.type === 'summary' ? '✦ Summary Node' : ''}</small>`;
                 bucket.appendChild(el);
             });
 
             if (messages.length > 5) {
-                status.innerText = "OVERFLOW";
-                status.className = "status-badge status-danger";
+                status.innerText = "OVERFLOW WARNING";
+                status.className = "px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/30";
             } else {
                 status.innerText = "SAFE";
-                status.className = "status-badge status-safe";
+                status.className = "px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
             }
         }
 
-        function reset() {
+        function resetSim() {
             messages = [];
             render();
         }
+
+        // Init
+        setMode('naive');
     </script>
 </body>
 </html>

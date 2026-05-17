@@ -3,298 +3,524 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Deep-Dive: Streaming in LLMs, AI/ML & Multimodal Applications</title>
-    <!-- Fonts -->
+    <title>Token Streaming Masterclass | Gemini Live & SSE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tailwind Typography Plugin -->
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        primary: '#3B82F6',
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                            emerald: '#00ff66',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                        'neon-emerald': '0 0 15px rgba(0, 255, 102, 0.25)',
                     }
                 }
             }
         }
     </script>
-    <!-- Pygments CSS for syntax highlighting -->
     <style>
-        /* Syntax highlighting styles (Monokai-ish) */
-        .codehilite { background: #272822; color: #f8f8f2; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin-bottom: 1.5rem; }
-        .codehilite .hll { background-color: #49483e }
-        .codehilite .c { color: #75715e } /* Comment */
-        .codehilite .err { color: #960050; background-color: #1e0010 } /* Error */
-        .codehilite .k { color: #66d9ef } /* Keyword */
-        .codehilite .l { color: #ae81ff } /* Literal */
-        .codehilite .n { color: #f8f8f2 } /* Name */
-        .codehilite .o { color: #f92672 } /* Operator */
-        .codehilite .p { color: #f8f8f2 } /* Punctuation */
-        .codehilite .ch { color: #75715e } /* Comment.Hashbang */
-        .codehilite .cm { color: #75715e } /* Comment.Multiline */
-        .codehilite .cp { color: #75715e } /* Comment.Preproc */
-        .codehilite .cpf { color: #75715e } /* Comment.PreprocFile */
-        .codehilite .c1 { color: #75715e } /* Comment.Single */
-        .codehilite .cs { color: #75715e } /* Comment.Special */
-        .codehilite .gd { color: #f92672 } /* Generic.Deleted */
-        .codehilite .ge { font-style: italic } /* Generic.Emph */
-        .codehilite .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
-        .codehilite .gr { color: #f92672 } /* Generic.Error */
-        .codehilite .gh { color: #f92672; font-weight: bold } /* Generic.Heading */
-        .codehilite .gi { color: #a6e22e } /* Generic.Inserted */
-        .codehilite .go { color: #66d9ef } /* Generic.Output */
-        .codehilite .gp { color: #f92672; font-weight: bold } /* Generic.Prompt */
-        .codehilite .gs { font-weight: bold } /* Generic.Strong */
-        .codehilite .gu { color: #75715e } /* Generic.Subheading */
-        .codehilite .gt { color: #f92672 } /* Generic.Traceback */
-        .codehilite .kc { color: #66d9ef } /* Keyword.Constant */
-        .codehilite .kd { color: #66d9ef } /* Keyword.Declaration */
-        .codehilite .kn { color: #f92672 } /* Keyword.Namespace */
-        .codehilite .kp { color: #66d9ef } /* Keyword.Pseudo */
-        .codehilite .kr { color: #66d9ef } /* Keyword.Reserved */
-        .codehilite .kt { color: #66d9ef } /* Keyword.Type */
-        .codehilite .ld { color: #e6db74 } /* Literal.Date */
-        .codehilite .m { color: #ae81ff } /* Literal.Number */
-        .codehilite .s { color: #e6db74 } /* Literal.String */
-        .codehilite .na { color: #a6e22e } /* Name.Attribute */
-        .codehilite .nb { color: #f8f8f2 } /* Name.Builtin */
-        .codehilite .nc { color: #a6e22e } /* Name.Class */
-        .codehilite .no { color: #66d9ef } /* Name.Constant */
-        .codehilite .nd { color: #a6e22e } /* Name.Decorator */
-        .codehilite .ni { color: #f8f8f2 } /* Name.Entity */
-        .codehilite .ne { color: #a6e22e } /* Name.Exception */
-        .codehilite .nf { color: #a6e22e } /* Name.Function */
-        .codehilite .nl { color: #f8f8f2 } /* Name.Label */
-        .codehilite .nn { color: #f8f8f2 } /* Name.Namespace */
-        .codehilite .nx { color: #a6e22e } /* Name.Other */
-        .codehilite .py { color: #f8f8f2 } /* Name.Property */
-        .codehilite .nt { color: #f92672 } /* Name.Tag */
-        .codehilite .nv { color: #f8f8f2 } /* Name.Variable */
-        .codehilite .ow { color: #f92672 } /* Operator.Word */
-        .codehilite .w { color: #f8f8f2 } /* Text.Whitespace */
-        .codehilite .mb { color: #ae81ff } /* Literal.Number.Bin */
-        .codehilite .mf { color: #ae81ff } /* Literal.Number.Float */
-        .codehilite .mh { color: #ae81ff } /* Literal.Number.Hex */
-        .codehilite .mi { color: #ae81ff } /* Literal.Number.Integer */
-        .codehilite .mo { color: #ae81ff } /* Literal.Number.Oct */
-        .codehilite .sa { color: #e6db74 } /* Literal.String.Affix */
-        .codehilite .sb { color: #e6db74 } /* Literal.String.Backtick */
-        .codehilite .sc { color: #e6db74 } /* Literal.String.Char */
-        .codehilite .dl { color: #e6db74 } /* Literal.String.Delimiter */
-        .codehilite .sd { color: #e6db74 } /* Literal.String.Doc */
-        .codehilite .s2 { color: #e6db74 } /* Literal.String.Double */
-        .codehilite .se { color: #ae81ff } /* Literal.String.Escape */
-        .codehilite .sh { color: #e6db74 } /* Literal.String.Heredoc */
-        .codehilite .si { color: #e6db74 } /* Literal.String.Interpol */
-        .codehilite .sx { color: #e6db74 } /* Literal.String.Other */
-        .codehilite .sr { color: #e6db74 } /* Literal.String.Regex */
-        .codehilite .s1 { color: #e6db74 } /* Literal.String.Single */
-        .codehilite .ss { color: #e6db74 } /* Literal.String.Symbol */
-        .codehilite .il { color: #ae81ff } /* Literal.Number.Integer.Long */
-        
         body {
-            background-color: #0f172a; /* slate-900 */
-            color: #f8fafc; /* slate-50 */
-        }
-        .prose {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .prose a {
-            color: #3b82f6;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .prose a:hover {
-            color: #60a5fa;
-            text-decoration: underline;
-        }
-        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-            color: #ffffff;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-        .prose p, .prose ul, .prose ol {
-            margin-bottom: 1.25rem;
-            line-height: 1.75;
-            color: #cbd5e1; /* slate-300 */
-        }
-        .prose strong {
-            color: #f1f5f9; /* slate-100 */
-            font-weight: 600;
-        }
-        .prose table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1.5rem;
-        }
-        .prose th, .prose td {
-            border: 1px solid #334155;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        .prose th {
-            background-color: #1e293b; /* slate-800 */
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
             color: #f8fafc;
         }
-        .prose tr:nth-child(even) {
-            background-color: #0f172a;
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .prose tr:nth-child(odd) {
-            background-color: #1e293b;
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
         }
-        .prose blockquote {
-            border-left: 4px solid #3b82f6;
-            padding-left: 1rem;
-            color: #94a3b8;
-            font-style: italic;
-            background-color: rgba(59, 130, 246, 0.1);
-            padding: 1rem;
-            border-radius: 0 0.5rem 0.5rem 0;
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
         }
-        .prose code:not(.codehilite code) {
-            background-color: #1e293b;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-size: 0.875em;
-            color: #e2e8f0;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
         }
-        
-        /* Layout enhancements */
-        .page-header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-bottom: 1px solid #334155;
-            padding: 2rem 0;
-            margin-bottom: 3rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
         }
-        .header-content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        .site-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #3b82f6;
-            letter-spacing: -0.025em;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
         }
-        .content-wrapper {
-            padding: 0 1.5rem 4rem 1.5rem;
-            min-height: calc(100vh - 200px);
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
         }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 0.875rem;
-            margin-bottom: 2rem;
-            transition: color 0.2s;
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
-        .back-link:hover {
-            color: #f8fafc;
-        }
-        .back-link svg {
-            margin-right: 0.5rem;
-            width: 1.25rem;
-            height: 1.25rem;
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            background: #090d1a;
+            border: 1px solid rgba(255,255,255,0.03);
         }
     </style>
 </head>
-<body class="antialiased selection:bg-blue-500/30">
-    <header class="page-header">
-        <div class="header-content">
-            <div class="site-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
-                Agentic AI Knowledge Base
-            </div>
+<body class="antialiased font-sans text-slate-200">
+
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
+
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-blue/30 bg-neon-blue/5 text-neon-blue text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-blue"></span> Inference Engineering
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            Real-Time <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">Token Streaming</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+            Establish absolute operational mastery over real-time token extraction architectures, integrating industrial standards from Google DeepMind (Gemini Live) and OpenAI (SSE streams).
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5">
+            <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg">
+                📚 technical theory
+            </button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ Interactive Stream Simulator
+            </button>
+            <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Implementation Blueprints
+            </button>
         </div>
     </header>
 
-    <main class="content-wrapper">
-        <article class="prose">
-            <h1 id="enterprise-deep-dive-streaming-in-llms-aiml-multimodal-applications">Enterprise Deep-Dive: Streaming in LLMs, AI/ML &amp; Multimodal Applications</h1>
-<p>This standalone root tracking manual establishes absolute operational mastery over real-time token extraction architectures. It integrates reference lecture curriculum with advanced industrial research from <strong>Google DeepMind (Gemini Live)</strong> and <strong>OpenAI (SSE streams)</strong>.</p>
-<hr/>
-<h2 id="what-is-streaming">📖 What is Streaming?</h2>
-<p><strong>In LLMs, streaming means the model starts sending tokens (words) as soon as they're generated, instead of waiting for the entire response to be ready before returning it.</strong></p>
-<div class="codehilite"><pre><span></span><code><span class="n">sequenceDiagram</span>
-<span class="w">    </span><span class="n">participant</span><span class="w"> </span><span class="n">Client</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">Frontend</span><span class="w"> </span><span class="n">Interface</span>
-<span class="w">    </span><span class="n">participant</span><span class="w"> </span><span class="n">Gateway</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">Inference</span><span class="w"> </span><span class="n">API</span><span class="w"> </span><span class="n">Gateway</span>
-<span class="w">    </span><span class="n">participant</span><span class="w"> </span><span class="n">Model</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">LLM</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Multimodal</span><span class="w"> </span><span class="n">Agent</span>
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
 
-<span class="w">    </span><span class="n">Client</span><span class="o">-&gt;&gt;</span><span class="nl">Gateway</span><span class="p">:</span><span class="w"> </span><span class="n">POST</span><span class="w"> </span><span class="o">/</span><span class="n">chat</span><span class="o">/</span><span class="n">completions</span><span class="w"> </span><span class="p">(</span><span class="nl">stream</span><span class="p">:</span><span class="w"> </span><span class="k">true</span><span class="p">)</span>
-<span class="w">    </span><span class="n">Gateway</span><span class="o">-&gt;&gt;</span><span class="nl">Model</span><span class="p">:</span><span class="w"> </span><span class="k">Initialize</span><span class="w"> </span><span class="n">Generation</span><span class="w"> </span><span class="n">Thread</span>
-<span class="w">    </span><span class="n">Note</span><span class="w"> </span><span class="k">over</span><span class="w"> </span><span class="nl">Model</span><span class="p">:</span><span class="w"> </span><span class="n">Computes</span><span class="w"> </span><span class="k">First</span><span class="w"> </span><span class="n">Token</span>
-<span class="w">    </span><span class="n">Model</span><span class="c1">--&gt;&gt;Client: data: {"choices": [{"delta": {"content": "Lang"}}]}</span>
-<span class="w">    </span><span class="n">Note</span><span class="w"> </span><span class="k">over</span><span class="w"> </span><span class="nl">Model</span><span class="p">:</span><span class="w"> </span><span class="n">Computes</span><span class="w"> </span><span class="k">Second</span><span class="w"> </span><span class="n">Token</span>
-<span class="w">    </span><span class="n">Model</span><span class="c1">--&gt;&gt;Client: data: {"choices": [{"delta": {"content": "Graph"}}]}</span>
-<span class="w">    </span><span class="n">Note</span><span class="w"> </span><span class="k">over</span><span class="w"> </span><span class="nl">Model</span><span class="p">:</span><span class="w"> </span><span class="n">Generation</span><span class="w"> </span><span class="n">Finished</span>
-<span class="w">    </span><span class="n">Model</span><span class="c1">--&gt;&gt;Client: data: [DONE]</span>
-</code></pre></div>
-<hr/>
-<h2 id="why-streaming-the-6-core-industrial-use-cases">🎯 Why Streaming? (The 6 Core Industrial Use Cases)</h2>
-<p>Verbatim alignment with advanced systems engineering paradigms:</p>
-<h3 id="1-faster-response-time-low-drop-off-rates">1. Faster Response Time &amp; Low Drop-Off Rates</h3>
-<ul>
-<li><strong>Metrics</strong>: Radically decreases <strong>Time-to-First-Token (TTFT)</strong> from typical 5–10 second blocking windows down to &lt;200 milliseconds. Prevents users from abandoning active loading sessions.</li>
-</ul>
-<h3 id="2-mimics-human-like-conversation">2. Mimics Human-Like Conversation</h3>
-<ul>
-<li><strong>Psychology</strong>: Builds trust, feels highly alive, and keeps end-users deeply engaged by replicating natural conversational cadences.</li>
-</ul>
-<h3 id="3-important-for-multi-modal-uis">3. Important for Multi-Modal UIs</h3>
-<ul>
-<li><strong>Mechanics</strong>: Essential for bidirectional audio interactions (e.g., Gemini Live, OpenAI Voice), rendering spoken word buffers instantly while parsing real-time user interjections.</li>
-</ul>
-<h3 id="4-better-ux-for-long-output-such-as-code">4. Better UX for Long Output such as Code</h3>
-<ul>
-<li><strong>Readability</strong>: Enables developers to visually audit, copy, or execute upstream programming function blocks while subsequent documentation sections are still compiling.</li>
-</ul>
-<h3 id="5-you-can-cancel-midway-saving-tokens">5. You Can Cancel Midway Saving Tokens</h3>
-<ul>
-<li><strong>Cost Optimization</strong>: Intercepts generator loops via client connection termination signals. Halting processing blocks early prevents expensive cloud API token billing metrics from accumulating unnecessarily.</li>
-</ul>
-<h3 id="6-interleave-ui-updates">6. Interleave UI Updates</h3>
-<ul>
-<li><strong>Dynamic Components</strong>: Renders non-textual UI elements instantly during generation turns. Developers can output intermediate state markers like <code>"thinking..."</code>, render animated loader spinners, or expose inline formatted tool calculation tables natively.</li>
-</ul>
-<hr/>
-<h2 id="industry-research-advanced-streaming-backends">🔬 Industry Research: Advanced Streaming Backends</h2>
-<h3 id="google-gemini-live-grpc-streams">🟢 Google Gemini Live &amp; gRPC Streams</h3>
-<p>Google's Gemini model variants leverage native bidirectional streaming interfaces.
-* <strong>Payload Unpacking</strong>: Responses arrive packed inside <code>GenerateContentResponse</code> protocol buffers containing continuous delta updates spanning raw string strings, image visual embeddings, and chunked byte sequences targeting client speakers directly.</p>
-<h3 id="openai-sse-server-sent-events-architecture">🔵 OpenAI SSE (Server-Sent Events) Architecture</h3>
-<p>Standard REST implementations emit HTTP chunked transfer boundaries leveraging plain text <code>text/event-stream</code> contracts.
-* <strong>Mechanics</strong>: Client connection sockets parse individual <code>data: {...}</code> lines terminating cleanly upon encountering a <code>[DONE]</code> target string, enabling infinite continuous outputs over single persistent TCP tunnels.</p>
-<hr/>
-<h2 id="lecture-chapters-reference">📺 Lecture Chapters Reference</h2>
-<p>Mapped exactly to your reference video layout structure:
-1. <strong>Intro</strong> (<code>0:00</code>)
-2. <strong>Streaming Demo</strong> (<code>2:55</code>)
-3. <strong>What is Streaming?</strong> (<code>4:13</code>)
-4. <strong>Importance of streaming</strong> (<code>5:35</code>)
-5. <strong>Implementing Streaming</strong> (<code>12:15</code>)
-6. <strong>Code</strong> (<code>14:08</code>)</p>
-        </article>
+        <!-- ==================== TAB: THEORY ==================== -->
+        <div id="tab-content-theory" class="space-y-16">
+            
+            <!-- Section 1: What is Streaming? -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Section 1: The Principle of Real-Time Generation
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            In traditional request-response architectures, the inference gateway blocks client connections until the model compiles the entire response payload. This causes a massive wait time (**Time-to-First-Token**) of up to 10 seconds.
+                        </p>
+                        <p class="border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400">
+                            "Streaming solves this by yielding token deltas incrementally as they are computed, lowering TTFT under 200 milliseconds."
+                        </p>
+                        <p>
+                            This is achieved using persistent network tunnels that push data using Server-Sent Events (SSE) or bidirectional gRPC protocol channels.
+                        </p>
+                    </div>
+
+                    <!-- Flow Diagram -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">SSE Transfer Timeline</h4>
+                        <div class="flex justify-center">
+                            <svg width="340" height="180" viewBox="0 0 340 180" class="w-full max-w-[340px]">
+                                <line x1="50" y1="20" x2="50" y2="160" stroke="#475569" stroke-width="1.5" />
+                                <line x1="290" y1="20" x2="290" y2="160" stroke="#475569" stroke-width="1.5" />
+                                <text x="50" y="15" fill="#94a3b8" font-family="Outfit" font-size="8" text-anchor="middle">Client</text>
+                                <text x="290" y="15" fill="#94a3b8" font-family="Outfit" font-size="8" text-anchor="middle">LLM API</text>
+
+                                <path d="M 50 40 L 290 60" stroke="#bc13fe" stroke-width="1.5" fill="none" />
+                                <text x="170" y="45" fill="#bc13fe" font-family="JetBrains Mono" font-size="6" text-anchor="middle">POST /chat (stream=true)</text>
+
+                                <path d="M 290 80 L 50 100" stroke="#00f2ff" stroke-width="1.5" stroke-dasharray="3" fill="none" />
+                                <text x="170" y="85" fill="#00f2ff" font-family="JetBrains Mono" font-size="6" text-anchor="middle">data: {"delta": "Lang"}</text>
+
+                                <path d="M 290 110 L 50 130" stroke="#00f2ff" stroke-width="1.5" stroke-dasharray="3" fill="none" />
+                                <text x="170" y="115" fill="#00f2ff" font-family="JetBrains Mono" font-size="6" text-anchor="middle">data: {"delta": "Graph"}</text>
+
+                                <path d="M 290 140 L 50 155" stroke="#ff007f" stroke-width="1.5" fill="none" />
+                                <text x="170" y="145" fill="#ff007f" font-family="JetBrains Mono" font-size="6" text-anchor="middle">data: [DONE]</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Industrial Systems Comparison -->
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- gRPC -->
+                <div class="glass p-8 rounded-3xl glow-card-purple flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-neon-purple mb-6 shadow-neon-purple/10">
+                            <span class="text-xl">🟢</span>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">Google Gemini Live & gRPC</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Utilizes bidirectional gRPC channels built over HTTP/2. This lets both client audio and LLM vocal synthesize payloads streaming concurrently across a single channel.
+                        </p>
+                        <div class="bg-slate-950/50 p-5 rounded-2xl border border-white/5 space-y-2 text-xs text-slate-300 font-mono">
+                            <div>• Persistent TCP Multiplexing</div>
+                            <div>• Native Binary Serialization (Protobuf)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SSE -->
+                <div class="glass p-8 rounded-3xl glow-card-pink flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-neon-pink/10 border border-neon-pink/20 flex items-center justify-center text-neon-pink mb-6 shadow-neon-pink/10">
+                            <span class="text-xl">🔵</span>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">OpenAI SSE Architecture</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Server-Sent Events (SSE) provide a unidirectional push method via text/event-streams. It relies on standard REST architecture, making it highly simple to integrate in standard browsers.
+                        </p>
+                        <div class="bg-slate-950/50 p-5 rounded-2xl border border-white/5 space-y-2 text-xs text-slate-300 font-mono">
+                            <div>• Lightweight Unidirectional Push</div>
+                            <div>• Terminates on standard <code>[DONE]</code> key</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== TAB: SIMULATOR ==================== -->
+        <div id="tab-content-simulator" class="hidden space-y-12">
+            <div class="glass p-6 md:p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-4">Real-Time Token Streaming Simulator</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    Witness real-time streaming mechanics. Start the stream to capture token chunks floating sequentially from the LLM inference server directly into the Client interface!
+                </p>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-8 bg-slate-950/60 p-6 rounded-2xl border border-white/5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Select Streaming Query</label>
+                        <select id="sim-prompt" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="grpc">"Explain the core benefit of gRPC streaming vs SSE."</option>
+                            <option value="code">"Write a Python FastAPI SSE stream endpoint."</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Token Generation Speed (ms)</label>
+                        <select id="sim-delay" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="150">Human Cadence (150ms)</option>
+                            <option value="50" selected>Turbo Speed (50ms)</option>
+                            <option value="15">Max Bandwidth (15ms)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="startTokenStream()" id="btn-run-sim" class="w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Start Stream
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Visual Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Graph Diagram (8 Cols) -->
+                    <div class="lg:col-span-8 bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex flex-col justify-between h-[450px]">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Active Network stream</h4>
+                        
+                        <!-- Visual Stream SVG -->
+                        <div class="flex-1 flex items-center justify-center p-2 relative overflow-hidden">
+                            <svg width="600" height="200" viewBox="0 0 600 200" class="w-full h-full max-h-[180px]">
+                                <!-- Connection Path -->
+                                <path id="stream-wire" d="M 80 100 H 520" stroke="#334155" stroke-width="3" fill="none" />
+                                
+                                <!-- Server Node -->
+                                <g>
+                                    <rect x="10" y="70" width="70" height="60" rx="8" fill="#090d1a" stroke="#bc13fe" stroke-width="2" />
+                                    <text x="45" y="100" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Inference</text>
+                                    <text x="45" y="112" fill="#bc13fe" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Server</text>
+                                </g>
+
+                                <!-- Client Node -->
+                                <g>
+                                    <rect x="520" y="70" width="70" height="60" rx="8" fill="#090d1a" stroke="#00f2ff" stroke-width="2" />
+                                    <text x="555" y="100" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Client</text>
+                                    <text x="555" y="112" fill="#00f2ff" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Browser</text>
+                                </g>
+
+                                <!-- Dynamic Floating Particles -->
+                                <circle id="particle-1" cx="80" cy="100" r="5" fill="#bc13fe" opacity="0" />
+                                <circle id="particle-2" cx="80" cy="100" r="5" fill="#00f2ff" opacity="0" />
+                            </svg>
+                        </div>
+                        
+                        <!-- Console Output Panel -->
+                        <div class="h-[120px] bg-slate-900 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-y-auto custom-scrollbar space-y-1.5" id="sim-console">
+                            <span class="text-slate-500">[System]: Standing by. Select scenarios and click "Start Stream".</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Metrics Monitor Panel (4 Cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        <!-- State Monitor Card -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex-1 overflow-y-auto custom-scrollbar max-h-[210px]">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Stream Metrics</h4>
+                            <div class="space-y-4 font-mono text-xs" id="state-monitor">
+                                <div><span class="text-slate-500">TTFT (First Token):</span> <span id="metric-ttft" class="text-slate-300">0ms</span></div>
+                                <div><span class="text-slate-500">Tokens Generated:</span> <span id="metric-count" class="text-slate-300">0</span></div>
+                                <div><span class="text-slate-500">Stream Status:</span> <span id="metric-status" class="text-neon-purple font-bold">"idle"</span></div>
+                            </div>
+                        </div>
+
+                        <!-- final output -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 h-[210px] overflow-y-auto custom-scrollbar flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Live UI Output</h4>
+                            <div class="flex-1 text-xs text-slate-400 space-y-3 font-mono" id="answer-preview">
+                                <div class="h-full flex items-center justify-center text-center italic text-slate-600 font-sans">
+                                    Token stack will output here.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: CODE ==================== -->
+        <div id="tab-content-code" class="hidden space-y-12">
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-6">Production Streaming Integration</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                    View templates for handling server-sent events inside python inference backends.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left nav -->
+                    <div class="flex flex-col gap-2 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
+                        <button onclick="switchCodeTab('code-fastapi-sse')" id="btn-code-fastapi-sse" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
+                            1. FastAPI SSE Endpoint
+                        </button>
+                        <button onclick="switchCodeTab('code-langgraph-stream')" id="btn-code-langgraph-stream" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            2. LangGraph Async Generator
+                        </button>
+                    </div>
+
+                    <!-- Code viewer -->
+                    <div class="lg:col-span-3">
+                        
+                        <!-- FastAPI SSE -->
+                        <div id="code-content-code-fastapi-sse" class="code-tab-content space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">FastAPI Server Sent Events endpoint</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import asyncio
+
+app = FastAPI()
+
+async def token_generator():
+    tokens = ["Lang", "Graph", " ", "is", " ", "extremely", " ", "powerful."]
+    for token in tokens:
+        yield f"data: {token}\n\n"
+        await asyncio.sleep(0.1)
+    yield "data: [DONE]\n\n"
+
+@app.get("/stream")
+async def stream_tokens():
+    return StreamingResponse(token_generator(), media_type="text/event-stream")
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- LangGraph Stream -->
+                        <div id="code-content-code-langgraph-stream" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Async Token Generator in LangGraph</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+# Triggering real-time state nodes streaming
+async for event in app.astream_events(
+    {"messages": [HumanMessage(content="Explain agent state machine")]},
+    version="v2"
+):
+    kind = event["event"]
+    # Check if a chat completion token is yielded
+    if kind == "on_chat_model_stream":
+        content = event["data"]["chunk"].content
+        if content:
+            print(content, end="", flush=True)
+                                </pre>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
-    
-    <footer class="border-t border-slate-800 mt-12 py-8 text-center text-slate-500 text-sm">
-        <p>Generated dynamically from Markdown • Agentic AI Workspace</p>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.4em]">
+        Agentic AI Streaming Manual • Autonomy & Integration
     </footer>
+
+    <!-- INTERACTIVE SIMULATOR SCRIPTS -->
+    <script>
+        function switchTab(tabId) {
+            const tabs = ['theory', 'simulator', 'code'];
+            tabs.forEach(id => {
+                const el = document.getElementById('tab-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+                }
+            });
+        }
+
+        function switchCodeTab(tabId) {
+            const codeTabs = ['code-fastapi-sse', 'code-langgraph-stream'];
+            codeTabs.forEach(id => {
+                const el = document.getElementById('code-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all";
+                }
+            });
+        }
+
+        async function startTokenStream() {
+            const scenario = document.getElementById('sim-prompt').value;
+            const delay = parseInt(document.getElementById('sim-delay').value);
+            const btn = document.getElementById('btn-run-sim');
+            const consoleEl = document.getElementById('sim-console');
+            const previewEl = document.getElementById('answer-preview');
+            const ttftEl = document.getElementById('metric-ttft');
+            const countEl = document.getElementById('metric-count');
+            const statusEl = document.getElementById('metric-status');
+            const streamWire = document.getElementById('stream-wire');
+            
+            btn.disabled = true;
+            btn.textContent = "Streaming...";
+            consoleEl.innerHTML = "";
+            previewEl.innerHTML = "";
+            ttftEl.innerText = "0ms";
+            countEl.innerText = "0";
+            
+            const logConsole = (msg, type = 'info') => {
+                let colorClass = 'text-slate-400';
+                if (type === 'success') colorClass = 'text-emerald-400';
+                if (type === 'error') colorClass = 'text-neon-pink';
+                if (type === 'warning') colorClass = 'text-neon-blue';
+                consoleEl.innerHTML += `<div class="${colorClass}">[SSE Event]: ${msg}</div>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            };
+
+            const animateParticle = async (particleId) => {
+                const particle = document.getElementById(particleId);
+                particle.setAttribute("cx", "80");
+                particle.setAttribute("opacity", "1");
+                
+                let start = null;
+                const duration = 200; // ms
+                
+                const step = (timestamp) => {
+                    if (!start) start = timestamp;
+                    const progress = (timestamp - start) / duration;
+                    const cx = 80 + progress * 440;
+                    particle.setAttribute("cx", cx.toString());
+                    
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    } else {
+                        particle.setAttribute("opacity", "0");
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+            logConsole("HTTP persistent handshake established.", 'info');
+            streamWire.style.stroke = "#bc13fe";
+            streamWire.style.strokeDasharray = "5";
+            streamWire.style.animation = "dash 1.5s linear infinite";
+            statusEl.innerText = "handshake_pending";
+            await wait(180); // TTFT Simulation
+            
+            ttftEl.innerText = "180ms";
+            statusEl.innerText = "active_stream";
+            logConsole("Time-to-First-Token (TTFT) parsed successfully at 180ms.", 'warning');
+
+            let rawText = "";
+            if (scenario === 'grpc') {
+                rawText = "Unlike unidirectional SSE transfer, gRPC employs bidirectional HTTP/2 connections, multiplexing audio streams alongside live model vocal synthesis natively.";
+            } else if (scenario === 'code') {
+                rawText = "from fastapi.responses import StreamingResponse\n@app.get('/stream')\nasync def stream():\n    return StreamingResponse(generator(), media_type='text/event-stream')";
+            }
+
+            const tokens = rawText.split(" ");
+            let currentCount = 0;
+
+            for (let i = 0; i < tokens.length; i++) {
+                const pId = i % 2 === 0 ? "particle-1" : "particle-2";
+                animateParticle(pId);
+                
+                const space = i === 0 ? "" : " ";
+                previewEl.innerText += space + tokens[i];
+                currentCount++;
+                countEl.innerText = currentCount.toString();
+                logConsole(`data: {"delta": "${tokens[i]}"}`, 'success');
+                
+                await wait(delay);
+            }
+
+            statusEl.innerText = "completed";
+            streamWire.style.stroke = "#334155";
+            streamWire.style.strokeDasharray = "none";
+            streamWire.style.animation = "none";
+            logConsole("data: [DONE] contract parsed cleanly.", 'error');
+
+            btn.disabled = false;
+            btn.textContent = "Start Stream";
+        }
+    </script>
 </body>
 </html>

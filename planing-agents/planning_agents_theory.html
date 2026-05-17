@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Agents Masterclass | Theory & Mechanics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
+        }
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
+        }
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
+        }
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
+        }
+        .gradient-text-blue {
+            background: linear-gradient(135deg, #00f2ff 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-text-purple {
+            background: linear-gradient(135deg, #bc13fe 0%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-text-pink {
+            background: linear-gradient(135deg, #ff007f 0%, #fb7185 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-border-left {
+            position: relative;
+        }
+        .gradient-border-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #00f2ff, #bc13fe);
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Node graph animation classes */
+        .node-active {
+            filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.8));
+            stroke: #00f2ff !important;
+            stroke-width: 3px !important;
+        }
+        .node-completed {
+            filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
+            stroke: #22c55e !important;
+            stroke-width: 2.5px !important;
+        }
+        .path-active {
+            stroke: #00f2ff !important;
+            stroke-dasharray: 6;
+            animation: dash 1s linear infinite;
+        }
+        .path-completed {
+            stroke: #22c55e !important;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -12;
+            }
+        }
+        
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            background: #090d1a;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans text-slate-200">
+
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
+
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-blue/30 bg-neon-blue/5 text-neon-blue text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-blue"></span> LangGraph Architectures
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            Autonomous <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">Planning Agents</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+            A comprehensive masterclass on how LLM systems break down high-level objectives into sequential steps or parallel subtasks using state machines, custom checkpoints, and dynamic fan-out patterns.
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5">
+            <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg">
+                📚 Complete Theory
+            </button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ Interactive Graph Visualizer
+            </button>
+            <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Implementation Blueprint
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
+
+        <!-- ==================== TAB: THEORY ==================== -->
+        <div id="tab-content-theory" class="space-y-16">
+            
+            <!-- Section 1: The Core Paradigm Shift -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    The Evolution of Agency: Reactive vs. Planning Agents
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            Traditional AI agents act **reactively**. In a standard loop (like <strong class="text-neon-blue">ReAct</strong>), the agent observes the user query, selects a tool, runs the tool, and immediately generates an intermediate response. While highly effective for simple questions, this reactive structure breaks down under complex, multi-step, or structured requirements (such as writing a cohesive 3,000-word system design document or writing complex APIs).
+                        </p>
+                        <p class="border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400">
+                            "Without a structural outline, reactive agents suffer from cognitive drift. They forget their high-level objective, repeat tasks redundantly, and produce uncoordinated, disjointed output."
+                        </p>
+                        <p>
+                            A **Planning Agent** resolves this failure by decoupling the reasoning process into two distinct, structured phases:
+                        </p>
+                        <ul class="space-y-3 pl-2">
+                            <li class="flex items-start gap-2.5">
+                                <svg class="w-5 h-5 text-neon-blue mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span><strong>Phase 1: Planning / Deconstruction</strong> – The LLM acts as an architect, generating a structured, validated, and comprehensive plan (outline) composed of independent tasks before executing any tools or writing content.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <svg class="w-5 h-5 text-neon-blue mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span><strong>Phase 2: Execution / Assembly</strong> – Specialized modules execute the planned steps. The plan is either executed sequentially with dynamic adjustments (Plan-and-Execute) or dispatched in parallel to multiple instances (Orchestrator-Worker).</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Comparison Diagram -->
+                    <div class="space-y-4">
+                        <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Reactive Agent (ReAct) Topology</h4>
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="px-4 py-1.5 bg-slate-900 border border-white/10 rounded-lg text-xs font-mono text-slate-400">User Query</div>
+                                <div class="w-0.5 h-4 bg-slate-700"></div>
+                                <div class="px-5 py-2 bg-red-950/30 border border-red-500/20 text-red-400 rounded-lg text-xs font-bold text-center w-full max-w-[280px]">
+                                    Thought → Action (Tool Call) → Observation
+                                    <div class="text-[10px] font-normal text-red-500/70 mt-1">Loops until terminal criteria met (high risk of drift)</div>
+                                </div>
+                                <div class="w-0.5 h-4 bg-slate-700"></div>
+                                <div class="px-4 py-1.5 bg-slate-900 border border-white/10 rounded-lg text-xs font-mono text-slate-400">Final Answer</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950/80 p-6 rounded-2xl border border-neon-blue/20 shadow-neon-blue/5 space-y-4">
+                            <h4 class="text-xs font-bold text-neon-blue uppercase tracking-widest text-center">Planning Agent Topology</h4>
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="px-4 py-1.5 bg-slate-900 border border-white/10 rounded-lg text-xs font-mono text-slate-400">User Objective</div>
+                                <div class="w-0.5 h-4 bg-neon-blue/50"></div>
+                                <div class="px-5 py-2 bg-cyan-950/30 border border-neon-blue/40 text-neon-blue rounded-lg text-xs font-bold text-center w-full max-w-[280px]">
+                                    1. Deconstruction (Orchestration Node)
+                                    <div class="text-[10px] font-normal text-slate-400 mt-1">Produces Structured Plan JSON (Pydantic validated)</div>
+                                </div>
+                                <div class="w-0.5 h-4 bg-neon-blue/50"></div>
+                                <div class="px-5 py-2 bg-purple-950/30 border border-neon-purple/40 text-neon-purple rounded-lg text-xs font-bold text-center w-full max-w-[280px]">
+                                    2. Multi-threaded Dispatch (Workers)
+                                    <div class="text-[10px] font-normal text-slate-400 mt-1">Executes isolated subtasks in parallel (Fan-out)</div>
+                                </div>
+                                <div class="w-0.5 h-4 bg-neon-blue/50"></div>
+                                <div class="px-5 py-2 bg-pink-950/30 border border-neon-pink/40 text-neon-pink rounded-lg text-xs font-bold text-center w-full max-w-[280px]">
+                                    3. Synthesis & Reduction (Reducer Subgraph)
+                                    <div class="text-[10px] font-normal text-slate-400 mt-1">Aggregates worker outputs and compiles final artifact</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Plan-and-Execute vs Orchestrator-Worker -->
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Card 1: Plan-and-Execute -->
+                <div class="glass p-8 rounded-3xl glow-card-purple flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center text-neon-purple mb-6 shadow-neon-purple/10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">Architecture A: Plan-and-Execute</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            Inspired by **BabyAGI** and **Plan-and-Solve** methodologies, this architecture is heavily **sequential** and **dynamic**. The agent creates a plan consisting of steps, runs the first step, and then routes back to a *Replanner* node. The Replanner inspects the state, marks the step completed, makes adjustments to the remaining steps, and triggers execution of the next step.
+                        </p>
+                        
+                        <div class="bg-slate-950/50 p-5 rounded-2xl border border-white/5 space-y-4 mb-6">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Plan-and-Execute Core Properties:</h4>
+                            <ul class="space-y-2 text-xs text-slate-300">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-purple"></span>
+                                    <span><strong>High Task Interdependence:</strong> Step B requires output from Step A.</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-purple"></span>
+                                    <span><strong>Re-planning Feedback Loop:</strong> Dynamic outline restructuring at each superstep.</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-purple"></span>
+                                    <span><strong>Low Thread Concurrency:</strong> Executed strictly one step at a time.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="border-t border-white/5 pt-4 text-xs font-mono text-neon-purple uppercase tracking-wider">
+                        Best For: Deep Research, Autonomous Coding Agents, Self-Correction Loops
+                    </div>
+                </div>
+
+                <!-- Card 2: Orchestrator-Worker -->
+                <div class="glass p-8 rounded-3xl glow-card-pink flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-neon-pink/10 border border-neon-pink/20 flex items-center justify-center text-neon-pink mb-6 shadow-neon-pink/10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold mb-4">Architecture B: Orchestrator-Worker</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                            This architecture relies on **parallel task deconstruction**. An *Orchestrator* analyzes the objective and spits out an array of independent tasks. Using LangGraph's dynamic <strong class="text-neon-pink">`Send` API</strong>, the system forks execution, launching specialized *Worker* nodes for each task concurrently. Finally, a *Reducer* node aggregates all parallel results.
+                        </p>
+                        
+                        <div class="bg-slate-950/50 p-5 rounded-2xl border border-white/5 space-y-4 mb-6">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Orchestrator-Worker Core Properties:</h4>
+                            <ul class="space-y-2 text-xs text-slate-300">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-pink"></span>
+                                    <span><strong>Low Task Interdependence:</strong> Subtasks can be executed in isolation.</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-pink"></span>
+                                    <span><strong>Maximum Concurrency:</strong> Parallel fan-out yields massive speed boosts.</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-neon-pink"></span>
+                                    <span><strong>State Aggregation Engine:</strong> Relies on Reducers to combine state values.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="border-t border-white/5 pt-4 text-xs font-mono text-neon-pink uppercase tracking-wider">
+                        Best For: Multi-Section Blogs, Parallel Web Scraping, Code Auditing Swarms
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Deep Dive LangGraph Mechanics -->
+            <section class="glass p-8 md:p-12 rounded-3xl relative">
+                <h2 class="text-3xl font-display font-bold mb-8">
+                    Deep-Dive: State Reducers & The Value Clobbering Problem
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm">
+                        <p>
+                            When executing nodes in parallel (Fan-out), LangGraph runs workers concurrently. If multiple worker nodes try to write to the same key in the Graph's global state, standard state machines will overwrite each other's outputs. This is known as **value clobbering**.
+                        </p>
+                        <p>
+                            LangGraph resolves this elegantly using **Reducers**. A Reducer is a function associated with a specific key in the `TypedDict` schema. When a node returns a value for that key, LangGraph runs the Reducer function rather than replacing the value.
+                        </p>
+                        <div class="p-5 bg-[#090d1a] border border-white/5 rounded-2xl space-y-3">
+                            <h4 class="text-xs font-bold text-neon-blue uppercase tracking-widest font-mono">The Code Archetype</h4>
+                            <pre class="text-[11px] text-emerald-400 font-mono overflow-x-auto leading-relaxed">
+<span class="text-slate-500"># In state.py</span>
+from typing import Annotated, TypedDict
+import operator
+
+class State(TypedDict):
+    topic: str
+    <span class="text-cyan-400"># The Reducer: operator.add appends new items to the existing list</span>
+    sections: Annotated[List[tuple[int, str]], operator.add]
+    final: str
+                            </pre>
+                        </div>
+                        <p>
+                            In the **Blog Writing Agent** implemented in your <a href="file:///home/divyansh-rawat/Agentic-AI/planing-agents/blog-writing-agent/bwa_backend.py" class="text-neon-blue hover:underline">bwa_backend.py</a>, the sections are stored as tuples of `(task_id, section_markdown)`. The reducer combines these tuples into an unordered list. When the execution flows into the **Reducer Node (`merge_content`)**, it sorts the list by `task_id` (index 0) to ensure sections are assembled in the precise planned order, solving parallel synchronization seamlessly!
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-6 md:p-8 rounded-2xl border border-white/5 space-y-6">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Fan-out / Fan-in Visualization</h4>
+                        
+                        <!-- Custom SVG Flow Diagram -->
+                        <div class="flex justify-center">
+                            <svg width="340" height="240" viewBox="0 0 340 240" class="w-full max-w-[340px]">
+                                <!-- Gradients -->
+                                <defs>
+                                    <linearGradient id="grad-blue-purp" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#00f2ff" />
+                                        <stop offset="100%" stop-color="#bc13fe" />
+                                    </linearGradient>
+                                </defs>
+                                
+                                <!-- Pathways -->
+                                <path d="M 50 120 L 120 50" stroke="#475569" stroke-width="1.5" fill="none" />
+                                <path d="M 50 120 L 120 120" stroke="#475569" stroke-width="1.5" fill="none" />
+                                <path d="M 50 120 L 120 190" stroke="#475569" stroke-width="1.5" fill="none" />
+                                
+                                <path d="M 190 50 L 260 120" stroke="#475569" stroke-width="1.5" fill="none" />
+                                <path d="M 190 120 L 260 120" stroke="#475569" stroke-width="1.5" fill="none" />
+                                <path d="M 190 190 L 260 120" stroke="#475569" stroke-width="1.5" fill="none" />
+                                
+                                <!-- Orchestrator Node -->
+                                <circle cx="50" cy="120" r="24" fill="#090d1a" stroke="#00f2ff" stroke-width="2" />
+                                <text x="50" y="124" fill="#00f2ff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">ORCH</text>
+                                
+                                <!-- Workers -->
+                                <g>
+                                    <rect x="120" y="30" width="70" height="40" rx="8" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                    <text x="155" y="52" fill="#fff" font-family="Inter" font-size="8" text-anchor="middle">Worker 1</text>
+                                    <text x="155" y="62" fill="#a1a1aa" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Section 1</text>
+                                </g>
+                                <g>
+                                    <rect x="120" y="100" width="70" height="40" rx="8" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                    <text x="155" y="122" fill="#fff" font-family="Inter" font-size="8" text-anchor="middle">Worker 2</text>
+                                    <text x="155" y="132" fill="#a1a1aa" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Section 2</text>
+                                </g>
+                                <g>
+                                    <rect x="120" y="170" width="70" height="40" rx="8" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                    <text x="155" y="192" fill="#fff" font-family="Inter" font-size="8" text-anchor="middle">Worker N</text>
+                                    <text x="155" y="202" fill="#a1a1aa" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Section N</text>
+                                </g>
+                                
+                                <!-- Reducer Node -->
+                                <circle cx="280" cy="120" r="24" fill="#090d1a" stroke="#ff007f" stroke-width="2" />
+                                <text x="280" y="124" fill="#ff007f" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">REDUCE</text>
+                                
+                                <!-- Annotation labels -->
+                                <text x="80" y="80" fill="#00f2ff" font-family="JetBrains Mono" font-size="7" font-weight="bold" transform="rotate(-30 80 80)">Dynamic Send()</text>
+                                <text x="220" y="85" fill="#ff007f" font-family="JetBrains Mono" font-size="7" font-weight="bold" transform="rotate(30 220 85)">operator.add</text>
+                            </svg>
+                        </div>
+                        
+                        <div class="text-xs text-slate-400 leading-relaxed border-t border-white/5 pt-4">
+                            <strong>Step-by-step Execution Lifecycle:</strong>
+                            <ol class="list-decimal list-inside space-y-1.5 mt-2">
+                                <li>The orchestrator inspects the main topic and generates <em>N</em> tasks.</li>
+                                <li>The router returns a list of <code>Send("worker", payload)</code> payloads.</li>
+                                <li>LangGraph spawns <em>N</em> worker operations in parallel.</li>
+                                <li>Each worker processes an isolated task and publishes a <code>(task_id, section_md)</code> tuple.</li>
+                                <li>The Reducer automatically aggregates worker tuples using <code>operator.add</code>.</li>
+                                <li>The Synthesis node executes only after all workers are completed.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3.5: The Dual Architectural Functions of Reducers (Accumulation vs. Multi-Stage Pipeline) -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-purple relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-purple/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-purple rounded-full"></span>
+                    Section 3.5: The Dual Architectural Functions of Reducers
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-6 text-slate-300 leading-relaxed text-sm">
+                        <p>
+                            In high-concurrency LLM agents, a <strong>Reducer</strong> performs two distinct functions: one at the <strong>State Schema level</strong> (data collection) and one at the <strong>Graph Compilation level</strong> (subgraph pipeline processing).
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-display font-bold text-neon-blue flex items-center gap-2">
+                                <span class="w-1.5 h-4 bg-neon-blue rounded-full"></span>
+                                1. State-Level Reducers: Accumulation without Clobbering
+                            </h3>
+                            <p class="text-xs">
+                                When a graph spawns multiple parallel worker nodes (fan-out), they execute concurrently in isolated threads. When they complete, they publish their drafts to a shared state key (<code>sections</code>). Without a reducer, each thread's write would overwrite (clobber) the previous ones, resulting in a single final section surviving.
+                            </p>
+                            <p class="text-xs">
+                                By declaring <code>sections: Annotated[List[tuple[int, str]], operator.add]</code> in our state contract, we assign a **State-Level Reducer**. Instead of replacing the value, the LangGraph runtime automatically appends every worker's <code>(task_id, section_markdown)</code> payload as it arrives, accumulating all drafts into an unordered list in global state memory.
+                            </p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-display font-bold text-neon-pink flex items-center gap-2">
+                                <span class="w-1.5 h-4 bg-neon-pink rounded-full"></span>
+                                2. Graph-Level Reducers: Compiled Subgraph Pipeline
+                            </h3>
+                            <p class="text-xs">
+                                Collecting the drafts is only the first step. To transition this raw list into a professional, cohesive asset, the reduction phase is elevated into a nested <strong>Reducer Subgraph</strong> (compiled separately as a sub-agent).
+                            </p>
+                            <p class="text-xs">
+                                This sub-agent performs a strict three-stage execution flow:
+                            </p>
+                            <ul class="list-disc list-inside space-y-1.5 pl-2 text-[11px] text-slate-400">
+                                <li><strong>Stitching (<code>merge_content</code>):</strong> Sorts the accumulated tuples by `task_id` to guarantee the sections are assembled in the precise ordered blueprint regardless of which worker finished first.</li>
+                                <li><strong>Asset Speculation (<code>decide_images</code>):</strong> An LLM scans the text and dynamically injects visual indicators (e.g. <code>[[IMAGE_1]]</code>) mapping to structured <code>ImageSpec</code> targets (placeholder, filename, caption, prompt, size).</li>
+                                <li><strong>Dynamic Compilation (<code>generate_and_place_images</code>):</strong> Dispatches visual prompts to multimodal image models (Gemini-2.5) and search-replaces the placeholders with final styled image tags.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Flowchart SVG depicting the dual reducer functions -->
+                    <div class="bg-slate-950/80 p-6 md:p-8 rounded-2xl border border-white/5 flex flex-col justify-between space-y-6">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Visualizing Reducer Schema & Subgraph Boundaries</h4>
+                        
+                        <div class="flex justify-center">
+                            <svg width="340" height="340" viewBox="0 0 340 340" class="w-full max-w-[340px]">
+                                <!-- Gradients -->
+                                <defs>
+                                    <linearGradient id="grad-accum" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#00f2ff" />
+                                        <stop offset="100%" stop-color="#bc13fe" />
+                                    </linearGradient>
+                                </defs>
+
+                                <!-- 1. ACCUMULATION PHASE -->
+                                <text x="10" y="20" fill="#64748b" font-family="Outfit" font-size="8" font-weight="bold" uppercase="true" tracking-wider="true">Phase 1: State Accumulator (operator.add)</text>
+                                
+                                <g>
+                                    <!-- Worker Boxes -->
+                                    <rect x="10" y="35" width="60" height="25" rx="4" fill="#090d1a" stroke="#00f2ff" stroke-width="1" />
+                                    <text x="40" y="50" fill="#00f2ff" font-family="Inter" font-size="7" text-anchor="middle">Worker 1</text>
+                                    <text x="40" y="58" fill="#64748b" font-family="JetBrains Mono" font-size="5" text-anchor="middle">(1, md1)</text>
+
+                                    <rect x="80" y="35" width="60" height="25" rx="4" fill="#090d1a" stroke="#00f2ff" stroke-width="1" />
+                                    <text x="110" y="50" fill="#00f2ff" font-family="Inter" font-size="7" text-anchor="middle">Worker 2</text>
+                                    <text x="110" y="58" fill="#64748b" font-family="JetBrains Mono" font-size="5" text-anchor="middle">(2, md2)</text>
+
+                                    <rect x="150" y="35" width="60" height="25" rx="4" fill="#090d1a" stroke="#00f2ff" stroke-width="1" />
+                                    <text x="180" y="50" fill="#00f2ff" font-family="Inter" font-size="7" text-anchor="middle">Worker N</text>
+                                    <text x="180" y="58" fill="#64748b" font-family="JetBrains Mono" font-size="5" text-anchor="middle">(N, mdN)</text>
+                                </g>
+
+                                <!-- Paths to Reducer State -->
+                                <path d="M 40 60 L 110 95" stroke="#bc13fe" stroke-width="1" stroke-dasharray="2" />
+                                <path d="M 110 60 L 110 95" stroke="#bc13fe" stroke-width="1" stroke-dasharray="2" />
+                                <path d="M 180 60 L 110 95" stroke="#bc13fe" stroke-width="1" stroke-dasharray="2" />
+
+                                <!-- Reducer State Box -->
+                                <g>
+                                    <rect x="50" y="95" width="120" height="35" rx="6" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                    <text x="110" y="112" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">sections state key</text>
+                                    <text x="110" y="122" fill="#bc13fe" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Annotated[List, operator.add]</text>
+                                </g>
+
+                                <!-- Divider -->
+                                <line x1="10" y1="145" x2="330" y2="145" stroke="#334155" stroke-dasharray="4" />
+
+                                <!-- 2. SUBGRAPH PHASE -->
+                                <text x="10" y="165" fill="#64748b" font-family="Outfit" font-size="8" font-weight="bold" uppercase="true" tracking-wider="true">Phase 2: Compiled Subgraph Pipeline</text>
+
+                                <g>
+                                    <!-- merge_content -->
+                                    <rect x="10" y="180" width="85" height="30" rx="6" fill="#090d1a" stroke="#00f2ff" stroke-width="1.5" />
+                                    <text x="52" y="195" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">merge_content</text>
+                                    <text x="52" y="205" fill="#00f2ff" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Sorts & Joins Sections</text>
+
+                                    <!-- Arrow -->
+                                    <path d="M 95 195 L 125 195" stroke="#475569" stroke-width="1" />
+
+                                    <!-- decide_images -->
+                                    <rect x="125" y="180" width="85" height="30" rx="6" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                    <text x="167" y="195" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">decide_images</text>
+                                    <text x="167" y="205" fill="#bc13fe" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Spec [[IMAGE_N]] outline</text>
+
+                                    <!-- Arrow -->
+                                    <path d="M 210 195 L 240 195" stroke="#475569" stroke-width="1" />
+
+                                    <!-- generate_and_place_images -->
+                                    <rect x="240" y="180" width="90" height="30" rx="6" fill="#090d1a" stroke="#ff007f" stroke-width="1.5" />
+                                    <text x="285" y="195" fill="#fff" font-family="Outfit" font-size="7" text-anchor="middle" font-weight="bold">generate_images</text>
+                                    <text x="285" y="205" fill="#ff007f" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Gemini Multimodal Generate</text>
+                                </g>
+
+                                <!-- Pydantic Contract -->
+                                <g>
+                                    <rect x="50" y="235" width="230" height="75" rx="8" fill="#090d1a" stroke="#22c55e" stroke-width="1" />
+                                    <text x="165" y="250" fill="#22c55e" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Reducer Data Contracts</text>
+                                    
+                                    <text x="65" y="265" fill="#a1a1aa" font-family="JetBrains Mono" font-size="7" text-anchor="start">GlobalImagePlan {</text>
+                                    <text x="80" y="277" fill="#a1a1aa" font-family="JetBrains Mono" font-size="7" text-anchor="start">md_with_placeholders: str</text>
+                                    <text x="80" y="289" fill="#a1a1aa" font-family="JetBrains Mono" font-size="7" text-anchor="start">images: List[ImageSpec]  # (prompt, quality, size)</text>
+                                    <text x="65" y="301" fill="#a1a1aa" font-family="JetBrains Mono" font-size="7" text-anchor="start">}</text>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="text-[10px] text-slate-500 text-center italic leading-relaxed">
+                            The Reducer first acts as a concurrent collector at the schema level, then transitions into a multi-stage compiler subgraph to weave and ground technical assets.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Upfront Routing & Dynamic Query Synthesizing -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Section 4: Strategic Upfront Routing & Topic Profiling
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            In reactive multi-agent flows, search queries are usually fired on-demand as workers stumble upon gaps in their local knowledge. While convenient, this causes massive execution overhead, redundancy, and unpredictability.
+                        </p>
+                        <p>
+                            A robust Planning Agent solves this by implementing a **Strategic Upfront Router**. Before any outlines are drafted, the user query is classified by a routing LLM node using <code>llm.with_structured_output(RouterDecision)</code>. The router maps the query into one of three strict operating profiles:
+                        </p>
+                        <ul class="space-y-3 pl-2 text-sm">
+                            <li class="flex items-start gap-2">
+                                <span class="text-neon-blue font-bold">1. Closed Book:</span>
+                                <span>Evergreen academic or theoretical concepts. No research is needed, saving API calls and reducing execution time to a bare minimum.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-neon-purple font-bold">2. Hybrid:</span>
+                                <span>Evergreen concepts that benefit from modern, live technical examples or software version updates. Spawns 3–5 targeted search queries.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-neon-pink font-bold">3. Open Book:</span>
+                                <span>Time-sensitive weekly roundups, active corporate announcements, release updates, or pricing reviews. Spawns up to 10 search queries.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- SVG 3-Way Router Diagram -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">3-Way Dynamic Routing Classifier</h4>
+                        <div class="flex justify-center">
+                            <svg width="360" height="200" viewBox="0 0 360 200" class="w-full max-w-[360px]">
+                                <!-- Central Router -->
+                                <rect x="130" y="70" width="100" height="50" rx="10" fill="#090d1a" stroke="#00f2ff" stroke-width="2" class="node-active" />
+                                <text x="180" y="100" fill="#00f2ff" font-family="Outfit" font-size="11" text-anchor="middle" font-weight="bold">Router Node</text>
+                                
+                                <!-- Input -->
+                                <path d="M 30 95 L 120 95" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" />
+                                <circle cx="30" cy="95" r="5" fill="#64748b" />
+                                <text x="45" y="85" fill="#64748b" font-family="JetBrains Mono" font-size="7">User Topic</text>
+
+                                <!-- Branches -->
+                                <path d="M 230 85 L 290 35" stroke="#bc13fe" stroke-width="1.5" stroke-dasharray="4" />
+                                <path d="M 230 95 L 290 95" stroke="#00f2ff" stroke-width="1.5" />
+                                <path d="M 230 105 L 290 155" stroke="#ff007f" stroke-width="1.5" stroke-dasharray="4" />
+
+                                <!-- Labels -->
+                                <rect x="280" y="15" width="70" height="30" rx="6" fill="#090d1a" stroke="#bc13fe" stroke-width="1" />
+                                <text x="315" y="33" fill="#bc13fe" font-family="Inter" font-size="8" text-anchor="middle" font-weight="bold">Closed Book</text>
+                                
+                                <rect x="280" y="80" width="70" height="30" rx="6" fill="#090d1a" stroke="#00f2ff" stroke-width="1" />
+                                <text x="315" y="98" fill="#00f2ff" font-family="Inter" font-size="8" text-anchor="middle" font-weight="bold">Hybrid</text>
+
+                                <rect x="280" y="145" width="70" height="30" rx="6" fill="#090d1a" stroke="#ff007f" stroke-width="1" />
+                                <text x="315" y="163" fill="#ff007f" font-family="Inter" font-size="8" text-anchor="middle" font-weight="bold">Open Book</text>
+                            </svg>
+                        </div>
+                        <div class="text-[10px] text-slate-500 leading-relaxed text-center italic">
+                            Structured decision bounds dictate whether the graph bypasses search entirely or deploys a multi-query parallel fetch.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Multi-Query Grounded Research & EvidencePack De-duplication -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-purple relative overflow-hidden">
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-neon-purple/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-purple rounded-full"></span>
+                    Section 5: Concurrent Grounded Research & Deduplication
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm">
+                        <p>
+                            Once a topic is identified as requiring external research (either `hybrid` or `open_book`), the router synthesizes a sequence of up to ten highly specific search queries. If we were to send these queries sequentially, search times would stack lineally, blocking the agent pipeline.
+                        </p>
+                        <p>
+                            Instead, the <strong>Research Node</strong> executes search queries concurrently (using Tavily Search APIs). However, concurrent searching across related queries introduces two critical engineering issues:
+                        </p>
+                        <ol class="list-decimal list-inside space-y-2 pl-2">
+                            <li><strong>State Memory Bloat:</strong> Raw search logs contain vast amounts of boilerplate HTML code, tracking parameters, and generic layout text.</li>
+                            <li><strong>Citation Overlap:</strong> Different queries will inevitably hit identical primary URLs, creating messy, duplicate citations in the compiled bibliography.</li>
+                        </ol>
+                        <p>
+                            To solve this, the agent processes raw outputs using a specialized schema extractor. It filters evidence into clean, unified <code>EvidenceItem</code> data models and maps them into a global dictionary keyed by the URL. This strictly ensures that each source is cited **exactly once** in the compiled <code>EvidencePack</code>.
+                        </p>
+                    </div>
+
+                    <!-- Code block showing Deduplication -->
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">Deduplication & Extraction Engine</h4>
+                        <div class="p-6 rounded-2xl code-block max-h-[320px] overflow-y-auto custom-scrollbar">
+                            <pre class="text-[11px] leading-relaxed text-cyan-300 font-mono">
+def research_node(state: State) -> dict:
+    queries = state.get("queries") or []
+    raw = []
+    # Concurrently execute queries in parallel
+    for q in queries:
+        raw.extend(_tavily_search(q, max_results=6))
+    
+    if not raw:
+        return {"evidence": []}
+
+    # Restructure using structured extraction LLM
+    extractor = llm.with_structured_output(EvidencePack)
+    pack = extractor.invoke([
+        SystemMessage(content=RESEARCH_SYSTEM),
+        HumanMessage(content=f"Raw Results: {raw}")
+    ])
+
+    # Strict URL-key deduplication
+    dedup = {}
+    for e in pack.evidence:
+        if e.url:
+            dedup[e.url] = e
+            
+    evidence = list(dedup.values())
+    return {"evidence": evidence}
+                            </pre>
+                        </div>
+                        <div class="text-[10px] text-slate-500 italic">
+                            By mapping by <code>e.url</code> inside our dedup dictionary, the context window receives only clean, unique information payloads.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Temporal Boundaries, Recency Cutoffs & Contextual As-Of Controls -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-pink relative overflow-hidden">
+                <div class="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-neon-pink/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-pink rounded-full"></span>
+                    Section 6: Temporal Grounding & Hard Recency Filtering
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            LLMs live in a "temporal vacuum". They do not inherently know the current year or date unless it is injected. When asked about modern tech developments, their internal weights skew towards historic data, causing them to hallucinate active facts (e.g., asserting that an old beta version is still the active build).
+                        </p>
+                        <p>
+                            To prevent this "time-travel" issue, the Planning Agent introduces strict **Contextual As-Of Controls**:
+                        </p>
+                        <ul class="space-y-3 pl-2">
+                            <li class="flex items-start gap-2">
+                                <span class="text-neon-pink">⏱️</span>
+                                <span><strong>State-Bound Epoch:</strong> The graph state maintains an <code>as_of</code> string representing the exact simulated datetime of the execution.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-neon-pink">⏱️</span>
+                                <span><strong>Dynamic Recency Cutoff:</strong> The router assigns a <code>recency_days</code> threshold. For weekly news roundups, this is locked to 7 days. For hybrid configurations, it extends to 45 days.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-neon-pink">⏱️</span>
+                                <span><strong>Hard Time Filter:</strong> Inside the research node, the date of search articles is extracted and normalized to ISO <code>YYYY-MM-DD</code>. Any item published older than <code>as_of - recency_days</code> is immediately stripped from the state.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Temporal Cutoff Filter Math</h4>
+                        <div class="p-5 bg-slate-900 rounded-xl border border-neon-pink/10 space-y-4">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-mono">as_of state variable:</span>
+                                <span class="text-neon-pink font-mono font-semibold">2026-05-17</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-mono">recency_days threshold:</span>
+                                <span class="text-neon-pink font-mono font-semibold">7 days</span>
+                            </div>
+                            <div class="h-0.5 bg-slate-800"></div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-mono">Computed Filter Cutoff:</span>
+                                <span class="text-emerald-400 font-mono font-semibold">2026-05-10</span>
+                            </div>
+                            <div class="text-[10px] text-slate-400 leading-relaxed bg-slate-950 p-3 rounded-lg border border-white/5 font-mono">
+                                # Code behind the filter
+                                cutoff = date.fromisoformat(state["as_of"]) - timedelta(days=state["recency_days"])
+                                evidence = [e for e in evidence if e.published_at >= cutoff]
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 italic text-center">
+                            Articles published before May 10, 2026 are completely discarded, ensuring the worker draft is grounded strictly in current-week events.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Anti-Drift Guardrails & Content Constraints -->
+            <section class="glass p-8 md:p-12 rounded-3xl relative">
+                <h2 class="text-3xl font-display font-bold mb-6">
+                    Section 7: Mid-Blog Cognitive Drift Guardrails
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm">
+                        <p>
+                            In a classic parallel map-reduce flow, each worker operates in an isolated environment, unaware of what other workers are doing. In blog writing, this leads to **Cognitive Drift**: a worker tasked with writing a section on "Latest MCP Releases" might drift into writing setup guides, code blocks, or installation tutorials, causing frustrating repetition and a disjointed overall flow.
+                        </p>
+                        <p>
+                            We enforce absolute outline cohesion using a three-tier guardrail system:
+                        </p>
+                        <ul class="space-y-3 pl-2">
+                            <li class="flex items-start gap-2.5">
+                                <svg class="w-5 h-5 text-neon-blue mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span><strong>Explicit Task Contracts:</strong> Each section is strictly defined by an active Pydantic <code>Task</code> model including precise target word counts, specific bullet subtopics, and true/false flags for <code>requires_code</code> or <code>requires_citations</code>.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <svg class="w-5 h-5 text-neon-blue mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span><strong>Global Kind Constraints:</strong> The orchestrator passes a global <code>blog_kind</code> value (e.g. <code>news_roundup</code>) to every worker. In a news roundup, worker system prompts strictly prohibit any coding tutorials, keeping the focus strictly on events and market implications.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <svg class="w-5 h-5 text-neon-blue mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span><strong>Citation Scope Locks:</strong> Under <code>open_book</code> mode, workers are explicitly blocked from introducing any claim, model, or funding update unless supported by an active evidence URL. Claims must have an explicit citation link matching <code>[Source](URL)</code>.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Comparison Table -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Execution Constraints & Scopes</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left text-slate-300">
+                                <thead class="text-[10px] text-slate-500 uppercase bg-slate-900 border-b border-white/5">
+                                    <tr>
+                                        <th scope="col" class="py-2 px-3">State Field</th>
+                                        <th scope="col" class="py-2 px-3">Explainer Kind</th>
+                                        <th scope="col" class="py-2 px-3">News Roundup Kind</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-white/5">
+                                        <td class="py-2.5 px-3 font-mono text-neon-blue">blog_kind</td>
+                                        <td class="py-2.5 px-3">"explainer" (Conceptual)</td>
+                                        <td class="py-2.5 px-3">"news_roundup" (Events)</td>
+                                    </tr>
+                                    <tr class="border-b border-white/5">
+                                        <td class="py-2.5 px-3 font-mono text-neon-blue">requires_code</td>
+                                        <td class="py-2.5 px-3">Allowed on tutorial/sys tasks</td>
+                                        <td class="py-2.5 px-3">Strictly Prohibited</td>
+                                    </tr>
+                                    <tr class="border-b border-white/5">
+                                        <td class="py-2.5 px-3 font-mono text-neon-blue">citation_policy</td>
+                                        <td class="py-2.5 px-3">Optional grounding cites</td>
+                                        <td class="py-2.5 px-3">Mandatory [Source](URL) for facts</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2.5 px-3 font-mono text-neon-blue">primary_focus</td>
+                                        <td class="py-2.5 px-3">Detailed architecture guides</td>
+                                        <td class="py-2.5 px-3">Market implications & context</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-[10px] text-slate-500 italic text-center leading-relaxed">
+                            Mapping target constraints into payload parameters guarantees that parallel worker nodes do not replicate setup code or drift out of topic scope.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: The ReducerWithImages Nested Subgraph & Gemini Multi-Modal Asset Generation -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Section 8: Nested Reducer Subgraphs & Multi-Modal Generation
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            Stitching parallel sections together is a basic reduction. But professional publishing pipelines require more than raw markdown text; they need tailored **multimodal visual assets** to illustrate complex topics.
+                        </p>
+                        <p>
+                            To solve this without cluttering the main blog writing state machine, we structure the final reduction phase as an independent, nested **Reducer Subgraph** (compiled using its own state rules):
+                        </p>
+                        <ol class="list-decimal list-inside space-y-3 pl-2 text-sm">
+                            <li>
+                                <strong>Stitch & Sort (<code>merge_content</code>):</strong> Workers push their draft snippets into the global state as <code>(task_id, section_markdown)</code>. The Reducer sorts these by the original task ID and merges them, preserving structural outline cohesion.
+                            </li>
+                            <li>
+                                <strong>Asset Speculation (<code>decide_images</code>):</strong> An editing LLM scans the full stitched document. It decides if technical illustrations are needed (max 3) and injects literal markers like <code>[[IMAGE_1]]</code> directly into the text. It outputs a <code>GlobalImagePlan</code> featuring custom visual prompt plans and filename targets.
+                            </li>
+                            <li>
+                                <strong>Multimodal Ingestion (<code>generate_and_place_images</code>):</strong> The system loops through the planned specifications. It sends the visual prompts to Google's <code>gemini-2.5-flash-image</code> model, downloads the compiled bytes as PNGs under <code>images/</code>, and search-replaces the markdown placeholders with fully rendered image tags.
+                            </li>
+                        </ol>
+                        <p class="border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400 text-xs">
+                            "Failsafe Engineering: If the multimodal API returns a safety cutoff, quota limit, or network block, the graph catches the exception and prints an interactive, graceful fallback quote box describing what the diagram would illustrate."
+                        </p>
+                    </div>
+
+                    <!-- Flowchart SVG for Reducer Subgraph -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">ReducerWithImages Subgraph Flow</h4>
+                        <div class="flex justify-center">
+                            <svg width="360" height="200" viewBox="0 0 360 200" class="w-full max-w-[360px]">
+                                <!-- Nodes -->
+                                <g>
+                                    <rect x="10" y="75" width="80" height="40" rx="8" fill="#090d1a" stroke="#00f2ff" stroke-width="1.5" />
+                                    <text x="50" y="93" fill="#fff" font-family="Inter" font-size="8" text-anchor="middle" font-weight="bold">merge_content</text>
+                                    <text x="50" y="103" fill="#64748b" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Stitch markdown</text>
+                                </g>
+
+                                <path d="M 90 95 L 130 95" stroke="#475569" stroke-width="1.5" />
+
+                                <g>
+                                    <rect x="130" y="75" width="80" height="40" rx="8" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                    <text x="170" y="93" fill="#fff" font-family="Inter" font-size="8" text-anchor="middle" font-weight="bold">decide_images</text>
+                                    <text x="170" y="103" fill="#a1a1aa" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Spec placeholders</text>
+                                </g>
+
+                                <path d="M 210 95 L 250 95" stroke="#475569" stroke-width="1.5" />
+
+                                <g>
+                                    <rect x="250" y="75" width="100" height="40" rx="8" fill="#090d1a" stroke="#ff007f" stroke-width="1.5" />
+                                    <text x="300" y="93" fill="#fff" font-family="Inter" font-size="8" text-anchor="middle" font-weight="bold">generate_images</text>
+                                    <text x="300" y="103" fill="#f43f5e" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Gemini Image API</text>
+                                </g>
+                                
+                                <!-- Fallback Loop -->
+                                <path d="M 300 115 L 300 160 L 50 160 L 50 115" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3" />
+                                <text x="175" y="155" fill="#22c55e" font-family="JetBrains Mono" font-size="7" text-anchor="middle">Safe Replace & Failsafe Fallbacks</text>
+                            </svg>
+                        </div>
+                        <div class="text-[10px] text-slate-500 italic text-center leading-relaxed">
+                            Encapsulated subgraphs keep standard orchestration states simple and allow isolated visual-asset pipelines to compile robustly.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== TAB: VISUALIZER (SIMULATOR) ==================== -->
+        <div id="tab-content-simulator" class="hidden space-y-12">
+            <div class="glass p-6 md:p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-4">Interactive Planning Simulator</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    Witness a live simulation of your multi-agent architecture in action. Enter a topic, choose a planning modality, and trigger the run. Watch the active nodes illuminate, see evidence get compiled, dynamic subtasks spawn, and workers draft sections in parallel!
+                </p>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-8 bg-slate-950/60 p-6 rounded-2xl border border-white/5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Enter Topic</label>
+                        <input type="text" id="sim-topic" value="Leveraging MCP (Model Context Protocol) for Desktop Tools" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Planning Mode</label>
+                        <select id="sim-mode" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="hybrid">Hybrid Mode (Evergreen + Research Tasks)</option>
+                            <option value="open_book">Open Book Mode (News/Recency Focused)</option>
+                            <option value="closed_book">Closed Book Mode (Evergreen Conceptual)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="runSimulation()" id="btn-run-sim" class="w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Trigger Graph Execution
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Visual Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Graph Diagram Visualization (8 Cols) -->
+                    <div class="lg:col-span-8 bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex flex-col justify-between h-[520px]">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Active LangGraph State Machine</h4>
+                        
+                        <!-- Main Graph SVG -->
+                        <div class="flex-1 flex items-center justify-center p-2">
+                            <svg width="600" height="380" viewBox="0 0 600 380" class="w-full h-full max-h-[350px]">
+                                <!-- Paths / Edges -->
+                                <path id="path-start-router" d="M 50 190 L 130 190" stroke="#334155" stroke-width="2.5" fill="none" />
+                                
+                                <path id="path-router-research" d="M 170 190 L 220 100" stroke="#334155" stroke-width="2" fill="none" stroke-dasharray="0" />
+                                <path id="path-router-orch" d="M 170 190 L 330 190" stroke="#334155" stroke-width="2.5" fill="none" />
+                                <path id="path-research-orch" d="M 280 100 L 330 190" stroke="#334155" stroke-width="2" fill="none" />
+                                
+                                <!-- Fan-Out Paths -->
+                                <path id="path-orch-w1" d="M 370 190 L 430 90" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-orch-w2" d="M 370 190 L 430 190" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-orch-w3" d="M 370 190 L 430 290" stroke="#334155" stroke-width="2" fill="none" />
+                                
+                                <!-- Fan-In Paths -->
+                                <path id="path-w1-reducer" d="M 500 90 L 530 150" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-w2-reducer" d="M 500 190 L 530 170" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-w3-reducer" d="M 500 290 L 530 190" stroke="#334155" stroke-width="2" fill="none" />
+                                
+                                <path id="path-reducer-end" d="M 570 190 L 590 190" stroke="#334155" stroke-width="2.5" fill="none" />
+
+                                <!-- START Node -->
+                                <circle cx="30" cy="190" r="14" fill="#0f172a" stroke="#475569" stroke-width="1.5" />
+                                <text x="30" y="193" fill="#64748b" font-family="JetBrains Mono" font-size="8" text-anchor="middle">START</text>
+
+                                <!-- Router Node -->
+                                <g id="node-router">
+                                    <rect x="90" y="160" width="80" height="60" rx="10" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="130" y="190" fill="#fff" font-family="Outfit" font-size="11" text-anchor="middle" font-weight="bold">Router</text>
+                                    <text x="130" y="204" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Node 01</text>
+                                </g>
+
+                                <!-- Research Node -->
+                                <g id="node-research">
+                                    <rect x="200" y="70" width="80" height="60" rx="10" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="240" y="100" fill="#fff" font-family="Outfit" font-size="11" text-anchor="middle" font-weight="bold">Research</text>
+                                    <text x="240" y="114" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Tavily Engine</text>
+                                </g>
+
+                                <!-- Orchestrator Node -->
+                                <g id="node-orch">
+                                    <rect x="290" y="160" width="80" height="60" rx="10" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="330" y="190" fill="#fff" font-family="Outfit" font-size="11" text-anchor="middle" font-weight="bold">Orchestrator</text>
+                                    <text x="330" y="204" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Outline Planner</text>
+                                </g>
+
+                                <!-- Workers (Parallel) -->
+                                <g id="node-w1">
+                                    <rect x="430" y="60" width="70" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="465" y="90" fill="#fff" font-family="Outfit" font-size="10" text-anchor="middle" font-weight="bold">Worker 1</text>
+                                    <text x="465" y="102" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Drafting...</text>
+                                </g>
+                                <g id="node-w2">
+                                    <rect x="430" y="160" width="70" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="465" y="190" fill="#fff" font-family="Outfit" font-size="10" text-anchor="middle" font-weight="bold">Worker 2</text>
+                                    <text x="465" y="202" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Drafting...</text>
+                                </g>
+                                <g id="node-w3">
+                                    <rect x="430" y="260" width="70" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="465" y="290" fill="#fff" font-family="Outfit" font-size="10" text-anchor="middle" font-weight="bold">Worker 3</text>
+                                    <text x="465" y="302" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Drafting...</text>
+                                </g>
+
+                                <!-- Reducer Node -->
+                                <g id="node-reducer">
+                                    <circle cx="550" cy="190" r="22" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="550" y="193" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Reducer</text>
+                                    <text x="550" y="204" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle" class="node-sub">Sub-graph</text>
+                                </g>
+                            </svg>
+                        </div>
+                        
+                        <!-- Console Output Panel -->
+                        <div class="h-[120px] bg-slate-900 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-y-auto custom-scrollbar space-y-1.5" id="sim-console">
+                            <span class="text-slate-500">[System]: Standing by. Click "Trigger Graph Execution" above to start simulation.</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic State & Outputs Panel (4 Cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        
+                        <!-- State Monitor Card -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex-1 overflow-y-auto custom-scrollbar max-h-[250px]">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Graph State Monitor</h4>
+                            <div class="space-y-3 font-mono text-xs" id="state-monitor">
+                                <div><span class="text-slate-500">topic:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">mode:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">needs_research:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">queries:</span> <span class="text-slate-300">[]</span></div>
+                                <div><span class="text-slate-500">evidence_count:</span> <span class="text-slate-300">0</span></div>
+                                <div><span class="text-slate-500">tasks_spawned:</span> <span class="text-slate-300">0</span></div>
+                                <div><span class="text-slate-500">sections_merged:</span> <span class="text-slate-300">0</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Generated Blog Preview (Dynamic Render) -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 h-[250px] overflow-y-auto custom-scrollbar flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Final Article Preview</h4>
+                            <div class="flex-1 text-xs text-slate-400 space-y-3" id="blog-preview">
+                                <div class="h-full flex items-center justify-center text-center italic text-slate-600">
+                                    Final stitched and markdown output will render here upon successful Reducer node completion.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: CODE & SCHEMAS ==================== -->
+        <div id="tab-content-code" class="hidden space-y-12">
+            
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-6">LangGraph Implementation Blueprint</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                    Review the robust and structured layout of your planning agent. Underneath the hood, this agent uses Pydantic structured output mapping for strict verification, multi-threaded mapping for speed, and a nested Reducer Subgraph to execute clean modular steps.
+                </p>
+
+                <!-- Code Tabs -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left nav -->
+                    <div class="flex flex-col gap-2 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
+                        <button onclick="switchCodeTab('code-schema')" id="btn-code-schema" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-blue/10 text-neon-blue border border-neon-blue/20">
+                            1. Schemas & Contracts
+                        </button>
+                        <button onclick="switchCodeTab('code-nodes')" id="btn-code-nodes" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            2. Routing & Research
+                        </button>
+                        <button onclick="switchCodeTab('code-orchestrator')" id="btn-code-orchestrator" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            3. Orchestrator Outline
+                        </button>
+                        <button onclick="switchCodeTab('code-worker')" id="btn-code-worker" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            4. Worker & Reducer
+                        </button>
+                    </div>
+
+                    <!-- Code viewer (3/4 cols) -->
+                    <div class="lg:col-span-3">
+                        
+                        <!-- Schema Code -->
+                        <div id="code-content-code-schema" class="code-tab-content space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Pydantic Schemas (Pydantic V2)</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-indigo-300 font-mono">
+<span class="text-emerald-400">class Task(BaseModel):</span>
+    id: int
+    title: str
+    goal: str = Field(..., description="One sentence describing what the reader should understand.")
+    bullets: List[str] = Field(..., min_length=3, max_length=6)
+    target_words: int = Field(..., description="Target words (120–550).")
+    tags: List[str] = Field(default_factory=list)
+    requires_research: bool = False
+    requires_citations: bool = False
+    requires_code: bool = False
+
+<span class="text-emerald-400">class Plan(BaseModel):</span>
+    blog_title: str
+    audience: str
+    tone: str
+    blog_kind: Literal["explainer", "tutorial", "news_roundup", "comparison", "system_design"] = "explainer"
+    constraints: List[str] = Field(default_factory=list)
+    tasks: List[Task]
+
+<span class="text-emerald-400">class State(TypedDict):</span>
+    topic: str
+    mode: str  # closed_book, hybrid, open_book
+    needs_research: bool
+    queries: List[str]
+    evidence: List[EvidenceItem]
+    plan: Optional[Plan]
+    sections: Annotated[List[tuple[int, str]], operator.add]  # Reducer field!
+    merged_md: str
+    final: str
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Routing & Research -->
+                        <div id="code-content-code-nodes" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Routing & Tavily Engine Nodes</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-indigo-300 font-mono">
+<span class="text-emerald-400">def router_node(state: State) -> dict:</span>
+    decider = llm.with_structured_output(RouterDecision)
+    decision = decider.invoke(
+        [
+            SystemMessage(content=ROUTER_SYSTEM),
+            HumanMessage(content=f"Topic: {state['topic']}\nAs-of date: {state['as_of']}"),
+        ]
+    )
+    return {
+        "needs_research": decision.needs_research,
+        "mode": decision.mode,
+        "queries": decision.queries,
+    }
+
+<span class="text-emerald-400">def route_next(state: State) -> str:</span>
+    <span class="text-cyan-400"># Routing Edge decides next state node path</span>
+    return "research" if state["needs_research"] else "orchestrator"
+
+<span class="text-emerald-400">def research_node(state: State) -> dict:</span>
+    queries = state.get("queries") or []
+    raw = []
+    for q in queries:
+        raw.extend(_tavily_search(q))  <span class="text-slate-500"># Invokes Tavily engine</span>
+    
+    extractor = llm.with_structured_output(EvidencePack)
+    pack = extractor.invoke([SystemMessage(content=RESEARCH_SYSTEM), ...])
+    return {"evidence": pack.evidence}
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Orchestrator Outline -->
+                        <div id="code-content-code-orchestrator" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Orchestration & Dynamic Send API</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-indigo-300 font-mono">
+<span class="text-emerald-400">def orchestrator_node(state: State) -> dict:</span>
+    planner = llm.with_structured_output(Plan)
+    plan = planner.invoke([
+        SystemMessage(content=ORCH_SYSTEM),
+        HumanMessage(content=f"Topic: {state['topic']}\nEvidence:\n{state['evidence']}")
+    ])
+    return {"plan": plan}
+
+<span class="text-emerald-400">def fanout(state: State):</span>
+    <span class="text-cyan-400"># LangGraph Send API: Dynamically triggers worker threads in parallel</span>
+    assert state["plan"] is not None
+    return [
+        Send(
+            "worker",
+            {
+                "task": task.model_dump(),
+                "topic": state["topic"],
+                "evidence": [e.model_dump() for e in state.get("evidence", [])],
+                "plan": state["plan"].model_dump(),
+            },
+        )
+        for task in state["plan"].tasks
+    ]
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Worker & Reducer -->
+                        <div id="code-content-code-worker" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Parallel Workers & Reducer Subgraph compiling</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-indigo-300 font-mono">
+<span class="text-emerald-400">def worker_node(payload: dict) -> dict:</span>
+    <span class="text-slate-500"># Standard isolated drafting node</span>
+    task = Task(**payload["task"])
+    section_md = llm.invoke([
+        SystemMessage(content=WORKER_SYSTEM),
+        HumanMessage(content=f"Draft section: {task.title}\nGoal: {task.goal}")
+    ]).content
+    return {"sections": [(task.id, section_md)]}
+
+<span class="text-emerald-400">def merge_content(state: State) -> dict:</span>
+    <span class="text-slate-500"># Sort by original task ID to secure structured order</span>
+    ordered = [md for _, md in sorted(state["sections"], key=lambda x: x[0])]
+    merged_md = "\n\n".join(ordered)
+    return {"merged_md": merged_md}
+                                </pre>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.6em] relative z-10">
+        Agentic AI Master Nexus • Plan-and-Execute Engineering
+    </footer>
+
+    <!-- INTERACTIVE SIMULATION LOGIC -->
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.getElementById('tab-content-theory').classList.add('hidden');
+            document.getElementById('tab-content-simulator').classList.add('hidden');
+            document.getElementById('tab-content-code').classList.add('hidden');
+            
+            // Remove active classes from buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+            });
+            
+            // Show selected tab content
+            document.getElementById('tab-content-' + tabId).classList.remove('hidden');
+            
+            // Set active color to current button
+            let activeColor = "bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+            if (tabId === 'theory') {
+                document.getElementById('btn-theory').className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 " + activeColor;
+            } else if (tabId === 'simulator') {
+                document.getElementById('btn-simulator').className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 " + activeColor;
+            } else if (tabId === 'code') {
+                document.getElementById('btn-code').className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 " + activeColor;
+            }
+        }
+
+        function switchCodeTab(codeTabId) {
+            document.querySelectorAll('.code-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.code-tab-btn').forEach(btn => {
+                btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all";
+            });
+            
+            document.getElementById('code-content-' + codeTabId).classList.remove('hidden');
+            document.getElementById('btn-' + codeTabId).className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-blue/10 text-neon-blue border border-neon-blue/20";
+        }
+
+        // SIMULATOR RUNNER
+        let isSimRunning = false;
+        async function runSimulation() {
+            if (isSimRunning) return;
+            isSimRunning = true;
+            
+            // UI elements
+            const consoleEl = document.getElementById('sim-console');
+            const stateEl = document.getElementById('state-monitor');
+            const previewEl = document.getElementById('blog-preview');
+            const btnRun = document.getElementById('btn-run-sim');
+            const topic = document.getElementById('sim-topic').value;
+            const mode = document.getElementById('sim-mode').value;
+            
+            btnRun.disabled = true;
+            btnRun.innerText = "Graph Executing...";
+            btnRun.className = "w-full px-6 py-3 bg-slate-700 rounded-xl font-bold text-sm tracking-wider uppercase text-slate-400 cursor-not-allowed";
+            
+            // Reset node styles
+            resetNodes();
+            
+            // Console logger helper
+            function log(message, type = 'system') {
+                let colorClass = "text-slate-400";
+                if (type === 'router') colorClass = "text-neon-blue";
+                else if (type === 'research') colorClass = "text-yellow-400";
+                else if (type === 'orch') colorClass = "text-purple-400";
+                else if (type === 'worker') colorClass = "text-pink-400";
+                else if (type === 'reducer') colorClass = "text-emerald-400";
+                else if (type === 'success') colorClass = "text-green-500 font-semibold";
+                
+                consoleEl.innerHTML += `<div class="${colorClass}">[${type.toUpperCase()}]: ${message}</div>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
+            
+            function updateState(key, val) {
+                const lines = stateEl.children;
+                for (let line of lines) {
+                    if (line.innerHTML.startsWith(`<span class="text-slate-500">${key}:</span>`)) {
+                        line.innerHTML = `<span class="text-slate-500">${key}:</span> <span class="text-cyan-400 font-semibold">${val}</span>`;
+                        break;
+                    }
+                }
+            }
+
+            consoleEl.innerHTML = "";
+            previewEl.innerHTML = `<div class="h-full flex items-center justify-center text-center italic text-slate-600">Simulating content rendering...</div>`;
+            
+            log("State graph compiled successfully. Invoking start step...", "system");
+            await delay(1200);
+
+            // ==================== 1. ROUTER NODE ====================
+            log("Entering Router node. Evaluating topic complexity...", "router");
+            setActiveNode('node-router');
+            setActivePath('path-start-router');
+            updateState('topic', `"${topic}"`);
+            
+            await delay(1800);
+            
+            let needsResearch = (mode !== 'closed_book');
+            let decisionMode = mode;
+            let queriesStr = "[]";
+            let queriesList = [];
+            
+            if (decisionMode === 'hybrid') {
+                queriesList = [`"Latest tools for ${topic}"`, `"Best libraries for ${topic}"`];
+                queriesStr = `["Latest tools for...", "Best libraries for..."]`;
+            } else if (decisionMode === 'open_book') {
+                queriesList = [`"${topic} news 2026"`, `"${topic} release updates"`, `"${topic} changelog"`];
+                queriesStr = `["Release updates...", "News 2026...", "Changelog..."]`;
+            }
+            
+            log(`Routing Decision: mode=${decisionMode}, needs_research=${needsResearch}`, "router");
+            log(`Structured reasoning: Topic warrants additional grounding queries.`, "router");
+            updateState('mode', `"${decisionMode}"`);
+            updateState('needs_research', needsResearch);
+            updateState('queries', queriesStr);
+            setCompletedNode('node-router');
+            
+            await delay(1500);
+
+            // ==================== 2. CONDITIONAL ROUTING ====================
+            if (needsResearch) {
+                log("Conditional path matched: [research]. Branching execution.", "system");
+                setActiveNode('node-research');
+                setActivePath('path-router-research');
+                await delay(1000);
+                
+                log(`Tavily engine queries launched. Resolving Google/Tavily context...`, "research");
+                for (let q of queriesList) {
+                    log(`Searching web for: ${q}`, "research");
+                    await delay(800);
+                }
+                
+                log(`Gathered ${queriesList.length * 4} search snippets. Extrapolating EvidencePack...`, "research");
+                updateState('evidence_count', queriesList.length * 3);
+                setCompletedNode('node-research');
+                setActivePath('path-research-orch');
+                await delay(1500);
+            } else {
+                log("Conditional path matched: [orchestrator]. No research required.", "system");
+                setActivePath('path-router-orch');
+                await delay(1200);
+            }
+
+            // ==================== 3. ORCHESTRATOR NODE ====================
+            log("Entering Orchestrator Node. Constructing structured plan outline...", "orch");
+            setActiveNode('node-orch');
+            await delay(1800);
+            
+            let mockTasksCount = 3;
+            log(`Plan outline successfully built. blog_title="Expert Explainer: ${topic}"`, "orch");
+            log(`Structured Outline Schema validation: OK. Created ${mockTasksCount} segmented tasks.`, "orch");
+            updateState('tasks_spawned', mockTasksCount);
+            setCompletedNode('node-orch');
+            
+            await delay(1500);
+
+            // ==================== 4. FAN-OUT WORKERS ====================
+            log("Dynamic Fan-Out triggered. Spawning concurrent workers via Send API...", "system");
+            setActivePath('path-orch-w1');
+            setActivePath('path-orch-w2');
+            setActivePath('path-orch-w3');
+            
+            setActiveNode('node-w1');
+            setActiveNode('node-w2');
+            setActiveNode('node-w3');
+            
+            log("Worker 1 running task: [System Architecture Overview]", "worker");
+            log("Worker 2 running task: [Step-by-step Technical Setup]", "worker");
+            log("Worker 3 running task: [Security, Benchmarks & Hardening]", "worker");
+            
+            // Animate progress text inside nodes
+            let wProgress = 0;
+            while(wProgress < 100) {
+                wProgress += 25;
+                setNodeSub('node-w1', `Drafting ${wProgress}%`);
+                setNodeSub('node-w2', `Drafting ${wProgress}%`);
+                setNodeSub('node-w3', `Drafting ${wProgress}%`);
+                await delay(800);
+            }
+            
+            log("Worker 1 completed section: # Technical Overview", "worker");
+            log("Worker 2 completed section: # Setup & Integration Guides", "worker");
+            log("Worker 3 completed section: # Deployment & Security Hardening", "worker");
+            
+            setCompletedNode('node-w1');
+            setCompletedNode('node-w2');
+            setCompletedNode('node-w3');
+            
+            setNodeSub('node-w1', `Completed`);
+            setNodeSub('node-w2', `Completed`);
+            setNodeSub('node-w3', `Completed`);
+            
+            setActivePath('path-w1-reducer');
+            setActivePath('path-w2-reducer');
+            setActivePath('path-w3-reducer');
+            
+            updateState('sections_merged', 3);
+            await delay(1500);
+
+            // ==================== 5. REDUCER SUBGRAPH ====================
+            log("Fan-in synchronization reached. Invoking Reducer Subgraph...", "reducer");
+            setActiveNode('node-reducer');
+            await delay(1000);
+            
+            log("Step 1: merge_content - Sorting sections by index and stitching...", "reducer");
+            await delay(1200);
+            
+            log("Step 2: decide_images - Scanning article for diagram placeholders...", "reducer");
+            await delay(1000);
+            
+            log("Proposing diagram: [[IMAGE_1]] (Architectural sequence flow flow chart)", "reducer");
+            await delay(1000);
+            
+            log("Step 3: generate_and_place_images - Rendering architectural graphic asset via Gemini...", "reducer");
+            await delay(1600);
+            
+            log("Compiled stitched markdown written under path: final_blog.md", "reducer");
+            setCompletedNode('node-reducer');
+            setActivePath('path-reducer-end');
+            
+            // Build preview
+            let previewHTML = `
+                <div class="space-y-4">
+                    <h1 class="text-sm font-bold text-white uppercase tracking-wider font-display">Expert Explainer: ${topic}</h1>
+                    <div class="text-[10px] text-slate-500">Kind: Explainer | Audience: Developers | Tone: Analytical</div>
+                    <hr class="border-white/5">
+                    
+                    <div class="space-y-3 text-[11px] leading-relaxed">
+                        <h2 class="font-semibold text-cyan-400">1. Architectural Paradigm Overview</h2>
+                        <p>Planning agents represent a shift from reactive agent loops to state machine-based blueprints. By introducing structured outlines first, we reduce intermediate cognitive decay...</p>
+                        
+                        <!-- Simulated Image -->
+                        <div class="my-4 p-4 rounded-xl border border-neon-blue/20 bg-slate-900/80 flex flex-col items-center gap-2">
+                            <div class="w-full h-24 bg-gradient-to-r from-cyan-950/20 to-purple-950/20 rounded-lg flex items-center justify-center border border-white/5 text-[9px] text-cyan-400 font-mono">
+                                [GLOWING GRAPH FLOW DIAGRAM]
+                            </div>
+                            <div class="text-[8px] text-slate-500 italic">Figure 1.1: Sequenced execution paradigm across parallel worker boundaries</div>
+                        </div>
+
+                        <h2 class="font-semibold text-cyan-400">2. Implementation Blueprint & Execution</h2>
+                        <p>Leveraging LangGraph, we bind the state machine to a compiled graph graph schema contract. Parallel worker execution speeds up task completion time by up to 300%...</p>
+                    </div>
+                </div>
+            `;
+            previewEl.innerHTML = previewHTML;
+            
+            log("Graph Execution complete. Final State reached successfully.", "success");
+            
+            // Reset Button
+            isSimRunning = false;
+            btnRun.disabled = false;
+            btnRun.innerText = "Trigger Graph Execution";
+            btnRun.className = "w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5";
+        }
+
+        // HELPERS
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function setActiveNode(id) {
+            document.getElementById(id).querySelector('rect, circle').setAttribute('class', 'node-active');
+        }
+
+        function setCompletedNode(id) {
+            document.getElementById(id).querySelector('rect, circle').setAttribute('class', 'node-completed');
+        }
+
+        function setNodeSub(nodeId, text) {
+            document.getElementById(nodeId).querySelector('.node-sub').textContent = text;
+        }
+
+        function setActivePath(id) {
+            document.getElementById(id).setAttribute('class', 'path-active');
+        }
+
+        function resetNodes() {
+            document.querySelectorAll('rect, circle').forEach(el => {
+                if (el.parentNode.id !== 'sim-start') {
+                    el.removeAttribute('class');
+                }
+            });
+            document.querySelectorAll('path').forEach(p => {
+                p.removeAttribute('class');
+            });
+            
+            // Reset subtitles
+            setNodeSub('node-router', 'Node 01');
+            setNodeSub('node-research', 'Tavily Engine');
+            setNodeSub('node-orch', 'Outline Planner');
+            setNodeSub('node-w1', 'Drafting...');
+            setNodeSub('node-w2', 'Drafting...');
+            setNodeSub('node-w3', 'Drafting...');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Memory Mastery | Agentic AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0ea5e9',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#bc13fe',
+                tertiaryColor: '#020617'
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                        },
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(188, 19, 254, 0.1) 0, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(15, 23, 42, 1) 0, transparent 100%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .code-block {
+            background: #010409;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            color: #e6edf3;
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Progress Bar -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-900 z-[100]">
+        <div id="progress" class="h-full bg-gradient-to-r from-brand-400 to-neon-purple w-0 transition-all duration-150"></div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="glass sticky top-0 z-50 px-8 py-5 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2v10"/><path d="M18.4 4.6a9 9 0 1 1-12.8 0"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-display font-bold text-white leading-none">Memory Mastery</h1>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-[0.2em] mt-1 font-bold">Production Grade Agentic AI</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex gap-8 items-center">
+                <a href="#short-term" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-400 transition-colors">Short-Term</a>
+                <a href="#context-problem" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-400 transition-colors">The Problem</a>
+                <a href="#long-term" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-400 transition-colors">Long-Term</a>
+                <a href="#lifecycle" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-400 transition-colors">Lifecycle</a>
+                <a href="../../index.html" class="px-5 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/10 transition-all">Nexus Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-24 px-8">
+        
+        <!-- Hero Section -->
+        <section class="mb-48 text-center relative">
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-500/10 blur-[120px] rounded-full -z-10"></div>
+            <div class="inline-block px-4 py-1.5 rounded-full bg-brand-400/10 border border-brand-400/20 text-brand-400 text-[10px] font-bold uppercase tracking-[0.3em] mb-8 animate-pulse">
+                Module 16: The Neural Layer
+            </div>
+            <h1 class="text-7xl md:text-8xl font-display font-black tracking-tighter text-white mb-10 leading-[0.9]">
+                How AI <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-neon-purple to-brand-400 bg-[length:200%_auto] animate-text-shimmer">Remembers.</span>
+            </h1>
+            <p class="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
+                Moving beyond the "Goldfish Memory" of vanilla LLMs. A complete guide to persistent context, thread-id isolation, and recursive summarization in LangGraph.
+            </p>
+            <div class="flex flex-wrap justify-center gap-6">
+                <div class="px-8 py-4 glass rounded-2xl border border-white/5 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-brand-400/20 flex items-center justify-center text-brand-400">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Short-Term</p>
+                        <p class="text-sm text-white font-bold">Context Window</p>
+                    </div>
+                </div>
+                <div class="px-8 py-4 glass rounded-2xl border border-white/5 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-neon-purple/20 flex items-center justify-center text-neon-purple">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v10"/><path d="M18.4 4.6a9 9 0 1 1-12.8 0"/></svg>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Long-Term</p>
+                        <p class="text-sm text-white font-bold">Persistent Store</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: The Context Window (Short-Term Memory) -->
+        <section id="short-term" class="mb-48 scroll-mt-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+                <div class="space-y-10">
+                    <div class="space-y-4">
+                        <h2 class="text-4xl font-display font-bold text-white">01. The Context Window</h2>
+                        <p class="text-slate-400 leading-relaxed">
+                            Think of the Context Window as the LLM's **Working Memory**. It's the maximum amount of information (tokens) the model can "see" and reason over at any single moment.
+                        </p>
+                    </div>
+                    
+                    <div class="glass p-8 rounded-[2rem] border-l-4 border-brand-400 bg-brand-400/5">
+                        <h4 class="text-lg font-bold text-white mb-4 italic">The Camera Analogy</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            A model with a small context window is like a **narrow-angle lens**—it can see the detail of a single flower but loses the forest. A model with a large context window is a **wide-angle lens**, capturing the entire mountain range of data.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-6 glass rounded-2xl border border-white/5 text-center group hover:bg-brand-400/10 transition-all">
+                            <h5 class="text-brand-400 font-bold mb-2">y = f<sub>θ</sub>(x)</h5>
+                            <p class="text-[11px] text-slate-500 uppercase tracking-widest font-bold">The Math</p>
+                            <p class="text-[10px] text-slate-400 mt-2">Where <strong>x</strong> is the input tokens limited by <code>max_tokens</code>.</p>
+                        </div>
+                        <div class="p-6 glass rounded-2xl border border-white/5 text-center group hover:bg-neon-purple/10 transition-all">
+                            <h5 class="text-neon-purple font-bold mb-2">ICL</h5>
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">In-Context Learning</p>
+                            <p class="text-[10px] text-slate-400 mt-2">The emergent ability to learn patterns directly from the prompt.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <div class="absolute -inset-4 bg-gradient-to-r from-brand-400 to-neon-purple opacity-20 blur-2xl rounded-[3rem] group-hover:opacity-30 transition-opacity"></div>
+                    <div class="glass p-12 rounded-[3rem] border border-white/5 relative overflow-hidden bg-black/40">
+                        <div class="mermaid">
+                            graph TD
+                                U[User Input] --> P[Prompt Builder]
+                                H[History] -- "Concat" --> P
+                                P --> L[LLM Context Window]
+                                L --> R[Response]
+                                R -- "Append" --> H
+                                
+                                style L fill:#38bdf8,stroke:#fff,stroke-width:2px,color:#000
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider mb-48"></div>
+
+        <!-- Section 2: The Fragility & Context Problem -->
+        <section id="context-problem" class="mb-48 scroll-mt-32">
+            <h2 class="text-4xl font-display font-bold text-center text-white mb-20">The Context Collapse Problem</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div class="glass p-10 rounded-[2.5rem] border border-white/5 bg-black/40 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-400/10 blur-3xl -z-10 group-hover:bg-brand-400/20 transition-all"></div>
+                    <div class="w-12 h-12 bg-brand-400/20 rounded-xl flex items-center justify-center text-brand-400 mb-8">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Trimming</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                        The "Blunt & Efficient" approach. When the conversation exceeds the limit, we simply delete the oldest messages.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-2 text-xs text-slate-500"><span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span> Fast execution</li>
+                        <li class="flex items-center gap-2 text-xs text-slate-500"><span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span> No token waste</li>
+                        <li class="flex items-center gap-2 text-xs text-rose-500"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Loses early context</li>
+                    </ul>
+                </div>
+
+                <div class="glass p-10 rounded-[2.5rem] border border-white/5 bg-black/40 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-neon-purple/10 blur-3xl -z-10 group-hover:bg-neon-purple/20 transition-all"></div>
+                    <div class="w-12 h-12 bg-neon-purple/20 rounded-xl flex items-center justify-center text-neon-purple mb-8">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h6"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Summarization</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                        The "Intelligent & Lossy" approach. Condensing a massive thread into a single paragraph summary.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-2 text-xs text-slate-500"><span class="w-1.5 h-1.5 rounded-full bg-neon-purple"></span> Retains core intent</li>
+                        <li class="flex items-center gap-2 text-xs text-slate-500"><span class="w-1.5 h-1.5 rounded-full bg-neon-purple"></span> Flexible memory</li>
+                        <li class="flex items-center gap-2 text-xs text-rose-500"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> LLM cost per summary</li>
+                    </ul>
+                </div>
+
+                <div class="glass p-10 rounded-[2.5rem] border border-brand-400/20 bg-brand-400/5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-400/20 blur-3xl -z-10 group-hover:bg-brand-400/30 transition-all"></div>
+                    <div class="w-12 h-12 bg-brand-400/40 rounded-xl flex items-center justify-center text-white mb-8">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Hybrid Context</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                        The "Modern Standard". Combining a Summary of past context with the most recent 10-20 messages for precision.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-2 text-xs text-white font-bold"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> Best of both worlds</li>
+                        <li class="flex items-center gap-2 text-xs text-slate-500"><span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> production-ready</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Visualization -->
+            <div class="mt-24 glass p-16 rounded-[3rem] border border-white/5 bg-black/20 overflow-hidden">
+                <div class="mermaid">
+                    graph LR
+                        A[Massive History] --> B[Summary Logic]
+                        A --> C[Trim Logic]
+                        B --> D[Hybrid Memory]
+                        C --> D
+                        D --> E[LLM Inference]
+                        
+                        subgraph "Context Strategy"
+                        B
+                        C
+                        end
+                        
+                        style D fill:#38bdf8,stroke:#fff,color:#000
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider mb-48"></div>
+
+        <!-- Section 3: Long-Term Memory (LTM) -->
+        <section id="long-term" class="mb-48 scroll-mt-32">
+            <h2 class="text-4xl font-display font-bold text-white mb-6">02. Long-Term Memory (LTM)</h2>
+            <p class="text-slate-400 max-w-3xl mb-16 leading-relaxed">
+                While Short-Term memory lives in the prompt, Long-Term memory lives in **Databases**. This is information that defines **continuity** across sessions, days, and weeks.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+                <!-- Three Types -->
+                <div class="space-y-8">
+                    <div class="p-8 glass rounded-[2rem] border border-white/5 relative group hover:border-brand-400/50 transition-all">
+                        <div class="flex items-center gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-brand-400/10 flex items-center justify-center text-brand-400 font-bold text-2xl">1</div>
+                            <div>
+                                <h4 class="text-xl font-bold text-white">Episodic Memory</h4>
+                                <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">"What Happened"</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 mt-6 leading-relaxed">
+                            Past events and experiences tied to specific time/context. Useful for tracking the state of long-running tasks.
+                        </p>
+                    </div>
+                    <div class="p-8 glass rounded-[2rem] border border-white/5 relative group hover:border-neon-purple/50 transition-all">
+                        <div class="flex items-center gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-neon-purple/10 flex items-center justify-center text-neon-purple font-bold text-2xl">2</div>
+                            <div>
+                                <h4 class="text-xl font-bold text-white">Semantic Memory</h4>
+                                <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">"What is True"</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 mt-6 leading-relaxed">
+                            Stable facts about the user or the world. "The user is a Senior Developer", "Budget is $5000".
+                        </p>
+                    </div>
+                    <div class="p-8 glass rounded-[2rem] border border-white/5 relative group hover:border-brand-400/50 transition-all">
+                        <div class="flex items-center gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-brand-400/10 flex items-center justify-center text-brand-400 font-bold text-2xl">3</div>
+                            <div>
+                                <h4 class="text-xl font-bold text-white">Procedural Memory</h4>
+                                <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">"How to do it"</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 mt-6 leading-relaxed">
+                            Strategies, rules, and learned behaviors. "When solving SQL, avoid subqueries".
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Persistence Mechanics -->
+                <div class="glass p-12 rounded-[3rem] border border-white/5 bg-black/40 h-fit sticky top-48">
+                    <h4 class="text-xl font-bold text-white mb-8 flex items-center gap-3">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                        Persistence Mechanics
+                    </h4>
+                    <div class="space-y-6">
+                        <div>
+                            <h5 class="text-xs font-bold text-brand-400 uppercase tracking-widest mb-2">Checkpointers</h5>
+                            <p class="text-xs text-slate-400">The "Save Game" feature of LangGraph. Automatically saves state to SQLite/Postgres after every node execution.</p>
+                        </div>
+                        <div>
+                            <h5 class="text-xs font-bold text-brand-400 uppercase tracking-widest mb-2">Thread IDs</h5>
+                            <p class="text-xs text-slate-400">The key to isolation. <code>thread_id="user_123"</code> ensures that the AI remembers THIS user's context specifically.</p>
+                        </div>
+                        <div class="pt-6 border-t border-white/5">
+                            <div class="code-block text-[10px]">
+<pre><code><span class="token comment"># Enable Persistence</span>
+checkpointer = SqliteSaver.from_conn_string(<span class="token string">":memory:"</span>)
+graph = builder.compile(checkpointer=checkpointer)
+
+<span class="token comment"># Invoke with context</span>
+config = {<span class="token string">"configurable"</span>: {<span class="token string">"thread_id"</span>: <span class="token string">"42"</span>}}
+graph.invoke(inputs, config)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider mb-48"></div>
+
+        <!-- Section 4: The Memory Lifecycle -->
+        <section id="lifecycle" class="mb-48 scroll-mt-32">
+            <h2 class="text-4xl font-display font-bold text-center text-white mb-20">The 4-Step Memory Pipeline</h2>
+            <div class="relative">
+                <!-- Vertical Line -->
+                <div class="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-brand-400 via-neon-purple to-brand-400 hidden lg:block"></div>
+                
+                <div class="space-y-32">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col lg:flex-row items-center gap-12 relative">
+                        <div class="lg:w-1/2 lg:text-right">
+                            <h3 class="text-2xl font-bold text-white mb-4">1. Creation / Update</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                The system analyzes the latest turn: "Is anything here worth remembering beyond this conversation?". It extracts **Memory Candidates** and filters out noise.
+                            </p>
+                        </div>
+                        <div class="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-brand-400 border-4 border-black z-10 hidden lg:flex items-center justify-center text-black font-bold text-xs">01</div>
+                        <div class="lg:w-1/2">
+                            <div class="glass p-6 rounded-2xl bg-brand-400/5 border border-brand-400/20 text-xs font-mono">
+                                <span class="text-brand-400">Extract:</span> "User prefers aisle seats."<br>
+                                <span class="text-brand-400">Filter:</span> Noise deleted (e.g. greetings).
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col lg:flex-row-reverse items-center gap-12 relative">
+                        <div class="lg:w-1/2 lg:text-left">
+                            <h3 class="text-2xl font-bold text-white mb-4">2. Selective Storage</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                Memories are persisted. Episodic events go to Structured DBs; Semantic knowledge goes to **Vector Databases** for semantic lookup.
+                            </p>
+                        </div>
+                        <div class="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-neon-purple border-4 border-black z-10 hidden lg:flex items-center justify-center text-black font-bold text-xs">02</div>
+                        <div class="lg:w-1/2">
+                            <div class="glass p-6 rounded-2xl bg-neon-purple/5 border border-neon-purple/20 text-xs font-mono text-right">
+                                <span class="text-neon-purple">Store:</span> Vector Store (ChromaDB/Pinecone)<br>
+                                <span class="text-neon-purple">Index:</span> Semantic Embeddings created.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col lg:flex-row items-center gap-12 relative">
+                        <div class="lg:w-1/2 lg:text-right">
+                            <h3 class="text-2xl font-bold text-white mb-4">3. Precision Retrieval</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                "Given current situation, what do I need now?". The system performs a **Semantic Search** to pull only relevant context, avoiding prompt bloat.
+                            </p>
+                        </div>
+                        <div class="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-brand-400 border-4 border-black z-10 hidden lg:flex items-center justify-center text-black font-bold text-xs">03</div>
+                        <div class="lg:w-1/2">
+                            <div class="glass p-6 rounded-2xl bg-brand-400/5 border border-brand-400/20 text-xs font-mono">
+                                <span class="text-brand-400">Search:</span> Cosine Similarity lookup.<br>
+                                <span class="text-brand-400">Result:</span> "Seat preference" retrieved.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex flex-col lg:flex-row-reverse items-center gap-12 relative">
+                        <div class="lg:w-1/2 lg:text-left">
+                            <h3 class="text-2xl font-bold text-white mb-4">4. Injection (Influencing LLM)</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                The retrieved memory is inserted into the **Short-Term Memory (STM)**. The LLM sees it as tokens in the prompt, allowing it to behave with continuity.
+                            </p>
+                        </div>
+                        <div class="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-neon-purple border-4 border-black z-10 hidden lg:flex items-center justify-center text-black font-bold text-xs">04</div>
+                        <div class="lg:w-1/2">
+                            <div class="glass p-6 rounded-2xl bg-neon-purple/5 border border-neon-purple/20 text-xs font-mono text-right">
+                                <span class="text-neon-purple">Inject:</span> Prompt Prefix updated.<br>
+                                <span class="text-neon-purple">Result:</span> Coherent, context-aware response.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Python Implementation Guide -->
+        <section id="implementation" class="mb-48 scroll-mt-32">
+            <h2 class="text-3xl font-display font-bold mb-12">Implementation Patterns: From Basics to Advanced</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-8">
+                    <!-- Pattern A: Trimming -->
+                    <div class="p-8 glass rounded-3xl bg-brand-400/5 border border-brand-400/10">
+                        <h4 class="text-brand-400 font-bold mb-4 flex items-center gap-2">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            Pattern A: Clean Deletion (Reducers)
+                        </h4>
+                        <p class="text-xs text-slate-400 mb-6">Using <code>RemoveMessage</code> to tell the state reducer to permanently delete specific tokens, keeping the state lean.</p>
+                        <div class="code-block text-[10px]">
+<pre><code><span class="token keyword">from</span> langchain.messages <span class="token keyword">import</span> RemoveMessage
+
+<span class="token keyword">def</span> <span class="token function">cleanup_node</span>(state):
+    msgs = state[<span class="token string">"messages"</span>]
+    <span class="token keyword">if</span> <span class="token function">len</span>(msgs) > <span class="token number">10</span>:
+        <span class="token comment"># Delete the oldest 6 messages</span>
+        <span class="token keyword">return</span> {<span class="token string">"messages"</span>: [RemoveMessage(id=m.id) <span class="token keyword">for</span> m <span class="token keyword">in</span> msgs[:<span class="token number">6</span>]]}</code></pre>
+                        </div>
+                    </div>
+                    
+                    <!-- Pattern B: Summarization -->
+                    <div class="p-8 glass rounded-3xl bg-neon-purple/5 border border-neon-purple/10">
+                        <h4 class="text-neon-purple font-bold mb-4 flex items-center gap-2">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h6"/></svg>
+                            Pattern B: Hybrid Summarization
+                        </h4>
+                        <p class="text-xs text-slate-400 mb-6">Recursive summarization maintained in the state. Retains the "gist" of the conversation indefinitely.</p>
+                        <div class="code-block text-[10px]">
+<pre><code><span class="token keyword">def</span> <span class="token function">summarize</span>(state):
+    summary = state.get(<span class="token string">"summary"</span>, <span class="token string">""</span>)
+    res = llm.invoke(f<span class="token string">"Update summary: {summary}"</span>)
+    <span class="token keyword">return</span> {<span class="token string">"summary"</span>: res.content, <span class="token string">"messages"</span>: state[<span class="token string">"messages"</span>][<span class="token number">-2</span>:]}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Advanced Pattern: Intelligent LTM -->
+                    <div class="p-8 glass rounded-3xl bg-white/5 border border-white/10 h-full flex flex-col">
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Pattern C: Intelligent LTM (BaseStore)
+                        </h4>
+                        <p class="text-xs text-slate-400 mb-6">The gold standard. An LLM analyzes input to extract facts, checks for duplicates, and persists them to a global <code>BaseStore</code>.</p>
+                        <div class="code-block text-[10px] flex-grow">
+<pre><code><span class="token keyword">class</span> <span class="token class-name">MemoryItem</span>(BaseModel):
+    text: str
+    is_new: bool <span class="token comment"># Deduplication Flag</span>
+
+<span class="token keyword">def</span> <span class="token function">memory_node</span>(state, config, store):
+    <span class="token comment"># 1. Search existing memories</span>
+    existing = store.search((<span class="token string">"user"</span>, uid, <span class="token string">"facts"</span>))
+    
+    <span class="token comment"># 2. Extract & Deduplicate with LLM</span>
+    decision = extractor.invoke(input_data)
+    
+    <span class="token comment"># 3. Put only unique facts</span>
+    <span class="token keyword">for</span> m <span class="token keyword">in</span> decision.memories:
+        <span class="token keyword">if</span> m.is_new: store.put(ns, id, {<span class="token string">"data"</span>: m.text})</code></pre>
+                        </div>
+                        <div class="mt-6 flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-white/5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-500">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                            </div>
+                            <p class="text-[10px] text-slate-400"><strong>Scaling Tip:</strong> Use <code>PostgresStore</code> for persistent LTM across distributed systems.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Modern Memory Layers (Mem0 / Supermemory) -->
+        <section class="mb-48">
+            <div class="glass p-16 rounded-[4rem] border border-white/5 bg-gradient-to-br from-brand-400/10 via-transparent to-neon-purple/10">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="text-4xl font-display font-bold text-white mb-8">Modern Memory Layers</h2>
+                        <p class="text-slate-400 mb-10 leading-relaxed">
+                            Standard memory Silos (thread-scoped) are no longer enough for enterprise AI. Modern layers like <strong>Mem0</strong> and <strong>Supermemory</strong> provide a universal memory substrate.
+                        </p>
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div class="w-6 h-6 rounded-full bg-brand-400/20 flex items-center justify-center shrink-0">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                <p class="text-xs text-slate-300"><strong>Self-Improving:</strong> Automatically resolves conflicting information (e.g. user moved from NYC to SF).</p>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-6 h-6 rounded-full bg-brand-400/20 flex items-center justify-center shrink-0">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                <p class="text-xs text-slate-300"><strong>Cross-Platform:</strong> Sync memory between your Web App, CLI, and Slack bot seamlessly.</p>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="w-6 h-6 rounded-full bg-brand-400/20 flex items-center justify-center shrink-0">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                                <p class="text-xs text-slate-300"><strong>Personalized Context:</strong> Builds a high-fidelity "Digital Twin" profile of the user.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center p-12 glass rounded-3xl border border-white/5 bg-black/40">
+                        <h3 class="text-5xl font-display font-black text-white mb-4">Mem0</h3>
+                        <p class="text-brand-400 font-bold uppercase tracking-widest text-xs mb-8">Universal Memory Layer</p>
+                        <div class="p-6 bg-brand-400/5 border border-brand-400/10 rounded-2xl italic text-slate-400 text-sm">
+                            "AI Agents forget. Mem0 Remembers."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Summary -->
+        <section class="mb-24 text-center">
+            <h2 class="text-3xl font-display font-bold text-white mb-10">Conclusion: The 3 Critical Challenges</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 glass rounded-2xl bg-rose-500/5 border border-rose-500/20">
+                    <h4 class="font-bold text-white mb-2">1. Selection</h4>
+                    <p class="text-[10px] text-slate-500">Choosing the exact bits of signal from a sea of noisy conversation.</p>
+                </div>
+                <div class="p-8 glass rounded-2xl bg-amber-500/5 border border-amber-500/20">
+                    <h4 class="font-bold text-white mb-2">2. Retrieval</h4>
+                    <p class="text-[10px] text-slate-500">Pulling only what is relevant to the *current* situation.</p>
+                </div>
+                <div class="p-8 glass rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+                    <h4 class="font-bold text-white mb-2">3. Orchestration</h4>
+                    <p class="text-[10px] text-slate-500">Managing the end-to-end loop without adding massive latency.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-20 border-t border-white/5 text-center">
+        <p class="text-xs text-slate-600 uppercase tracking-[0.5em] font-bold mb-4 opacity-40">Module 16 • Memory Mastery • Agentic AI</p>
+        <p class="text-[10px] text-slate-700 italic">Built for production-grade engineering.</p>
+    </footer>
+
+    <script>
+        // Scroll Progress Logic
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress").style.width = scrolled + "%";
+        };
+    </script>
+
+</body>
+</html>

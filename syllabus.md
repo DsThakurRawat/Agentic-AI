@@ -133,3 +133,8 @@ This master syllabus maps the full spectrum of stateful agentic application deve
 
 ### 32. Self-RAG Tutorial `[CampusX]`
 * **Focus**: End-to-end continuous validation loops utilizing specialized critique tags to evaluate document relevance, check factual hallucination thresholds, and rewrite generation outputs iteratively.
+
+### 33. Autonomous Planning Agents `[CampusX]` `[Advanced]`
+* **Focus**: Structuring multi-step agent actions into sequential Plan-and-Execute loops (BabyAGI-style replanning) or concurrent Orchestrator-Worker graphs. Mitigating parallel value clobbering using structural schemas, state reducers (`operator.add`), and order-based section aggregation.
+* **Core Outcomes**: Building highly resilient, dynamic planning frameworks for long-form composition, automated research pipelines, and structured multi-tool orchestration.
+

@@ -100,116 +100,209 @@
 
     <main class="max-w-6xl mx-auto py-16 px-8">
         
-        <!-- Intro -->
-        <div class="mb-20">
+        <!-- Intro Section -->
+        <div class="mb-24 text-center">
             <h1 class="text-5xl md:text-6xl font-display font-extrabold mb-8 tracking-tight">
-                Modular Encapsulation & <br/>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Hierarchical Graphs</span>
+                Hierarchical Agency & <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Subgraph Orchestration</span>
             </h1>
-            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
-                Tackle system complexity through modularity. Encapsulate complete independent graphs as standalone functional nodes, enabling separation of concerns and reusable agentic components.
+            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl mx-auto">
+                Break the monolith. Build complex agentic systems by encapsulating logic into independent, state-isolated sub-graphs that communicate via clean interfaces.
             </p>
         </div>
 
-        <!-- Detailed Theory -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
-                <span class="text-brand-400">01</span>
-                Theoretical Foundations
-            </h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div class="space-y-8">
-                    <div class="glass p-8 rounded-3xl">
-                        <h3 class="text-xl font-bold mb-4">The Case for Modularity</h3>
-                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
-                            As systems grow, monolithic graphs become unmanageable. Subgraphs allow you to isolate internal logic (e.g., retrieval, scoring) and expose only a clean interface to the parent orchestrator.
+        <!-- Section 1: The Why? (SDLC Analogy) -->
+        <section class="mb-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl font-display font-bold mb-8 flex items-center gap-3">
+                        <span class="text-brand-400 text-sm tracking-[0.3em] uppercase">Theory</span>
+                        Why Subgraphs are Needed?
+                    </h2>
+                    <div class="space-y-6 text-slate-400 leading-relaxed">
+                        <p>
+                            In traditional software development, we don't write one 10,000-line function. We use modules, classes, and microservices. **Subgraphs are the Microservices of Agentic AI.**
                         </p>
-                        <ul class="space-y-3 text-xs text-slate-300">
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
-                                <strong class="text-white">Separation of Concerns:</strong> Hide internal node complexity.
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
-                                <strong class="text-white">Unit Testing:</strong> Test sub-graphs in isolation.
-                            </li>
-                        </ul>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 glass rounded-xl border border-brand-400/20 bg-brand-400/5">
+                                <h4 class="font-bold text-white text-xs mb-1 uppercase tracking-widest">Modularity</h4>
+                                <p class="text-[10px]">Divide a massive problem into bite-sized, independent workflows.</p>
+                            </div>
+                            <div class="p-4 glass rounded-xl border border-neon-purple/20 bg-neon-purple/5">
+                                <h4 class="font-bold text-white text-xs mb-1 uppercase tracking-widest">Reusability</h4>
+                                <p class="text-[10px]">Build a "RAG Subgraph" once and use it across ten different parent agents.</p>
+                            </div>
+                            <div class="p-4 glass rounded-xl border border-brand-400/20 bg-brand-400/5">
+                                <h4 class="font-bold text-white text-xs mb-1 uppercase tracking-widest">Failure Isolation</h4>
+                                <p class="text-[10px]">If the "Coding Subgraph" fails, the "Testing Subgraph" can retry it without crashing the whole system.</p>
+                            </div>
+                            <div class="p-4 glass rounded-xl border border-neon-purple/20 bg-neon-purple/5">
+                                <h4 class="font-bold text-white text-xs mb-1 uppercase tracking-widest">State Separation</h4>
+                                <p class="text-[10px]">Each subgraph has its own private state, preventing "Global Variable Hell".</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="glass p-8 rounded-3xl border-l-4 border-neon-purple">
-                    <h3 class="text-xl font-bold mb-4">State Interaction Models</h3>
-                    <div class="space-y-4 text-xs">
-                        <div class="p-4 bg-black/20 rounded-xl border border-white/5">
-                            <strong class="text-brand-400 block mb-1">Independent State:</strong> Subgraph has its own `TypedDict`. Requires manual mapping in a bridge node.
-                        </div>
-                        <div class="p-4 bg-black/20 rounded-xl border border-white/5">
-                            <strong class="text-neon-purple block mb-1">Shared State:</strong> Both graphs share the same data schema. Updates are automatically reflected globally.
+                <!-- Software Dev Ascent Visualization -->
+                <div class="glass p-12 rounded-[3rem] border border-white/5 relative group bg-black/40">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-brand-400 to-neon-purple rounded-[3rem] blur opacity-10"></div>
+                    <div class="relative">
+                        <div class="mermaid">
+                            graph TD
+                                TL((Team Lead Agent)) --> BE[Backend Subgraph]
+                                TL --> FE[Frontend Subgraph]
+                                
+                                subgraph "Dev Ascent"
+                                    BE --> Test[Testing Subgraph]
+                                    FE --> Test
+                                    Test --> DevOps[DevOps Subgraph]
+                                end
+                                
+                                style TL fill:#0ea5e9,stroke:#fff
+                                style BE fill:#1e293b,stroke:#38bdf8
+                                style FE fill:#1e293b,stroke:#38bdf8
+                                style DevOps fill:#bc13fe,stroke:#fff
                         </div>
                     </div>
+                    <p class="text-[10px] text-center text-slate-500 mt-6 uppercase tracking-widest">Figure 15.1: The Hierarchical Software Factory</p>
                 </div>
             </div>
         </section>
 
-        <!-- Visualization -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12">The Subgraph Bridge Pattern</h2>
-            <div class="glass p-12 rounded-3xl">
-                <div class="mermaid">
-                    graph LR
-                        subgraph "Parent Graph"
-                            P_Start([START]) --> P_Node[Node: Research]
-                            P_Node --> Sub_Interface[Call Subgraph Node]
-                            Sub_Interface --> P_End([END])
-                        end
-
-                        subgraph "Encapsulated Subgraph"
-                            Sub_Interface -- "Map Input" --> S_Start([START])
-                            S_Start --> S1[Translate]
-                            S1 --> S2[Summarize]
-                            S2 --> S_End([END])
-                            S_End -- "Map Output" --> Sub_Interface
-                        end
-
-                        style P_Start fill:#0ea5e9,stroke:#38bdf8
-                        style Sub_Interface fill:#bc13fe,stroke:#a855f7
-                        style S1 fill:#1e293b,stroke:#334155
-                </div>
-            </div>
-        </section>
-
-        <!-- Technical Implementation -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12">Code Implementation</h2>
-            <div class="glass rounded-3xl overflow-hidden">
-                <div class="flex border-b border-white/10 bg-black/20">
-                    <button onclick="switchTab('sub')" id="btn-sub" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] active-tab transition-all">Subgraph Definition</button>
-                    <button onclick="switchTab('parent')" id="btn-parent" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">Bridge Node Logic</button>
-                </div>
+        <!-- Section 2: Implementation Patterns -->
+        <section class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12 text-center text-white">The Two Orchestration Patterns</h2>
+            <div class="grid grid-cols-1 gap-12">
                 
-                <div class="p-8">
-                    <div id="content-sub" class="block space-y-6">
-                        <div class="code-block">
-<pre><code><span class="token comment"># 1. Compile Subgraph Independently</span>
-subgraph_builder = StateGraph(SubState)
-subgraph_builder.add_node(<span class="token string">"translate"</span>, translate_node)
-subgraph_builder.add_edge(START, <span class="token string">"translate"</span>)
-subgraph = subgraph_builder.compile()</code></pre>
+                <!-- Pattern 1 -->
+                <div class="glass p-12 rounded-[3rem] border border-white/5 bg-black/40">
+                    <div class="flex flex-col lg:flex-row gap-12">
+                        <div class="flex-1">
+                            <div class="inline-block px-3 py-1 rounded-full bg-brand-400/10 border border-brand-400/20 text-brand-400 text-[10px] font-bold uppercase tracking-widest mb-4">Pattern 01</div>
+                            <h3 class="text-2xl font-bold text-white mb-6">Independent Subgraphs (Bridge Pattern)</h3>
+                            <p class="text-sm text-slate-400 leading-relaxed mb-8">
+                                Use this when the subgraph has a <strong>completely different state schema</strong>. This is perfect for utility graphs (like Translation, Summarization, or RAG) that shouldn't know anything about your application's domain logic.
+                            </p>
+                            <ul class="space-y-4 mb-8">
+                                <li class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <p class="text-xs text-slate-300"><strong>Explicit Mapping:</strong> You must manually translate parent keys to subgraph keys.</p>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <p class="text-xs text-slate-300"><strong>Encapsulation:</strong> The subgraph is treated as an external black box.</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="flex-1 bg-black/60 rounded-2xl p-6 border border-white/5">
+                            <pre class="text-[11px] text-slate-400 font-mono">
+<span class="text-brand-400"># Parent Node acts as a Bridge</span>
+def translate_node(state: ParentState):
+    # 1. Map Parent -> Subgraph
+    sub_input = {"input_text": state["ans_en"]}
+    
+    # 2. Invoke Subgraph manually
+    res = subgraph.invoke(sub_input)
+    
+    # 3. Map Subgraph -> Parent
+    return {"ans_hi": res["translated_text"]}
+</pre>
                         </div>
                     </div>
-                    <div id="content-parent" class="hidden space-y-6">
-                        <div class="code-block">
-<pre><code><span class="token keyword">def</span> <span class="token function">bridge_node</span>(state: ParentState):
-    <span class="token comment"># Map Parent State -> Subgraph State</span>
-    sub_res = subgraph.invoke({<span class="token string">"input_text"</span>: state[<span class="token string">"eng_draft"</span>]})
-    
-    <span class="token comment"># Map Subgraph Result -> Parent State</span>
-    <span class="token keyword">return</span> {<span class="token string">"hin_draft"</span>: sub_res[<span class="token string">"translated_text"</span>]}</code></pre>
+                </div>
+
+                <!-- Pattern 2 -->
+                <div class="glass p-12 rounded-[3rem] border border-white/5 bg-black/40">
+                    <div class="flex flex-col lg:flex-row gap-12">
+                        <div class="flex-1">
+                            <div class="inline-block px-3 py-1 rounded-full bg-neon-purple/10 border border-neon-purple/20 text-neon-purple text-[10px] font-bold uppercase tracking-widest mb-4">Pattern 02</div>
+                            <h3 class="text-2xl font-bold text-white mb-6">Shared State (Direct Integration)</h3>
+                            <p class="text-sm text-slate-400 leading-relaxed mb-8">
+                                Use this when the subgraph <strong>shares keys</strong> with the parent state. The subgraph is added directly to the parent graph as a node. LangGraph automatically manages the state flow.
+                            </p>
+                            <ul class="space-y-4 mb-8">
+                                <li class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-neon-purple shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <p class="text-xs text-slate-300"><strong>Native Flow:</strong> Updates returned by the subgraph merge directly into parent state.</p>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-neon-purple shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <p class="text-xs text-slate-300"><strong>Reduced Boilerplate:</strong> No need for manual bridge functions.</p>
+                                </li>
+                            </ul>
                         </div>
+                        <div class="flex-1 bg-black/60 rounded-2xl p-6 border border-white/5">
+                            <pre class="text-[11px] text-slate-400 font-mono">
+<span class="text-neon-purple"># Add compiled graph directly as a node</span>
+parent_builder.add_node("answer", generate_node)
+parent_builder.add_node("translate", <span class="text-white">subgraph</span>)
+
+parent_builder.add_edge(START, "answer")
+parent_builder.add_edge("answer", "translate")
+parent_builder.add_edge("translate", END)
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 3: Failure Isolation Deep Dive -->
+        <section class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
+                <span class="text-brand-400">03</span>
+                Failure Isolation & Retries
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div class="space-y-6">
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        One of the most powerful reasons to use subgraphs is <strong>Isolation</strong>. In a monolithic graph, a failure in a specific logic branch can be hard to recover from without resetting the entire flow.
+                    </p>
+                    <div class="p-6 glass rounded-2xl border-l-4 border-brand-400 bg-brand-400/5">
+                        <h4 class="font-bold text-white mb-2 italic">Production Tip:</h4>
+                        <p class="text-[11px] text-slate-300">
+                            Apply <code>RetryPolicies</code> specifically to the Subgraph nodes. If your "Research Subgraph" fails due to a rate limit, the Parent orchestrator can catch the error and decide to skip the node or try an alternative data source, keeping the rest of the application alive.
+                        </p>
+                    </div>
+                </div>
+                <div class="bg-black/40 rounded-3xl p-8 border border-white/5">
+                    <div class="mermaid">
+                        graph TD
+                            P[Parent Graph] --> S[Subgraph: Coding]
+                            S -- "Exception" --> Catch{Error Handler}
+                            Catch -- "Retry Subgraph" --> S
+                            Catch -- "Degraded Mode" --> Final[Parent Result]
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Section 4: Observability & Streaming -->
+        <section class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12">Observability in the Hierarchy</h2>
+            <div class="glass p-12 rounded-3xl text-center">
+                <p class="text-sm text-slate-400 mb-8 max-w-2xl mx-auto">
+                    When streaming from a parent graph, subgraph events are hidden by default. To "look inside" the nested execution, use the <code>subgraphs=True</code> flag.
+                </p>
+                <div class="bg-[#010409] p-6 rounded-2xl inline-block text-left border border-white/5">
+                    <pre class="text-xs text-brand-400"><code>for chunk in graph.stream(
+    {"input": "..."} , 
+    subgraphs=True, 
+    stream_mode="updates"
+):
+    print(chunk) <span class="text-slate-600"># Streams internal subgraph nodes too!</span></code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Back to Nexus -->
+        <div class="text-center pb-20">
+            <a href="../../index.html" class="inline-flex items-center gap-2 text-brand-400 hover:text-white transition-colors uppercase tracking-[0.3em] text-xs font-bold">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                Return to Nexus
+            </a>
+        </div>
     </main>
 
     <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-[0.4em] opacity-40">

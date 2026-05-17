@@ -100,116 +100,266 @@
 
     <main class="max-w-6xl mx-auto py-16 px-8">
         
-        <!-- Intro -->
-        <div class="mb-20">
+        <!-- Intro Header -->
+        <div class="mb-20 text-center">
             <h1 class="text-5xl md:text-6xl font-display font-extrabold mb-8 tracking-tight">
                 Supervised Agency & <br/>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-neon-purple">Interruption Gatekeepers</span>
             </h1>
-            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl">
+            <p class="text-xl text-slate-400 leading-relaxed max-w-3xl mx-auto">
                 Tempering autonomous execution with human oversight. Implement stateful pauses, request manual approval for high-risk actions, and resume execution with precise override commands.
             </p>
         </div>
 
-        <!-- Detailed Theory -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3">
-                <span class="text-brand-400">01</span>
-                Theoretical Foundations
+        <!-- Section 1: Theory of Supervision -->
+        <section class="mb-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl font-display font-bold mb-8 flex items-center gap-3">
+                        <span class="text-brand-400 text-sm tracking-[0.3em] uppercase">Theory</span>
+                        The HITL Paradigm
+                    </h2>
+                    <div class="space-y-6 text-slate-400 leading-relaxed">
+                        <p>
+                            Human-in-the-Loop (HITL) isn't just a safety feature; it's a **Design Pattern**. It bridges the gap between unreliable AI autonomy and rigid human control. 
+                        </p>
+                        <div class="p-6 glass rounded-2xl border-l-4 border-brand-400 bg-brand-400/5">
+                            <h4 class="font-bold text-white mb-2">Why Pause?</h4>
+                            <ul class="text-xs space-y-2 list-disc ml-4">
+                                <li><strong>Safety:</strong> Don't let an agent spend $10,000 without a signature.</li>
+                                <li><strong>Grounding:</strong> Have a human verify a RAG citation before it becomes part of a final report.</li>
+                                <li><strong>Steerability:</strong> Allow the human to correct the agent's path if it deviates from the user's intent.</li>
+                            </ul>
+                        </div>
+                        <p>
+                            In LangGraph, this is achieved by leveraging <strong>Checkpointers</strong>. When an interrupt is triggered, the graph's entire state is serialized and stored, allowing the process to terminate and wait indefinitely for a signal to resume.
+                        </p>
+                    </div>
+                </div>
+                <div class="glass p-12 rounded-[3rem] border border-white/5 relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-brand-400 to-neon-purple rounded-[3rem] blur opacity-10"></div>
+                    <div class="relative">
+                        <div class="mermaid">
+                            graph TD
+                                subgraph "Autonomous Loop"
+                                    A[Agent Node] --> B{Sensitive?}
+                                end
+                                
+                                B -- "Yes" --> INT{{INTERRUPT}}
+                                INT -- "Save State" --> DB[(Checkpointer)]
+                                
+                                subgraph "Human Interaction"
+                                    DB -- "Await Approval" --> H((Human User))
+                                    H -- "Manual Review" --> ACTION{Action}
+                                    ACTION -- "Approve" --> RES[Resume State]
+                                    ACTION -- "Edit" --> EDIT[Update State]
+                                end
+                                
+                                RES --> C[Tool Execution]
+                                EDIT --> A
+                                
+                                style INT fill:#f43f5e,stroke:#fff
+                                style H fill:#38bdf8,stroke:#fff
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Common HITL Patterns (Goated Patterns) -->
+        <section id="patterns" class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3 text-white">
+                <span class="text-brand-400">02</span>
+                Common Implementation Patterns
             </h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div class="space-y-8">
-                    <div class="glass p-8 rounded-3xl">
-                        <h3 class="text-xl font-bold mb-4">The Role of Persistence</h3>
-                        <p class="text-sm text-slate-400 leading-relaxed">
-                            HITL is only possible when the graph is **Persistent**. When an interrupt is triggered, the engine serializes the current `State` and instruction pointer into a database. The thread stays "suspended" until a resume command is received.
-                        </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Pattern 1: Action Approval -->
+                <div class="glass p-8 rounded-3xl border-l-4 border-red-500 bg-red-500/5">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-500">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <h4 class="text-white font-bold text-xl">Action Approval</h4>
                     </div>
-                    <div class="glass p-8 rounded-3xl border-l-4 border-brand-400">
-                        <h3 class="text-xl font-bold mb-4">Resuming with Command()</h3>
-                        <p class="text-sm text-slate-400 leading-relaxed">
-                            To "jump-start" a paused execution, developers use the `Command` object. This can pass a simple approval ("yes") or a full state override to "fix" a model's faulty decision before it proceeds.
-                        </p>
-                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                        The "Gatekeeper" pattern. The agent prepares an action (e.g., <strong>Payment, Email, Deletion</strong>) but stops before execution. It waits for a binary "Approve" or "Reject" signal.
+                    </p>
+                    <div class="text-[10px] uppercase tracking-widest text-red-400 font-bold">Use Case: Financial Transactions</div>
                 </div>
-                <div class="glass p-8 rounded-3xl">
-                    <h3 class="text-xl font-bold mb-4">Interruption Strategies</h3>
-                    <div class="space-y-4 text-xs">
-                        <div class="p-4 bg-black/20 rounded-xl border border-white/5">
-                            <strong class="text-brand-400 block mb-1">interrupt_before:</strong> Static checkpoint configured during compilation. Pauses *before* a node is invoked.
+
+                <!-- Pattern 2: Output Review / Edit -->
+                <div class="glass p-8 rounded-3xl border-l-4 border-brand-400 bg-brand-400/5">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-brand-400/20 flex items-center justify-center text-brand-400">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         </div>
-                        <div class="p-4 bg-black/20 rounded-xl border border-white/5">
-                            <strong class="text-brand-400 block mb-1">interrupt_after:</strong> Pauses *after* a node completes. Useful for auditing generated outputs.
-                        </div>
-                        <div class="p-4 bg-black/20 rounded-xl border border-brand-400/30">
-                            <strong class="text-neon-purple block mb-1">interrupt():</strong> Dynamic pause triggered inside a node or tool based on runtime ambiguity.
-                        </div>
+                        <h4 class="text-white font-bold text-xl">Output Review & Edit</h4>
                     </div>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                        The human acts as an <strong>Editor</strong>. The agent generates a draft, the human modifies the state (text, parameters, or logic), and the agent resumes using the updated information.
+                    </p>
+                    <div class="text-[10px] uppercase tracking-widest text-brand-400 font-bold">Use Case: Content Generation</div>
+                </div>
+
+                <!-- Pattern 3: Ambiguity Clarification -->
+                <div class="glass p-8 rounded-3xl border-l-4 border-neon-purple bg-neon-purple/5">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-neon-purple/20 flex items-center justify-center text-neon-purple">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                        </div>
+                        <h4 class="text-white font-bold text-xl">Ambiguity Clarification</h4>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                        When the agent encounters multiple valid paths or missing data, it <strong>Interrupts itself</strong> and asks the human for specific parameters or preferences.
+                    </p>
+                    <div class="text-[10px] uppercase tracking-widest text-neon-purple font-bold">Use Case: Booking & Scheduling</div>
+                </div>
+
+                <!-- Pattern 4: Escalation Pattern -->
+                <div class="glass p-8 rounded-3xl border-l-4 border-amber-500 bg-amber-500/5">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                        </div>
+                        <h4 class="text-white font-bold text-xl">Escalation / Handoff</h4>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                        The agent detects it has reached its <strong>Knowledge Limit</strong> or failed a validation check too many times. It gracefully exits and passes the full context to a human operator.
+                    </p>
+                    <div class="text-[10px] uppercase tracking-widest text-amber-500 font-bold">Use Case: Customer Support Handoff</div>
                 </div>
             </div>
         </section>
 
-        <!-- Visualization -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12">The HITL Supervision Flow</h2>
-            <div class="glass p-12 rounded-3xl">
-                <div class="mermaid">
-                    graph TD
-                        S([START]) --> Chat[Chat Node: Reasoning]
-                        Chat -- "Proposes Action" --> Guard{Security Checkpoint}
-                        
-                        Guard -- "Pauses Superstep" --> DB[(Persistent Store)]
-                        DB -- "Awaiting Approval" --> Human((Human Admin))
-                        
-                        Human -- "Command(resume='yes')" --> Resume[Resume Execution]
-                        Resume --> Tool[Tool Node: High-Risk Action]
-                        Tool --> END([END])
-                        
-                        style S fill:#0ea5e9,stroke:#38bdf8
-                        style END fill:#bc13fe,stroke:#a855f7
-                        style Guard fill:#450a0a,stroke:#991b1b
-                        style Human fill:#065f46,stroke:#059669
+        <!-- Section 3: Breakpoint Strategies -->
+        <section id="strategies" class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12 text-center text-white">Three Ways to Pause</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass p-8 rounded-3xl hover:border-brand-400/30 transition-all">
+                    <h4 class="text-brand-400 font-bold mb-2 text-sm uppercase tracking-widest">01. Static Interrupt</h4>
+                    <h5 class="text-white font-bold mb-4">interrupt_before</h5>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Configured at <code>compile()</code> time. The graph ALWAYS pauses before the specified node. Best for critical tools like "Send Money" or "Drop Database".
+                    </p>
+                </div>
+                <div class="glass p-8 rounded-3xl hover:border-brand-400/30 transition-all">
+                    <h4 class="text-brand-400 font-bold mb-2 text-sm uppercase tracking-widest">02. Manual Check</h4>
+                    <h5 class="text-white font-bold mb-4">interrupt_after</h5>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Pauses execution immediately after a node completes. Useful for <strong>Audit Logs</strong> where you want a human to verify the output before moving to the next logic step.
+                    </p>
+                </div>
+                <div class="glass p-8 rounded-3xl hover:border-neon-purple/30 transition-all">
+                    <h4 class="text-neon-purple font-bold mb-2 text-sm uppercase tracking-widest">03. Dynamic Logic</h4>
+                    <h5 class="text-white font-bold mb-4">interrupt()</h5>
+                    <h4 class="text-[10px] text-slate-500 mt-1 uppercase italic">(New in LangGraph)</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed mt-4">
+                        Triggered INSIDE a node or tool. The agent can decide at runtime if it's "unsure" and needs human help, passing a custom payload to the UI.
+                    </p>
                 </div>
             </div>
         </section>
 
-        <!-- Technical Implementation -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-display font-bold mb-12">Code Implementation</h2>
-            <div class="glass rounded-3xl overflow-hidden">
+        <!-- Section 3: Technical Implementation -->
+        <section class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12">Implementation Workflow</h2>
+            <div class="glass rounded-[2rem] overflow-hidden">
                 <div class="flex border-b border-white/10 bg-black/20">
-                    <button onclick="switchTab('pause')" id="btn-pause" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] active-tab transition-all">Triggering Interrupts</button>
-                    <button onclick="switchTab('resume')" id="btn-resume" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">Resuming Execution</button>
+                    <button onclick="switchTab('config')" id="btn-config" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] active-tab transition-all">1. Configuration</button>
+                    <button onclick="switchTab('interaction')" id="btn-interaction" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">2. Interaction</button>
+                    <button onclick="switchTab('resume')" id="btn-resume" class="px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all">3. Resuming</button>
                 </div>
                 
-                <div class="p-8">
-                    <div id="content-pause" class="block space-y-6">
-                        <div class="code-block">
-<pre><code><span class="token keyword">from</span> langgraph.types <span class="token keyword">import</span> interrupt
-
-<span class="token keyword">def</span> <span class="token function">secure_node</span>(state):
-    <span class="token comment"># Pauses and sends payload to caller</span>
-    decision = interrupt(<span class="token string">"Confirm transaction?"</span>)
-    
-    <span class="token keyword">if</span> decision == <span class="token string">"yes"</span>:
-        <span class="token keyword">return</span> {<span class="token string">"status"</span>: <span class="token string">"approved"</span>}</code></pre>
-                        </div>
-                    </div>
-                    <div id="content-resume" class="hidden space-y-6">
-                        <div class="code-block">
-<pre><code><span class="token keyword">from</span> langgraph.types <span class="token keyword">import</span> Command
-
-<span class="token comment"># Resuming a thread from an external UI/CLI</span>
-app.invoke(
-    Command(resume=<span class="token string">"yes"</span>),
-    config={<span class="token string">"configurable"</span>: {<span class="token string">"thread_id"</span>: <span class="token string">"session_01"</span>}}
+                <div class="p-8 bg-[#010409]">
+                    <!-- Config Tab -->
+                    <div id="content-config" class="block">
+                        <pre class="code-block border-none p-0"><code><span class="token comment"># Compile with a persistent checkpointer and a breakpoint</span>
+graph = workflow.compile(
+    checkpointer=MemorySaver(),
+    <span class="text-brand-400">interrupt_before=["tool_node"]</span>
 )</code></pre>
-                        </div>
+                    </div>
+                    <!-- Interaction Tab -->
+                    <div id="content-interaction" class="hidden">
+                        <pre class="code-block border-none p-0"><code><span class="token comment"># Fetch current state to show to human</span>
+snapshot = graph.get_state(config)
+print(snapshot.next) <span class="token comment"># Shows ["tool_node"]</span>
+print(snapshot.values) <span class="token comment"># Shows current variables</span>
+
+<span class="token comment"># (Optional) Human edits the state</span>
+graph.update_state(config, {"input": "Corrected instructions"})</code></pre>
+                    </div>
+                    <!-- Resume Tab -->
+                    <div id="content-resume" class="hidden">
+                        <pre class="code-block border-none p-0"><code><span class="token comment"># Resume by passing None (uses existing checkpoint)</span>
+<span class="token comment"># or using the Command() pattern for specific responses</span>
+graph.invoke(<span class="token keyword">None</span>, config)</code></pre>
                     </div>
                 </div>
             </div>
         </section>
+        <!-- Section 4: Practical Case Study (Social Media Manager) -->
+        <section id="case-study" class="mb-32">
+            <h2 class="text-3xl font-display font-bold mb-12 flex items-center gap-3 text-white">
+                <span class="text-brand-400">04</span>
+                Case Study: Social Media Manager
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="glass p-12 rounded-[3rem] border border-white/5 bg-black/20">
+                    <div class="mermaid">
+                        graph LR
+                            subgraph "Frontend (User UI)"
+                                FE[Enter Topic] --> SUB[Submit Button]
+                            end
+                            
+                            SUB -- "invoke()" --> START
+                            
+                            subgraph "Backend (LangGraph)"
+                                START([START]) --> RES[Research Node]
+                                RES --> POST[Post Generation]
+                                POST -- "interrupt()" --> HITL{{HITL Pause}}
+                                HITL -- "Human Review" --> END([END])
+                            end
+                            
+                            style HITL fill:#f43f5e,stroke:#fff
+                            style FE fill:#0ea5e9,stroke:#fff
+                    </div>
+                    <p class="text-[10px] text-center text-slate-500 mt-6 uppercase tracking-widest">Figure 14.2: Social Media Workflow Topology</p>
+                </div>
+                <div class="space-y-6 text-slate-400 leading-relaxed">
+                    <h3 class="text-2xl font-bold text-white">The "Draft & Review" Cycle</h3>
+                    <p>
+                        In this scenario, we don't want the agent to post directly to X (Twitter). Instead, we implement a <strong>Review Cycle</strong>.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex gap-4">
+                            <div class="w-6 h-6 rounded-full bg-brand-400/20 text-brand-400 flex items-center justify-center text-xs font-bold shrink-0">1</div>
+                            <p class="text-xs">The user enters a topic (e.g., "GenAI") in the frontend and clicks submit.</p>
+                        </li>
+                        <li class="flex gap-4">
+                            <div class="w-6 h-6 rounded-full bg-brand-400/20 text-brand-400 flex items-center justify-center text-xs font-bold shrink-0">2</div>
+                            <p class="text-xs">The backend executes <strong>Research</strong> and generates a <strong>Draft Post</strong>.</p>
+                        </li>
+                        <li class="flex gap-4">
+                            <div class="w-6 h-6 rounded-full bg-neon-purple/20 text-neon-purple flex items-center justify-center text-xs font-bold shrink-0">3</div>
+                            <p class="text-xs">The <code>post</code> node triggers an <code>interrupt()</code>. The state is saved, and control returns to the frontend UI.</p>
+                        </li>
+                        <li class="flex gap-4">
+                            <div class="w-6 h-6 rounded-full bg-brand-400/20 text-brand-400 flex items-center justify-center text-xs font-bold shrink-0">4</div>
+                            <p class="text-xs">The human reviews the draft, makes edits if necessary, and clicks "Publish".</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
+        <!-- Back to Nexus -->
+        <div class="text-center pb-20">
+            <a href="../../index.html" class="inline-flex items-center gap-2 text-brand-400 hover:text-white transition-colors uppercase tracking-[0.3em] text-xs font-bold">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                Return to Nexus
+            </a>
+        </div>
     </main>
 
     <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-xs uppercase tracking-[0.4em] opacity-40">

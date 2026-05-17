@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrective RAG (CRAG) Masterclass | Theory & Mechanics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
+        }
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
+        }
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
+        }
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .node-active {
+            filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.8));
+            stroke: #00f2ff !important;
+            stroke-width: 3px !important;
+        }
+        .node-completed {
+            filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
+            stroke: #22c55e !important;
+            stroke-width: 2.5px !important;
+        }
+        .path-active {
+            stroke: #00f2ff !important;
+            stroke-dasharray: 6;
+            animation: dash 1s linear infinite;
+        }
+        .path-completed {
+            stroke: #22c55e !important;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -12;
+            }
+        }
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            background: #090d1a;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans text-slate-200">
+
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
+
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-blue/30 bg-neon-blue/5 text-neon-blue text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-blue"></span> Active Knowledge Correction
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            Corrective <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">RAG (CRAG)</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+            A masterclass on building self-correcting RAG systems. Understand retrieval evaluator scoring, sentence-strip noise filtration (T5 model), dynamic query rewriting, and ambiguous blending to guarantee zero-hallucination answers.
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5">
+            <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg">
+                📚 Conceptual Theory
+            </button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ Interactive CRAG Simulator
+            </button>
+            <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Notebook Walkthroughs
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
+
+        <!-- ==================== TAB: THEORY ==================== -->
+        <div id="tab-content-theory" class="space-y-16">
+            
+            <!-- Module 1: The Core Limitations of RAG -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Module 1: The Core Limitations of Standard RAG
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            Traditional Retrieval-Augmented Generation (RAG) is built on a massive, highly idealistic assumption: **that vector databases retrieve correct, relevant contexts 100% of the time**. 
+                        </p>
+                        <p>
+                            In real-world deployment, this assumption falls apart. Standard RAG retrievers routinely retrieve irrelevant, stale, or incomplete information due to two critical issues:
+                        </p>
+                        <ul class="space-y-3 pl-2">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-blue">❌</span>
+                                <span><strong>Semantic Gap Failure:</strong> Embedding algorithms measure lexical and semantic similarity, not factual truth. A document that matches the query’s vocabulary perfectly can actually be completely irrelevant or contain false statements.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-blue">❌</span>
+                                <span><strong>Context Window Noise:</strong> Packing full chunked documents into the LLM's context window exposes the generator to irrelevant background noise, leading to "Lost in the Middle" syndrome and semantic drift.</span>
+                            </li>
+                        </ul>
+                        <p class="border-l-2 border-slate-700 pl-4 py-1 italic text-slate-400 text-xs">
+                            "When an LLM generator is fed irrelevant or incorrect context, it either produces garbage answers or hallucinates, completely defeating the purpose of the RAG system."
+                        </p>
+                    </div>
+
+                    <!-- Visualizing RAG Flow -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Standard RAG Lifecycle (Slide 1 Overview)</h4>
+                        <div class="flex justify-center">
+                            <svg width="340" height="180" viewBox="0 0 340 180" class="w-full max-w-[340px]">
+                                <rect x="10" y="70" width="60" height="40" rx="6" fill="#090d1a" stroke="#00f2ff" stroke-width="1.5" />
+                                <text x="40" y="95" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Query (x)</text>
+                                
+                                <path d="M 70 90 L 120 45" stroke="#64748b" stroke-width="1.5" />
+                                <path d="M 70 90 L 120 135" stroke="#64748b" stroke-width="1.5" />
+
+                                <rect x="120" y="25" width="80" height="40" rx="6" fill="#090d1a" stroke="#475569" stroke-width="1" />
+                                <text x="160" y="45" fill="#a1a1aa" font-family="Inter" font-size="7" text-anchor="middle">Vector DB</text>
+                                <text x="160" y="55" fill="#64748b" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Embed Lookup</text>
+
+                                <rect x="120" y="115" width="80" height="40" rx="6" fill="#090d1a" stroke="#bc13fe" stroke-width="1" />
+                                <text x="160" y="135" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Retrieved Context</text>
+                                <text x="160" y="145" fill="#bc13fe" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Raw chunked docs</text>
+
+                                <path d="M 200 45 L 250 90" stroke="#64748b" stroke-width="1.5" />
+                                <path d="M 200 135 L 250 90" stroke="#64748b" stroke-width="1.5" />
+
+                                <rect x="250" y="70" width="80" height="40" rx="6" fill="#090d1a" stroke="#00f2ff" stroke-width="1.5" />
+                                <text x="290" y="90" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">LLM Response</text>
+                                <text x="290" y="100" fill="#22c55e" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Unverified! Hallucination risk.</text>
+                            </svg>
+                        </div>
+                        <div class="text-[10px] text-slate-500 italic text-center leading-relaxed">
+                            No validation occurs. Whatever semantic similarity returns is directly injected into the generator prompt.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 2: Corrective RAG (CRAG) Foundations -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-purple relative overflow-hidden">
+                <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-neon-purple/5 blur-3xl pointer-events-none"></div>
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-purple rounded-full"></span>
+                    Module 2: Corrective RAG (CRAG) Foundations
+                </h2>
+                
+                <div class="space-y-6 text-slate-300 leading-relaxed text-sm md:text-base">
+                    <p>
+                        Introduced in early 2024, **Corrective Retrieval-Augmented Generation (CRAG)** resolves these flaws by implementing a lightweight, active **Retrieval Evaluator** node. 
+                    </p>
+                    <p>
+                        Instead of sending retrieved contexts straight to the generator, the Evaluator intercepts the flow. It assesses the relevance of the retrieved documents against the user query, assigns a confidence grade, and dynamically branches execution into three correction workflows:
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                        <div class="p-6 bg-slate-950/60 border border-emerald-500/20 rounded-2xl space-y-3">
+                            <h4 class="text-emerald-400 font-bold uppercase tracking-wider text-xs">Route 1: Correct (Confidence &ge; 0.8)</h4>
+                            <p class="text-xs text-slate-400">
+                                The vector documents match the query's criteria perfectly. CRAG forwards the documents to a **Knowledge Refinement** stage to strip away noise and stitch only high-signal sentences for generation.
+                            </p>
+                        </div>
+                        <div class="p-6 bg-slate-950/60 border border-neon-pink/20 rounded-2xl space-y-3">
+                            <h4 class="text-neon-pink font-bold uppercase tracking-wider text-xs">Route 2: Incorrect (Confidence &lt; 0.2)</h4>
+                            <p class="text-xs text-slate-400">
+                                The vector documents are completely useless. CRAG bypasses the database completely, rewrites the query, and triggers concurrent **Web Search (Tavily search)** to retrieve external ground-truth facts.
+                            </p>
+                        </div>
+                        <div class="p-6 bg-slate-950/60 border border-neon-blue/20 rounded-2xl space-y-3">
+                            <h4 class="text-neon-blue font-bold uppercase tracking-wider text-xs">Route 3: Ambiguous (0.2 &le; Score &lt; 0.8)</h4>
+                            <p class="text-xs text-slate-400">
+                                The vector documents contain some useful context but are incomplete. CRAG branches concurrently: refining internal contexts ($k_{in}$) AND querying web engines ($k_{ex}$), blending both sets of context.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 3: Active Flowchart of CRAG -->
+            <section class="glass p-8 md:p-12 rounded-3xl relative">
+                <h2 class="text-3xl font-display font-bold mb-8">
+                    Module 3: Core Flowchart & Routing Mechanics
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                    <div class="lg:col-span-7 flex justify-center bg-slate-950/70 p-6 rounded-2xl border border-white/5">
+                        <!-- Custom CRAG flowchart based on paper -->
+                        <svg width="600" height="340" viewBox="0 0 600 340" class="w-full h-full max-h-[320px]">
+                            <!-- Paths -->
+                            <path d="M 40 170 L 100 170" stroke="#00f2ff" stroke-width="2" />
+                            <path d="M 180 170 L 230 170" stroke="#00f2ff" stroke-width="2" />
+                            
+                            <!-- Branches -->
+                            <path d="M 280 140 L 340 70" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="2" />
+                            <path d="M 280 170 L 340 170" stroke="#00f2ff" stroke-width="1.5" />
+                            <path d="M 280 200 L 340 270" stroke="#ff007f" stroke-width="1.5" stroke-dasharray="2" />
+
+                            <!-- Merge Paths to Generator -->
+                            <path d="M 420 70 L 480 150" stroke="#64748b" stroke-width="1.5" />
+                            <path d="M 420 170 L 480 170" stroke="#64748b" stroke-width="1.5" />
+                            <path d="M 420 270 L 480 190" stroke="#64748b" stroke-width="1.5" />
+                            
+                            <path d="M 540 170 L 580 170" stroke="#22c55e" stroke-width="2" />
+
+                            <!-- START -->
+                            <circle cx="25" cy="170" r="15" fill="#090d1a" stroke="#64748b" stroke-width="1.5" />
+                            <text x="25" y="173" fill="#64748b" font-family="JetBrains Mono" font-size="7" text-anchor="middle">START</text>
+
+                            <!-- Node 1: Vector Retrieval -->
+                            <g>
+                                <rect x="100" y="140" width="80" height="60" rx="8" fill="#090d1a" stroke="#00f2ff" stroke-width="2" class="node-active" />
+                                <text x="140" y="170" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Retrieval</text>
+                                <text x="140" y="182" fill="#00f2ff" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Chroma DB</text>
+                            </g>
+
+                            <!-- Node 2: Evaluator -->
+                            <g>
+                                <rect x="230" y="140" width="80" height="60" rx="8" fill="#090d1a" stroke="#bc13fe" stroke-width="2" />
+                                <text x="270" y="165" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Retrieval</text>
+                                <text x="270" y="175" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Evaluator</text>
+                                <text x="270" y="187" fill="#bc13fe" font-family="JetBrains Mono" font-size="5" text-anchor="middle">T5 / ChatGPT</text>
+                            </g>
+
+                            <!-- Action Nodes -->
+                            <g>
+                                <rect x="340" y="40" width="80" height="60" rx="6" fill="#090d1a" stroke="#22c55e" stroke-width="1.5" />
+                                <text x="380" y="65" fill="#22c55e" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Knowledge</text>
+                                <text x="380" y="75" fill="#22c55e" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Refinement</text>
+                                <text x="380" y="87" fill="#a1a1aa" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Strip and filter (k_in)</text>
+                            </g>
+
+                            <g>
+                                <rect x="340" y="140" width="80" height="60" rx="6" fill="#090d1a" stroke="#00f2ff" stroke-width="1.5" />
+                                <text x="380" y="165" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Blended</text>
+                                <text x="380" y="175" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Refine + Search</text>
+                                <text x="380" y="187" fill="#a1a1aa" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Combine (k_in + k_ex)</text>
+                            </g>
+
+                            <g>
+                                <rect x="340" y="240" width="80" height="60" rx="6" fill="#090d1a" stroke="#ff007f" stroke-width="1.5" />
+                                <text x="380" y="265" fill="#ff007f" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Knowledge</text>
+                                <text x="380" y="275" fill="#ff007f" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Searching</text>
+                                <text x="380" y="287" fill="#a1a1aa" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Web Search (k_ex)</text>
+                            </g>
+
+                            <!-- Node 3: Generator -->
+                            <g>
+                                <rect x="480" y="140" width="70" height="60" rx="8" fill="#090d1a" stroke="#22c55e" stroke-width="2" />
+                                <text x="515" y="170" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Generator</text>
+                                <text x="515" y="182" fill="#22c55e" font-family="JetBrains Mono" font-size="6" text-anchor="middle">LLM Synthesis</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-4 text-xs md:text-sm text-slate-300 leading-relaxed">
+                        <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">The Routing Decisions</h4>
+                        <p>
+                            The core decision-making within CRAG is controlled by the **Retrieval Evaluator**. By prompting the evaluation LLM to output a clean JSON structured schema containing a confidence probability, the system determines the next stage:
+                        </p>
+                        <div class="p-4 bg-slate-900 rounded-xl border border-white/5 space-y-2">
+                            <div class="flex justify-between items-center font-mono text-[11px]">
+                                <span class="text-emerald-400">Score &ge; 0.8:</span>
+                                <span class="text-slate-400">=> Correct (Knowledge Refinement)</span>
+                            </div>
+                            <div class="flex justify-between items-center font-mono text-[11px]">
+                                <span class="text-neon-pink">Score &lt; 0.2:</span>
+                                <span class="text-slate-400">=> Incorrect (Tavily Web Search)</span>
+                            </div>
+                            <div class="flex justify-between items-center font-mono text-[11px]">
+                                <span class="text-neon-blue">0.2 &le; Score &lt; 0.8:</span>
+                                <span class="text-slate-400">=> Ambiguous (Concurrently Blends Both)</span>
+                            </div>
+                        </div>
+                        <p>
+                            This exact 3-stage conditional branching matches the **Iteration 2 Flowchart** (from Slide 3). It ensures that no matter what the vector search provides, the agent contains a recovery buffer to rescue the generation phase!
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 4: Knowledge Refinement (Decomposition & Filtration) -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-pink relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-pink/5 blur-3xl pointer-events-none"></div>
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-pink rounded-full"></span>
+                    Module 4: Knowledge Refinement (Slide 2 Focus)
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm">
+                        <p>
+                            In standard RAG, chunked documents (typically 500-1000 tokens) are fed raw into the context window. This includes menus, repetitive terminology, and unrelated background sentences.
+                        </p>
+                        <p>
+                            CRAG resolves this through **Knowledge Refinement** (conceptualized in your Slide 2 drawing). When a document $d_i$ is flagged as containing relevant information, it undergoes a surgical three-step deconstruction:
+                        </p>
+                        <ul class="space-y-3 pl-2">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-pink font-semibold">1. Decompose:</span>
+                                <span>The chunked document $d_i$ is decomposed into a list of fine-grained sentence strips: $[s_1, s_2, ..., s_k]$.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-pink font-semibold">2. Filter:</span>
+                                <span>A lightweight evaluation model (originally a T5 model with 770M parameters, or structured prompt rules in modern LLMs) evaluates each individual sentence strip. It discards strips that do not directly address the query $x$.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-pink font-semibold">3. Recompose:</span>
+                                <span>The high-signal sentence strips that pass the relevance filter are stitched back together into a clean, highly condensed context block ($k_{in}$).</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 flex flex-col justify-between">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center mb-4">Sentence-Strip Deconstruction Pipeline</h4>
+                        <div class="flex justify-center">
+                            <svg width="340" height="200" viewBox="0 0 340 200" class="w-full max-w-[340px]">
+                                <!-- Chunk Box -->
+                                <rect x="10" y="10" width="80" height="30" rx="4" fill="#090d1a" stroke="#00f2ff" stroke-width="1.5" />
+                                <text x="50" y="28" fill="#00f2ff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Document chunk (d_i)</text>
+
+                                <path d="M 50 40 L 50 70" stroke="#bc13fe" stroke-width="1.5" />
+
+                                <!-- Strips -->
+                                <g>
+                                    <rect x="120" y="55" width="90" height="18" rx="3" fill="#090d1a" stroke="#bc13fe" stroke-width="1" />
+                                    <text x="165" y="66" fill="#fff" font-family="Inter" font-size="6" text-anchor="middle">Strip 1: irrelevant sentence</text>
+                                    <line x1="220" y1="64" x2="240" y2="64" stroke="#ef4444" stroke-width="1.5" />
+                                    <text x="250" y="67" fill="#ef4444" font-family="JetBrains Mono" font-size="7">X (Filter out)</text>
+
+                                    <rect x="120" y="85" width="90" height="18" rx="3" fill="#090d1a" stroke="#bc13fe" stroke-width="1" />
+                                    <text x="165" y="96" fill="#fff" font-family="Inter" font-size="6" text-anchor="middle">Strip 2: high-signal fact</text>
+                                    <path d="M 220 94 L 235 94" stroke="#22c55e" stroke-width="1.5" />
+                                    <text x="250" y="97" fill="#22c55e" font-family="JetBrains Mono" font-size="7">✓ (Retain)</text>
+
+                                    <rect x="120" y="115" width="90" height="18" rx="3" fill="#090d1a" stroke="#bc13fe" stroke-width="1" />
+                                    <text x="165" y="126" fill="#fff" font-family="Inter" font-size="6" text-anchor="middle">Strip K: irrelevant background</text>
+                                    <line x1="220" y1="124" x2="240" y2="124" stroke="#ef4444" stroke-width="1.5" />
+                                    <text x="250" y="127" fill="#ef4444" font-family="JetBrains Mono" font-size="7">X (Filter out)</text>
+                                </g>
+
+                                <path d="M 285 105 L 285 150 L 195 150" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="2" />
+                                
+                                <!-- Stitch Box -->
+                                <rect x="90" y="140" width="100" height="30" rx="4" fill="#090d1a" stroke="#22c55e" stroke-width="1.5" />
+                                <text x="140" y="158" fill="#22c55e" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Refined Context (k_in)</text>
+                            </svg>
+                        </div>
+                        <div class="text-[10px] text-slate-500 italic text-center leading-relaxed">
+                            Sentence strips are evaluated in isolation. Discarding noise yields highly concentrated, relevant facts for the generation model.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 5: Dynamic Query Rewriting & Web Searching -->
+            <section class="glass p-8 md:p-12 rounded-3xl relative">
+                <h2 class="text-3xl font-display font-bold mb-6">
+                    Module 5: Dynamic Query Rewriting & Web Searching
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm">
+                        <p>
+                            When internal data is graded as **Incorrect** or **Ambiguous**, CRAG activates the **Knowledge Searching** route (Slide 4). Simply throwing the user's conversational query straight into a search engine is ineffective; search engines expect concise search tokens, not conversational dialogue.
+                        </p>
+                        <p>
+                            To extract high-signal answers from the web, the system operates in two stages:
+                        </p>
+                        <ul class="space-y-4 pl-2">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-blue">1.</span>
+                                <span><strong>Query Rewriter Node:</strong> An LLM rewrites the complex user request $x$ into 3-5 distinct, targeted search engine queries optimized for Google or Tavily (e.g., rewriting "Who was the screenwriter for Death of a Batman?" into <code>"Death of a Batman screenwriter"</code>, <code>"Death of a Batman writer credits"</code>).</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-blue">2.</span>
+                                <span><strong>Web Search Refinement Node:</strong> The queries are executed in parallel on Tavily Search API. The raw web search logs are parsed, key URLs are extracted, and snippets are compiled. The system then selects the most relevant fragments and stores them as external knowledge context ($k_{ex}$).</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Code panel showing rewrite -->
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest font-mono">Query Re-engineering & Search Ingestion</h4>
+                        <div class="p-6 rounded-2xl code-block max-h-[300px] overflow-y-auto custom-scrollbar">
+                            <pre class="text-[11px] leading-relaxed text-cyan-300 font-mono">
+# Query Rewrite Blueprint
+REWRITE_SYSTEM = """You are a search query re-engineer.
+Rewrite the complex user query into 3 concise search engine queries.
+Keep queries short, keyword-focused, and stripped of conversational fluff.
+"""
+
+def query_rewrite_node(state: State) -> dict:
+    rewriter = llm.with_structured_output(SearchQueries)
+    result = rewriter.invoke([
+        SystemMessage(content=REWRITE_SYSTEM),
+        HumanMessage(content=f"Query: {state['query']}")
+    ])
+    return {"search_queries": result.queries}
+                            </pre>
+                        </div>
+                        <div class="text-[10px] text-slate-500 italic">
+                            Translating raw dialogue into keyword-based search vectors ensures Tavily retrieves exact factual matches.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 6: Blended Context Synthesis (Ambiguous Mode) -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Module 6: Blended Context Synthesis (Ambiguous Mode)
+                </h2>
+                
+                <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                    <p>
+                        The real magic of Corrective RAG lies in its handling of **Ambiguity**. Often, retrieved document databases are neither completely correct nor completely incorrect. They might contain part of an answer but lack crucial modern context, or cite a fact without listing its recent updates.
+                    </p>
+                    <p>
+                        When the Evaluator grades the retrieved context in the ambiguous zone ($0.2 \le \text{Score} < 0.8$), CRAG refuses to settle for partial information or risk web hallucination. It triggers a **Blended Context Synthesis** pathway:
+                    </p>
+                    <div class="p-6 bg-slate-950/70 border border-white/5 rounded-2xl space-y-4">
+                        <div class="flex flex-col md:flex-row items-center justify-around gap-6 text-center text-xs font-mono">
+                            <div class="p-4 bg-emerald-950/30 border border-emerald-500/20 rounded-xl max-w-[200px]">
+                                <span class="text-emerald-400 font-bold">1. Refine Vectors</span>
+                                <div class="text-[10px] text-slate-500 mt-1">Extracts clean internal facts (k_in)</div>
+                            </div>
+                            <span class="text-slate-500 text-lg font-bold">+</span>
+                            <div class="p-4 bg-pink-950/30 border border-neon-pink/20 rounded-xl max-w-[200px]">
+                                <span class="text-neon-pink font-bold">2. Search Web</span>
+                                <div class="text-[10px] text-slate-500 mt-1">Extracts external ground truth (k_ex)</div>
+                            </div>
+                            <span class="text-slate-500 text-lg font-bold">=></span>
+                            <div class="p-4 bg-purple-950/30 border border-neon-purple/20 rounded-xl max-w-[200px]">
+                                <span class="text-neon-purple font-bold">3. Blend & Stitch</span>
+                                <div class="text-[10px] text-slate-500 mt-1">Injects both into Generator prompt</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        By weaving internal proprietary documents ($k_{in}$) together with fresh web facts ($k_{ex}$), CRAG gives the generator LLM a comprehensive, ground-truth foundation. The resulting response is highly detailed, contextually complete, and verified on all fronts!
+                    </p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== TAB: VISUALIZER (SIMULATOR) ==================== -->
+        <div id="tab-content-simulator" class="hidden space-y-12">
+            <div class="glass p-6 md:p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-4">Interactive Corrective RAG Simulator</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    Witness how Corrective RAG heals retrieval failures in real-time. Enter a custom technical query, choose an Evaluator confidence score, and execute the graph. Watch the nodes illuminate dynamically as CRAG condenses internal context, rewrites query queries, fetches live web ground truths, and blends them!
+                </p>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-8 bg-slate-950/60 p-6 rounded-2xl border border-white/5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Enter Query</label>
+                        <input type="text" id="sim-query" value="Who was the screenwriter for Death of a Batman?" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Evaluator Score Boundary</label>
+                        <select id="sim-eval" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="ambiguous">Ambiguous (Score = 0.45) - Refine + Web Search</option>
+                            <option value="correct">Correct (Score = 0.92) - Knowledge Refinement Only</option>
+                            <option value="incorrect">Incorrect (Score = 0.08) - Complete Web Search</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="runCRAGSimulation()" id="btn-run-sim" class="w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Run CRAG State Machine
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Visual Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Graph Diagram Visualization (8 Cols) -->
+                    <div class="lg:col-span-8 bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex flex-col justify-between h-[520px]">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">CRAG Graph State Machine</h4>
+                        
+                        <!-- Main Graph SVG -->
+                        <div class="flex-1 flex items-center justify-center p-2">
+                            <svg width="600" height="380" viewBox="0 0 600 380" class="w-full h-full max-h-[350px]">
+                                <!-- Paths -->
+                                <path id="path-start-retrieve" d="M 50 190 L 110 190" stroke="#334155" stroke-width="2.5" fill="none" />
+                                <path id="path-retrieve-eval" d="M 190 190 L 230 190" stroke="#334155" stroke-width="2.5" fill="none" />
+                                
+                                <!-- Routing Branches -->
+                                <path id="path-eval-refine" d="M 310 170 L 370 90" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-eval-ambig" d="M 310 190 L 370 190" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-eval-rewrite" d="M 310 210 L 370 290" stroke="#334155" stroke-width="2" fill="none" />
+
+                                <!-- Rewrite to Search -->
+                                <path id="path-rewrite-search" d="M 450 290 L 490 290" stroke="#334155" stroke-width="2" fill="none" />
+
+                                <!-- Paths to Generator -->
+                                <path id="path-refine-gen" d="M 450 90 L 510 160" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-ambig-gen" d="M 450 190 L 510 190" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-search-gen" d="M 550 260 L 550 220" stroke="#334155" stroke-width="2" fill="none" />
+                                
+                                <path id="path-gen-end" d="M 570 190 L 590 190" stroke="#334155" stroke-width="2.5" fill="none" />
+
+                                <!-- START Node -->
+                                <circle cx="30" cy="190" r="14" fill="#0f172a" stroke="#475569" stroke-width="1.5" />
+                                <text x="30" y="193" fill="#64748b" font-family="JetBrains Mono" font-size="8" text-anchor="middle">START</text>
+
+                                <!-- Retrieval Node -->
+                                <g id="node-retrieve">
+                                    <rect x="110" y="160" width="80" height="60" rx="10" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="150" y="190" fill="#fff" font-family="Outfit" font-size="11" text-anchor="middle" font-weight="bold">Retrieval</text>
+                                    <text x="150" y="204" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Vector DB</text>
+                                </g>
+
+                                <!-- Evaluator Node -->
+                                <g id="node-eval">
+                                    <rect x="230" y="160" width="80" height="60" rx="10" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="270" y="190" fill="#fff" font-family="Outfit" font-size="11" text-anchor="middle" font-weight="bold">Evaluator</text>
+                                    <text x="270" y="204" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Grade Context</text>
+                                </g>
+
+                                <!-- Refine Node -->
+                                <g id="node-refine">
+                                    <rect x="370" y="60" width="80" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="410" y="85" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Refinement</text>
+                                    <text x="410" y="97" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Filter</text>
+                                    <text x="410" y="108" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Sentence split</text>
+                                </g>
+
+                                <!-- Ambiguous Node -->
+                                <g id="node-ambig">
+                                    <rect x="370" y="160" width="80" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="410" y="185" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Blended</text>
+                                    <text x="410" y="197" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Refine+Search</text>
+                                    <text x="410" y="208" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Blend (k_in+k_ex)</text>
+                                </g>
+
+                                <!-- Rewrite Node -->
+                                <g id="node-rewrite">
+                                    <rect x="370" y="260" width="80" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="410" y="285" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Query</text>
+                                    <text x="410" y="297" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Rewrite</text>
+                                    <text x="410" y="308" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Format keywords</text>
+                                </g>
+
+                                <!-- Search Node -->
+                                <g id="node-search">
+                                    <rect x="490" y="260" width="80" height="60" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="530" y="290" fill="#fff" font-family="Outfit" font-size="10" text-anchor="middle" font-weight="bold">Web Search</text>
+                                    <text x="530" y="302" fill="#475569" font-family="JetBrains Mono" font-size="7" text-anchor="middle" class="node-sub">Tavily Engine</text>
+                                </g>
+
+                                <!-- Generator Node -->
+                                <g id="node-generator">
+                                    <circle cx="550" cy="190" r="22" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="550" y="193" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Generator</text>
+                                    <text x="550" y="204" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle" class="node-sub">Synthesis</text>
+                                </g>
+                            </svg>
+                        </div>
+                        
+                        <!-- Console Output Panel -->
+                        <div class="h-[120px] bg-slate-900 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-y-auto custom-scrollbar space-y-1.5" id="sim-console">
+                            <span class="text-slate-500">[System]: Standing by. Click "Run CRAG State Machine" above to begin.</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic State & Outputs Panel (4 Cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        
+                        <!-- State Monitor Card -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex-1 overflow-y-auto custom-scrollbar max-h-[250px]">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">CRAG State Monitor</h4>
+                            <div class="space-y-3 font-mono text-xs" id="state-monitor">
+                                <div><span class="text-slate-500">query:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">internal_grade:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">eval_score:</span> <span class="text-slate-300">0.0</span></div>
+                                <div><span class="text-slate-500">decomposed_strips:</span> <span class="text-slate-300">0</span></div>
+                                <div><span class="text-slate-500">refined_context_k_in:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">search_queries:</span> <span class="text-slate-300">[]</span></div>
+                                <div><span class="text-slate-500">external_context_k_ex:</span> <span class="text-slate-300">null</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Generated Blog Preview (Dynamic Render) -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 h-[250px] overflow-y-auto custom-scrollbar flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Final Synthesized Answer</h4>
+                            <div class="flex-1 text-xs text-slate-400 space-y-3" id="answer-preview">
+                                <div class="h-full flex items-center justify-center text-center italic text-slate-600">
+                                    The corrected response compiled by the RAG generator will render here upon successful node completion.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: CODE & SCHEMAS ==================== -->
+        <div id="tab-content-code" class="hidden space-y-12">
+            
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-6">Corrective RAG Notebook Blueprints</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                    Walk through the technical implementation of CRAG across all 6 development files. This architecture establishes custom evaluators, sentence splitting metrics, and multi-threaded web searches in a unified LangGraph compiled state machine.
+                </p>
+
+                <!-- Code Tabs -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left nav -->
+                    <div class="flex flex-col gap-2 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
+                        <button onclick="switchCodeTab('code-basic')" id="btn-code-basic" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-blue/10 text-neon-blue border border-neon-blue/20">
+                            1. Basic Vector Retrieval
+                        </button>
+                        <button onclick="switchCodeTab('code-eval')" id="btn-code-eval" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            2. Retrieval Evaluator
+                        </button>
+                        <button onclick="switchCodeTab('code-refinement')" id="btn-code-refinement" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            3. Strip Decomposition
+                        </button>
+                        <button onclick="switchCodeTab('code-routing')" id="btn-code-routing" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            4. Compiler & Routes
+                        </button>
+                    </div>
+
+                    <!-- Code viewer (3/4 cols) -->
+                    <div class="lg:col-span-3">
+                        
+                        <!-- Basic Vector Retrieval -->
+                        <div id="code-content-code-basic" class="code-tab-content space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Notebooks 1 & 2: Embedding & Database Lookup</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-indigo-300 font-mono">
+<span class="text-slate-500"># In database.py</span>
+from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def initialize_vector_db(documents_list):
+    # Strip text blocks and chunk securely
+    splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=100)
+    chunks = splitter.split_documents(documents_list)
+    
+    # Ingest chunks into Chroma database
+    db = Chroma.from_documents(chunks, OpenAIEmbeddings(model="text-embedding-3-small"))
+    return db.as_retriever(search_kwargs={"k": 4})
+
+def retrieve_context(state: State) -> dict:
+    retriever = state["retriever"]
+    docs = retriever.invoke(state["query"])
+    return {"retrieved_docs": docs}
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Retrieval Evaluator -->
+                        <div id="code-content-code-eval" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Notebook 3: Structuring Evaluator JSON Outputs</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-indigo-300 font-mono">
+<span class="text-emerald-400">class EvaluationGrade(BaseModel):</span>
+    confidence_score: float = Field(..., description="Relevance score from 0.0 to 1.0.")
+    rationale: str = Field(..., description="Brief logical justification for this grade.")
+
+EVAL_SYSTEM = """You are a rigorous information quality auditor.
+Analyze the retrieved document context against the user query.
+Assign a confidence score from 0.0 (completely irrelevant) to 1.0 (perfect factual answer).
+"""
+
+<span class="text-emerald-400">def evaluate_retrieval_node(state: State) -> dict:</span>
+    grader = llm.with_structured_output(EvaluationGrade)
+    docs = state["retrieved_docs"]
+    query = state["query"]
+    
+    # Score the accumulated documents
+    grade = grader.invoke([
+        SystemMessage(content=EVAL_SYSTEM),
+        HumanMessage(content=f"Query: {query}\nRetrieved: {docs}")
+    ])
+    
+    # Establish dynamic routing boundaries
+    if grade.confidence_score >= 0.8:
+        internal_grade = "correct"
+    elif grade.confidence_score < 0.2:
+        internal_grade = "incorrect"
+    else:
+        internal_grade = "ambiguous"
+        
+    return {
+        "eval_score": grade.confidence_score,
+        "internal_grade": internal_grade
+    }
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Strip Decomposition -->
+                        <div id="code-content-code-refinement" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Notebooks 4 & 5: Sentence Strip Decomposition</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-indigo-300 font-mono">
+<span class="text-emerald-400">def refine_knowledge_node(state: State) -> dict:</span>
+    docs = state["retrieved_docs"]
+    query = state["query"]
+    refined_strips = []
+    
+    # Step 1: Decompose document into sentences
+    for doc in docs:
+        sentences = doc.page_content.split(". ")
+        
+        # Step 2: Evaluate sentence strips in isolation
+        for sent in sentences:
+            if not sent.strip():
+                continue
+            is_relevant = check_sentence_relevance(sent, query) # LLM classifier
+            
+            # Step 3: Filter & Accumulate
+            if is_relevant:
+                refined_strips.append(sent.strip())
+                
+    # Step 4: Recompose into clean context (k_in)
+    k_in = ". ".join(refined_strips)
+    return {"refined_context_k_in": k_in}
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Compiler & Routes -->
+                        <div id="code-content-code-routing" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Notebook 6: LangGraph Compilation & Routes</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-indigo-300 font-mono">
+<span class="text-emerald-400">def routing_edge(state: State) -> str:</span>
+    # Grade-based conditional router edge
+    grade = state["internal_grade"]
+    if grade == "correct":
+        return "refine"
+    elif grade == "incorrect":
+        return "rewrite"
+    else:
+        return "ambiguous"
+
+# Building the Active Graph Schema
+workflow = StateGraph(State)
+workflow.add_node("retrieve", retrieve_context)
+workflow.add_node("evaluator", evaluate_retrieval_node)
+workflow.add_node("refine", refine_knowledge_node)
+workflow.add_node("rewrite", query_rewrite_node)
+workflow.add_node("web_search", web_search_node)
+workflow.add_node("generator", generator_synthesis_node)
+
+workflow.add_edge(START, "retrieve")
+workflow.add_edge("retrieve", "evaluator")
+
+# Branch dynamically based on Evaluator confidence
+workflow.add_conditional_edges(
+    "evaluator",
+    routing_edge,
+    {
+        "refine": "refine",
+        "rewrite": "rewrite",
+        "ambiguous": "refine" # In ambiguous, trigger refine + rewrite concurrently
+    }
+)
+# Connect paths to dynamic generator
+workflow.add_edge("refine", "generator")
+workflow.add_edge("rewrite", "web_search")
+workflow.add_edge("web_search", "generator")
+workflow.add_edge("generator", END)
+
+crag_app = workflow.compile()
+                                </pre>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.6em] relative z-10">
+        Corrective RAG Master Nexus • Active Correction System
+    </footer>
+
+    <!-- INTERACTIVE SIMULATION LOGIC -->
+    <script>
+        function switchTab(tabId) {
+            document.getElementById('tab-content-theory').classList.add('hidden');
+            document.getElementById('tab-content-simulator').classList.add('hidden');
+            document.getElementById('tab-content-code').classList.add('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+            });
+            
+            document.getElementById('tab-content-' + tabId).classList.remove('hidden');
+            
+            let activeColor = "bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+            if (tabId === 'theory') {
+                document.getElementById('btn-theory').className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 " + activeColor;
+            } else if (tabId === 'simulator') {
+                document.getElementById('btn-simulator').className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 " + activeColor;
+            } else if (tabId === 'code') {
+                document.getElementById('btn-code').className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 " + activeColor;
+            }
+        }
+
+        function switchCodeTab(codeTabId) {
+            document.querySelectorAll('.code-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.code-tab-btn').forEach(btn => {
+                btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all";
+            });
+            
+            document.getElementById('code-content-' + codeTabId).classList.remove('hidden');
+            document.getElementById('btn-' + codeTabId).className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-blue/10 text-neon-blue border border-neon-blue/20";
+        }
+
+        // SIMULATOR RUNNER
+        let isSimRunning = false;
+        async function runCRAGSimulation() {
+            if (isSimRunning) return;
+            isSimRunning = true;
+            
+            const consoleEl = document.getElementById('sim-console');
+            const stateEl = document.getElementById('state-monitor');
+            const previewEl = document.getElementById('answer-preview');
+            const btnRun = document.getElementById('btn-run-sim');
+            const query = document.getElementById('sim-query').value;
+            const evalMode = document.getElementById('sim-eval').value;
+            
+            btnRun.disabled = true;
+            btnRun.innerText = "CRAG Graph Executing...";
+            btnRun.className = "w-full px-6 py-3 bg-slate-700 rounded-xl font-bold text-sm tracking-wider uppercase text-slate-400 cursor-not-allowed";
+            
+            resetNodes();
+            
+            function log(message, type = 'system') {
+                let colorClass = "text-slate-400";
+                if (type === 'retrieve') colorClass = "text-neon-blue";
+                else if (type === 'evaluator') colorClass = "text-yellow-400";
+                else if (type === 'refinement') colorClass = "text-emerald-400";
+                else if (type === 'rewrite') colorClass = "text-purple-400";
+                else if (type === 'search') colorClass = "text-pink-400";
+                else if (type === 'success') colorClass = "text-green-500 font-semibold";
+                
+                consoleEl.innerHTML += `<div class="${colorClass}">[${type.toUpperCase()}]: ${message}</div>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
+            
+            function updateState(key, val) {
+                const lines = stateEl.children;
+                for (let line of lines) {
+                    if (line.innerHTML.startsWith(`<span class="text-slate-500">${key}:</span>`)) {
+                        line.innerHTML = `<span class="text-slate-500">${key}:</span> <span class="text-cyan-400 font-semibold">${val}</span>`;
+                        break;
+                    }
+                }
+            }
+
+            consoleEl.innerHTML = "";
+            previewEl.innerHTML = `<div class="h-full flex items-center justify-center text-center italic text-slate-600">Simulating generation synthesis...</div>`;
+            
+            log("Compiling CRAG active state machine. Initializing START edge...", "system");
+            await delay(1000);
+
+            // ==================== 1. RETRIEVAL NODE ====================
+            log(`Querying Vector DB index for semantic overlaps...`, "retrieve");
+            setActiveNode('node-retrieve');
+            setActivePath('path-start-retrieve');
+            updateState('query', `"${query}"`);
+            
+            await delay(1800);
+            
+            let retrievedDocsCount = (evalMode === 'incorrect') ? 1 : 2;
+            log(`Retrieved ${retrievedDocsCount} semantic documents. Routing to Evaluator...`, "retrieve");
+            setCompletedNode('node-retrieve');
+            setActivePath('path-retrieve-eval');
+            await delay(1200);
+
+            // ==================== 2. EVALUATOR NODE ====================
+            log("Entering Retrieval Evaluator. Assigning confidence metrics...", "evaluator");
+            setActiveNode('node-eval');
+            await delay(1800);
+
+            let score = 0.45;
+            let internalGrade = "ambiguous";
+            
+            if (evalMode === 'correct') {
+                score = 0.92;
+                internalGrade = "correct";
+            } else if (evalMode === 'incorrect') {
+                score = 0.08;
+                internalGrade = "incorrect";
+            }
+
+            log(`Retrieval Audit Complete: Score=${score}, Grade=${internalGrade.toUpperCase()}`, "evaluator");
+            updateState('eval_score', score);
+            updateState('internal_grade', `"${internalGrade}"`);
+            setCompletedNode('node-eval');
+            await delay(1500);
+
+            // ==================== 3. ROUTING BOUNDARY ====================
+            if (internalGrade === 'correct') {
+                log("Evaluator Grade matched [correct] boundary. Routing to Refinement Node.", "system");
+                setActiveNode('node-refine');
+                setActivePath('path-eval-refine');
+                await delay(1500);
+
+                log("Step 1: Decomposing retrieved documents into 12 distinct sentence strips...", "refinement");
+                updateState('decomposed_strips', 12);
+                await delay(1200);
+
+                log("Step 2: Sentence audit - Filtering out 9 irrelevant/background strips...", "refinement");
+                await delay(1200);
+
+                log("Step 3: Stitched 3 high-signal strips into unified knowledge context (k_in)", "refinement");
+                updateState('refined_context_k_in', '"[Refined fact block: screenplay credits for Death of a Batman]"');
+                setCompletedNode('node-refine');
+                setActivePath('path-refine-gen');
+                await delay(1500);
+
+            } else if (internalGrade === 'incorrect') {
+                log("Evaluator Grade matched [incorrect] boundary. Bypassing database. Routing to Query Rewrite.", "system");
+                setActiveNode('node-rewrite');
+                setActivePath('path-eval-rewrite');
+                await delay(1500);
+
+                log("Re-engineering conversational query into search keywords...", "rewrite");
+                let searchQueries = `["Death of a Batman screenplay writer", "Death of a Batman credits"]`;
+                updateState('search_queries', searchQueries);
+                setCompletedNode('node-rewrite');
+                setActivePath('path-rewrite-search');
+                await delay(1500);
+
+                log("Invoking Tavily parallel fetch on re-engineered queries...", "search");
+                setActiveNode('node-search');
+                await delay(1800);
+
+                log("Fetched 8 high-signal snippets from Tavily. Recomposing external context (k_ex)...", "search");
+                updateState('external_context_k_ex', '"[Web Search Fact: Screenplay written by Bob Kane & Bill Finger]"');
+                setCompletedNode('node-search');
+                setActivePath('path-search-gen');
+                await delay(1500);
+
+            } else {
+                // Ambiguous Mode
+                log("Evaluator Grade matched [ambiguous] zone. Activating parallel refinement + web search branches.", "system");
+                setActiveNode('node-ambig');
+                setActivePath('path-eval-ambig');
+                await delay(1500);
+
+                log("Refining partial internal document contexts (k_in)...", "refinement");
+                updateState('decomposed_strips', 8);
+                await delay(1000);
+                log("Stitched 2 internal strips into k_in", "refinement");
+                updateState('refined_context_k_in', '"[Partial Vector context: screenwriter credits]"');
+
+                log("Spawning query rewriter concurrently...", "rewrite");
+                let searchQueries = `["Who wrote Death of a Batman", "Death of a Batman writer"]`;
+                updateState('search_queries', searchQueries);
+                await delay(1000);
+
+                log("Ingesting fresh web search ground truth (k_ex)...", "search");
+                updateState('external_context_k_ex', '"[Web Source: Screenplay co-written by Alan Moore]"');
+                await delay(1500);
+
+                log("Blended internal refined context (k_in) + external web search facts (k_ex) successfully.", "refinement");
+                setCompletedNode('node-ambig');
+                setActivePath('path-ambig-gen');
+                await delay(1500);
+            }
+
+            // ==================== 4. GENERATOR NODE ====================
+            log("Activating Generator. Synthesizing combined context variables...", "success");
+            setActiveNode('node-generator');
+            await delay(1800);
+
+            let finalHTML = "";
+            if (internalGrade === 'correct') {
+                finalHTML = `
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold text-white uppercase tracking-wider font-display">Synthesis Route: Correct Knowledge Refinement</h4>
+                        <div class="text-[9px] text-slate-500">Context Source: Internal Vector DB (Cleaned k_in)</div>
+                        <hr class="border-white/5">
+                        <p class="text-[11px] leading-relaxed text-slate-300">
+                            Based on your internal documents, the screenplay for <strong>Death of a Batman</strong> was co-written by the original creators <strong>Bob Kane</strong> and <strong>Bill Finger</strong> in the 1966 television adaptation production scripts.
+                        </p>
+                    </div>
+                `;
+            } else if (internalGrade === 'incorrect') {
+                finalHTML = `
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold text-white uppercase tracking-wider font-display">Synthesis Route: Incorrect Web Search Grounding</h4>
+                        <div class="text-[9px] text-slate-500">Context Source: Tavily Search API (k_ex Only)</div>
+                        <hr class="border-white/5">
+                        <p class="text-[11px] leading-relaxed text-slate-300">
+                            No matching items were discovered in your vector index. However, according to live web searches: The screenplay for the classic animated film <strong>Death of a Batman</strong> (2024 Release) was penned by award-winning comic writer <strong>Jeph Loeb</strong>.
+                        </p>
+                    </div>
+                `;
+            } else {
+                finalHTML = `
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-bold text-white uppercase tracking-wider font-display">Synthesis Route: Blended Context Orchestration</h4>
+                        <div class="text-[9px] text-slate-500">Context Source: Refined Vector (k_in) + Tavily Web Search (k_ex)</div>
+                        <hr class="border-white/5">
+                        <p class="text-[11px] leading-relaxed text-slate-300">
+                            By combining internal document records with recent search updates, we have compiled the full factual history: While the original character bible (retrieved internally) credits <strong>Bob Kane</strong>, the screenplay adaptation for the upcoming 2026 digital release of <strong>Death of a Batman</strong> was finalized by <strong>Alan Moore</strong>.
+                        </p>
+                    </div>
+                `;
+            }
+
+            previewEl.innerHTML = finalHTML;
+            setCompletedNode('node-generator');
+            setActivePath('path-gen-end');
+            log("RAG Output generation successfully compiled. State machine finished.", "success");
+
+            // Reset Button
+            isSimRunning = false;
+            btnRun.disabled = false;
+            btnRun.innerText = "Run CRAG State Machine";
+            btnRun.className = "w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5";
+        }
+
+        // HELPERS
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function setActiveNode(id) {
+            document.getElementById(id).querySelector('rect, circle').setAttribute('class', 'node-active');
+        }
+
+        function setCompletedNode(id) {
+            document.getElementById(id).querySelector('rect, circle').setAttribute('class', 'node-completed');
+        }
+
+        function setActivePath(id) {
+            document.getElementById(id).setAttribute('class', 'path-active');
+        }
+
+        function resetNodes() {
+            document.querySelectorAll('rect, circle').forEach(el => {
+                if (el.parentNode.id !== 'sim-start') {
+                    el.removeAttribute('class');
+                }
+            });
+            document.querySelectorAll('path').forEach(p => {
+                p.removeAttribute('class');
+            });
+        }
+    </script>
+</body>
+</html>

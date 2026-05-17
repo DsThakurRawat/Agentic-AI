@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Reflective RAG (Self-RAG) Masterclass | Theory & Mechanics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0ea5e9',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#38bdf8',
+                secondaryColor: '#bc13fe',
+                tertiaryColor: '#020617'
+            }
+        });
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: {
+                            blue: '#00f2ff',
+                            purple: '#bc13fe',
+                            pink: '#ff007f',
+                            cyan: '#0ff',
+                        },
+                        slate: {
+                            850: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 15px rgba(0, 242, 255, 0.25)',
+                        'neon-purple': '0 0 15px rgba(188, 19, 254, 0.25)',
+                        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 10%, rgba(0, 242, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 95% 80%, rgba(188, 19, 254, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.02) 0%, transparent 50%);
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass:hover {
+            border-color: rgba(0, 242, 255, 0.15);
+            background: rgba(15, 23, 42, 0.65);
+        }
+        .glow-card-blue:hover {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.3);
+        }
+        .glow-card-purple:hover {
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.15);
+            border-color: rgba(188, 19, 254, 0.3);
+        }
+        .glow-card-pink:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 0, 127, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .node-active {
+            filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.8));
+            stroke: #00f2ff !important;
+            stroke-width: 3px !important;
+        }
+        .node-completed {
+            filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
+            stroke: #22c55e !important;
+            stroke-width: 2.5px !important;
+        }
+        .path-active {
+            stroke: #00f2ff !important;
+            stroke-dasharray: 6;
+            animation: dash 1s linear infinite;
+        }
+        .path-completed {
+            stroke: #22c55e !important;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -12;
+            }
+        }
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            background: #090d1a;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans text-slate-200">
+
+    <!-- Top Glow Header -->
+    <div class="absolute top-0 left-0 w-full h-[5px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink shadow-lg"></div>
+
+    <!-- Header Navigation -->
+    <header class="py-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-purple/30 bg-neon-purple/5 text-neon-purple text-xs font-bold uppercase tracking-[0.25em] mb-6 animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-neon-purple"></span> Self-Reflective Knowledge Alignment
+        </div>
+        <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tighter mb-6">
+            Self-Reflective <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink">RAG (Self-RAG)</span>
+        </h1>
+        <p class="max-w-3xl text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+            A masterclass on building autonomous, self-correcting RAG systems. Explore adaptive retrieval gating, semantic relevance filtering, fact-grounding checks (IsSUP), strict revision loops, and query rewriting mechanics.
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/5">
+            <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg">
+                📚 Conceptual Theory
+            </button>
+            <button onclick="switchTab('simulator')" id="btn-simulator" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                ⚡ Interactive Self-RAG Simulator
+            </button>
+            <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5">
+                💻 Notebook Walkthroughs
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-7xl mx-auto px-6 pb-24 relative z-10">
+
+        <!-- ==================== TAB: THEORY ==================== -->
+        <div id="tab-content-theory" class="space-y-16">
+            
+            <!-- Module 1: The RAG Trilemma -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-blue relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neon-blue/5 blur-3xl pointer-events-none"></div>
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-blue rounded-full"></span>
+                    Module 1: The RAG Trilemma & Hallucination Vectors
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-5 text-slate-300 leading-relaxed text-sm md:text-base">
+                        <p>
+                            Traditional RAG pipelines assume that blindly piping retrieved documents into an LLM context window guarantees factuality. In reality, this linear paradigm creates three massive failure modes:
+                        </p>
+                        <ul class="space-y-3 pl-2">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-blue">❌</span>
+                                <span><strong>Unnecessary Retrieval:</strong> Querying database storage for queries that could be resolved via parametric knowledge, adding latency and cost.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-blue">❌</span>
+                                <span><strong>Irrelevant Ingestion:</strong> Injecting semantic noise from poorly chunked contexts, which distracts the LLM and degrades synthesis quality.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-neon-blue">❌</span>
+                                <span><strong>Abstraction Hallucination:</strong> Falsely representing details or generating qualitative statements that are unsupported by the original facts.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Visualizing Naive RAG Failure -->
+                    <div class="bg-slate-950/80 p-6 rounded-2xl border border-white/5 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Linear RAG Risk Vector</h4>
+                        <div class="flex justify-center">
+                            <svg width="340" height="150" viewBox="0 0 340 150" class="w-full max-w-[340px]">
+                                <rect x="10" y="55" width="60" height="40" rx="6" fill="#090d1a" stroke="#00f2ff" stroke-width="1.5" />
+                                <text x="40" y="80" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">User Query</text>
+                                
+                                <path d="M 70 75 L 120 75" stroke="#bc13fe" stroke-width="1.5" />
+
+                                <rect x="120" y="55" width="80" height="40" rx="6" fill="#090d1a" stroke="#bc13fe" stroke-width="1.5" />
+                                <text x="160" y="75" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Retrieved Docs</text>
+                                <text x="160" y="85" fill="#ff007f" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Contains Noise</text>
+
+                                <path d="M 200 75 L 250 75" stroke="#bc13fe" stroke-width="1.5" />
+
+                                <rect x="250" y="55" width="80" height="40" rx="6" fill="#090d1a" stroke="#ff007f" stroke-width="1.5" />
+                                <text x="290" y="75" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Synthesized Answer</text>
+                                <text x="290" y="85" fill="#ff007f" font-family="JetBrains Mono" font-size="5" text-anchor="middle">Hallucination Risk</text>
+                            </svg>
+                        </div>
+                        <div class="text-[10px] text-slate-500 italic text-center leading-relaxed">
+                            Linear flows offer no route to verify factuality or correct abstractions before sending the response to the user.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 2: The Self-RAG Paradigm -->
+            <section class="glass p-8 md:p-12 rounded-3xl glow-card-purple relative overflow-hidden">
+                <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-neon-purple/5 blur-3xl pointer-events-none"></div>
+                <h2 class="text-3xl font-display font-bold mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-8 bg-neon-purple rounded-full"></span>
+                    Module 2: Self-RAG - The Self-Correcting State Machine
+                </h2>
+                
+                <div class="space-y-6 text-slate-300 leading-relaxed text-sm md:text-base">
+                    <p>
+                        **Self-RAG** solves this trilemma by structuring RAG as a state machine governed by self-reflection steps. Instead of executing in a single straight line, a Self-RAG agent actively queries itself:
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+                        <div class="p-6 bg-slate-950/60 border border-neon-blue/20 rounded-2xl space-y-3">
+                            <h4 class="text-neon-blue font-bold uppercase tracking-wider text-xs">1. Adaptive Gating</h4>
+                            <p class="text-xs text-slate-400">
+                                Evaluates whether external knowledge is actually needed. If the model can answer using its own memory, it skips database lookup entirely.
+                            </p>
+                        </div>
+                        <div class="p-6 bg-slate-950/60 border border-neon-purple/20 rounded-2xl space-y-3">
+                            <h4 class="text-neon-purple font-bold uppercase tracking-wider text-xs">2. Relevance Filter</h4>
+                            <p class="text-xs text-slate-400">
+                                Validates retrieved pages. It throws away irrelevant chunks to ensure only high-signal text feeds into the prompt context.
+                            </p>
+                        </div>
+                        <div class="p-6 bg-slate-950/60 border border-neon-pink/20 rounded-2xl space-y-3">
+                            <h4 class="text-neon-pink font-bold uppercase tracking-wider text-xs">3. Grounding (IsSUP)</h4>
+                            <p class="text-xs text-slate-400">
+                                Verifies that the generated response does not introduce any abstract claims or qualitative terms unsupported by the source text.
+                            </p>
+                        </div>
+                        <div class="p-6 bg-slate-950/60 border border-emerald-500/20 rounded-2xl space-y-3">
+                            <h4 class="text-emerald-400 font-bold uppercase tracking-wider text-xs">4. Query Refiner Loop</h4>
+                            <p class="text-xs text-slate-400">
+                                If an answer fails usefulness checks, the agent rewrites the query, pulls fresh documents, and retries up to three times.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 3: Step-by-Step Architecture -->
+            <section class="glass p-8 md:p-12 rounded-3xl relative">
+                <h2 class="text-3xl font-display font-bold mb-8">
+                    Module 3: Step-by-Step State Node Mechanics
+                </h2>
+                
+                <div class="space-y-8 text-sm md:text-base text-slate-300 leading-relaxed">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-neon-blue flex items-center gap-2">
+                                <span class="w-1.5 h-6 bg-neon-blue rounded-full"></span>
+                                Step 1-3: Routing & relevance Gating
+                            </h3>
+                            <p>
+                                When a user runs a query, `decide_retrieval` evaluates if specific facts are needed. If `should_retrieve` is `True`, it invokes semantic retrieval; otherwise, it answers from direct memory.
+                            </p>
+                            <p>
+                                Once documents are retrieved, `is_relevant` grades them at a topic level. If local database results are completely irrelevant, the graph branches to `rewrite_query` and initiates a live **Tavily Web Search** fallback.
+                            </p>
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold text-neon-purple flex items-center gap-2">
+                                <span class="w-1.5 h-6 bg-neon-purple rounded-full"></span>
+                                Step 4-5: Fact Grounding (IsSUP) & Revision Loop
+                            </h3>
+                            <p>
+                                Generating an answer isn't the final step. The **IsSUP** check validates grounding. If the LLM generates an answer that is `partially_supported` or `no_support` (e.g., calling policies "generous" or "employee-first" when the text only lists basic dates), the node routes to `revise_answer`.
+                            </p>
+                            <p>
+                                The **Strict Reviser** rewrites the answer using **quote-only** bullet points direct from the text and loops back to IsSUP. A state variable `retries` bounds the loop (max 10 retries) to prevent infinite loops.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-slate-950/70 border border-white/5 rounded-2xl space-y-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest font-mono">The Blended Refinement Paradigm</h4>
+                        <p class="text-xs text-slate-400">
+                            If an answer is grounded but graded as `not_useful` by the usefulness checker (`IsUSE`), the graph invokes a **query rewriting loop**. The query is stripped of conversational fluff, injected with 2-5 high-signal search keywords, and loops back to retrieval. This guarantees recovery even in highly ambiguous cases!
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== TAB: SIMULATOR ==================== -->
+        <div id="tab-content-simulator" class="hidden space-y-12">
+            <div class="glass p-6 md:p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-4">Interactive Self-RAG Simulator</h3>
+                <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                    Witness how the Self-RAG state machine handles out-of-knowledge queries, detects hallucinations, and executes active self-correction.
+                </p>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-8 bg-slate-950/60 p-6 rounded-2xl border border-white/5">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Choose Query Scenario</label>
+                        <select id="sim-scenario" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="culture">1. Describe NexaAI's company culture (Requires Revision Loop)</option>
+                            <option value="refund">2. What is the refund policy of NexaAI? (Triggers Web Search Fallback)</option>
+                            <option value="trial">3. Is there a free trial for the premium plan? (Fails Usefulness -> Refines Search)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Recursion Speed (ms)</label>
+                        <select id="sim-speed" class="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-slate-200 text-sm font-semibold focus:outline-none focus:border-neon-blue transition-all">
+                            <option value="1200">Slow (1.2s per node)</option>
+                            <option value="600" selected>Normal (0.6s per node)</option>
+                            <option value="200">Fast (0.2s per node)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="runSelfRAGSimulation()" id="btn-run-sim" class="w-full px-6 py-3 bg-gradient-to-r from-neon-blue to-neon-purple rounded-xl font-bold text-sm tracking-wider uppercase hover:shadow-neon-blue/20 shadow-lg transition-all transform hover:-translate-y-0.5">
+                            Run Self-RAG Graph
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Visual Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <!-- Graph Diagram (8 Cols) -->
+                    <div class="lg:col-span-8 bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex flex-col justify-between h-[520px]">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Self-Reflective RAG State Graph</h4>
+                        
+                        <!-- Main SVG Graph -->
+                        <div class="flex-1 flex items-center justify-center p-2">
+                            <svg width="600" height="380" viewBox="0 0 600 380" class="w-full h-full max-h-[350px]">
+                                <!-- Paths -->
+                                <path id="path-start-decide" d="M 40 190 L 80 190" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-decide-direct" d="M 120 160 L 160 90" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-decide-retrieve" d="M 120 220 L 160 290" stroke="#334155" stroke-width="2" fill="none" />
+                                
+                                <path id="path-retrieve-relevant" d="M 240 290 L 270 290" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-relevant-web" d="M 310 320 L 310 350 H 130 V 290" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-relevant-generate" d="M 310 260 L 310 190 H 350" stroke="#334155" stroke-width="2" fill="none" />
+
+                                <path id="path-generate-issup" d="M 430 170 L 460 170" stroke="#334155" stroke-width="2" fill="none" />
+                                
+                                <!-- Revise Loop Paths -->
+                                <path id="path-issup-revise" d="M 500 140 L 500 90 H 450" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-revise-issup" d="M 370 90 H 320 V 150" stroke="#334155" stroke-width="2" fill="none" />
+                                
+                                <path id="path-issup-isuse" d="M 540 170 L 570 170" stroke="#334155" stroke-width="2" fill="none" />
+                                
+                                <!-- Refine / Rewrite Path -->
+                                <path id="path-isuse-rewrite" d="M 570 190 H 490 V 230" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-rewrite-retrieve" d="M 410 250 H 200 V 260" stroke="#334155" stroke-width="2" fill="none" />
+
+                                <path id="path-isuse-end" d="M 585 140 L 585 50" stroke="#334155" stroke-width="2" fill="none" />
+                                <path id="path-direct-end" d="M 240 70 L 550 50" stroke="#334155" stroke-width="2" fill="none" />
+
+                                <!-- Nodes -->
+                                <!-- START -->
+                                <circle cx="20" cy="190" r="12" fill="#0f172a" stroke="#475569" stroke-width="1.5" />
+                                <text x="20" y="193" fill="#64748b" font-family="JetBrains Mono" font-size="6" text-anchor="middle">START</text>
+
+                                <!-- Decide Retrieval -->
+                                <g id="node-decide">
+                                    <polygon points="120,160 160,190 120,220 80,190" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="120" y="193" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">Decide?</text>
+                                </g>
+
+                                <!-- Direct Generate -->
+                                <g id="node-direct">
+                                    <rect x="160" y="40" width="80" height="50" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="200" y="65" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Direct Gen</text>
+                                    <text x="200" y="78" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle">No Retrieval</text>
+                                </g>
+
+                                <!-- Retrieve -->
+                                <g id="node-retrieve">
+                                    <rect x="160" y="260" width="80" height="50" rx="8" fill="#090d1a" stroke="#475569" stroke-width="2" />
+                                    <text x="200" y="285" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Retrieve</text>
+                                    <text x="200" y="298" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Vector DB</text>
+                                </g>
+
+                                <!-- Relevance Filter -->
+                                <g id="node-relevant">
+                                    <rect x="270" y="260" width="80" height="50" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="310" y="285" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">IsRelevant?</text>
+                                    <text x="310" y="298" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Topic Check</text>
+                                </g>
+
+                                <!-- Generate from Context -->
+                                <g id="node-generate">
+                                    <rect x="350" y="140" width="80" height="50" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="390" y="165" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Context Gen</text>
+                                    <text x="390" y="178" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle">RAG Response</text>
+                                </g>
+
+                                <!-- IsSUP Grounded check -->
+                                <g id="node-issup">
+                                    <rect x="460" y="140" width="80" height="50" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="500" y="165" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">IsSUP?</text>
+                                    <text x="500" y="178" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Groundedness</text>
+                                </g>
+
+                                <!-- Revise Answer -->
+                                <g id="node-revise">
+                                    <rect x="370" y="60" width="80" height="50" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="410" y="85" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Revise</text>
+                                    <text x="410" y="98" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Quote-Only Loop</text>
+                                </g>
+
+                                <!-- IsUSE Useful check -->
+                                <g id="node-isuse">
+                                    <circle cx="585" cy="170" r="18" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="585" y="173" fill="#fff" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">IsUSE?</text>
+                                </g>
+
+                                <!-- Rewrite Question -->
+                                <g id="node-rewrite">
+                                    <rect x="410" y="210" width="80" height="50" rx="8" fill="#090d1a" stroke="#475569" stroke-width="1.5" />
+                                    <text x="450" y="235" fill="#fff" font-family="Outfit" font-size="9" text-anchor="middle" font-weight="bold">Rewrite Query</text>
+                                    <text x="450" y="248" fill="#475569" font-family="JetBrains Mono" font-size="6" text-anchor="middle">Optimize Search</text>
+                                </g>
+
+                                <!-- END Node -->
+                                <circle cx="585" cy="30" r="14" fill="#0f172a" stroke="#22c55e" stroke-width="2" />
+                                <text x="585" y="33" fill="#22c55e" font-family="Outfit" font-size="8" text-anchor="middle" font-weight="bold">END</text>
+                            </svg>
+                        </div>
+                        
+                        <!-- Console Output Panel -->
+                        <div class="h-[120px] bg-slate-900 border border-white/5 rounded-xl p-4 font-mono text-xs overflow-y-auto custom-scrollbar space-y-1.5" id="sim-console">
+                            <span class="text-slate-500">[System]: Standing by. Select a query scenario and click "Run Self-RAG Graph".</span>
+                        </div>
+                    </div>
+                    
+                    <!-- State Monitor Panel (4 Cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        <!-- State Monitor Card -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 flex-1 overflow-y-auto custom-scrollbar max-h-[250px]">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Self-RAG Graph State</h4>
+                            <div class="space-y-3 font-mono text-xs" id="state-monitor">
+                                <div><span class="text-slate-500">question:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">retrieval_query:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">rewrite_tries:</span> <span class="text-slate-300">0</span></div>
+                                <div><span class="text-slate-500">need_retrieval:</span> <span class="text-slate-300">null</span></div>
+                                <div><span class="text-slate-500">relevant_docs:</span> <span class="text-slate-300">0</span></div>
+                                <div><span class="text-slate-500">issup_grade:</span> <span class="text-slate-300">${state.issup_grade ? `"${state.issup_grade}"` : 'null'}</span></div>
+                                <div><span class="text-slate-500">grounding_retries:</span> <span class="text-slate-300">0</span></div>
+                                <div><span class="text-slate-500">isuse_grade:</span> <span class="text-slate-300">${state.isuse_grade ? `"${state.isuse_grade}"` : 'null'}</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Final Answer preview -->
+                        <div class="bg-slate-950/80 rounded-2xl border border-white/5 p-6 h-[250px] overflow-y-auto custom-scrollbar flex flex-col">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Grounded Answer Preview</h4>
+                            <div class="flex-1 text-xs text-slate-400 space-y-3" id="answer-preview">
+                                <div class="h-full flex items-center justify-center text-center italic text-slate-600">
+                                    The final aligned, quote-grounded answer will compile here.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB: CODE & SCHEMAS ==================== -->
+        <div id="tab-content-code" class="hidden space-y-12">
+            
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-display font-bold mb-6">Self-RAG Implementation Blueprints</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                    View the production-grade python patterns for the core components of the Self-RAG state machine.
+                </p>
+
+                <!-- Code Tabs -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left nav -->
+                    <div class="flex flex-col gap-2 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
+                        <button onclick="switchCodeTab('code-state')" id="btn-code-state" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
+                            1. State Definition
+                        </button>
+                        <button onclick="switchCodeTab('code-issup')" id="btn-code-issup" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            2. Fact Grounding (IsSUP)
+                        </button>
+                        <button onclick="switchCodeTab('code-revise')" id="btn-code-revise" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            3. Strict Quote-Only Reviser
+                        </button>
+                        <button onclick="switchCodeTab('code-routing')" id="btn-code-routing" class="code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all">
+                            4. State Graph Setup
+                        </button>
+                    </div>
+
+                    <!-- Code viewer -->
+                    <div class="lg:col-span-3">
+                        
+                        <!-- State Definition -->
+                        <div id="code-content-code-state" class="code-tab-content space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">LangGraph TypedDict State Schema</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+from typing import List, TypedDict, Literal
+from langchain_core.documents import Document
+
+class State(TypedDict):
+    question: str
+    retrieval_query: str
+    rewrite_tries: int
+    need_retrieval: bool
+    docs: List[Document]
+    relevant_docs: List[Document]
+    context: str
+    answer: str
+    issup: Literal["fully_supported", "partially_supported", "no_support"]
+    evidence: List[str]
+    retries: int
+    isuse: Literal["useful", "not_useful"]
+    use_reason: str
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- IsSUP Prompt -->
+                        <div id="code-content-code-issup" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">IsSUP Fact Grounding Prompts</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+class IsSUPDecision(BaseModel):
+    issup: Literal["fully_supported", "partially_supported", "no_support"]
+    evidence: List[str] = Field(default_factory=list, description="Direct quotes from context.")
+
+issup_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are verifying whether the ANSWER is supported by the CONTEXT.\n"
+               "Return JSON with keys: issup, evidence.\n"
+               "issup must be: fully_supported, partially_supported, or no_support.\n\n"
+               "Rules:\n"
+               "- Be strict: if the answer contains ANY qualitative embellishment not explicitly stated,\n"
+               "  grade as partially_supported.\n"
+               "- Do not use external knowledge."),
+    ("human", "Question:\n{question}\n\nAnswer:\n{answer}\n\nContext:\n{context}")
+])
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Strict Reviser -->
+                        <div id="code-content-code-revise" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono">Strict Quote-Only Revision Node</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+revise_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a STRICT reviser.\n\n"
+               "You must output based on the following format:\n\n"
+               "FORMAT (quote-only answer):\n"
+               "- &lt;direct quote from the CONTEXT&gt;\n"
+               "- &lt;direct quote from the CONTEXT&gt;\n\n"
+               "Rules:\n"
+               "- Use ONLY the CONTEXT.\n"
+               "- Do NOT add any new words besides bullet dashes and the quotes themselves."),
+    ("human", "Question:\n{question}\n\nCurrent Answer:\n{answer}\n\nCONTEXT:\n{context}")
+])
+
+def revise_answer(state: State):
+    out = llm.invoke(revise_prompt.format_messages(
+        question=state["question"],
+        answer=state["answer"],
+        context=state["context"]
+    ))
+    return {
+        "answer": out.content,
+        "retries": state.get("retries", 0) + 1
+    }
+                                </pre>
+                            </div>
+                        </div>
+
+                        <!-- Graph Setup -->
+                        <div id="code-content-code-routing" class="code-tab-content hidden space-y-4">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest font-mono"> LangGraph Flow Construction</h4>
+                            <div class="p-6 rounded-2xl code-block max-h-[420px] overflow-y-auto custom-scrollbar">
+                                <pre class="text-[12px] leading-relaxed text-cyan-300 font-mono">
+g = StateGraph(State)
+
+# Nodes
+g.add_node("decide_retrieval", decide_retrieval)
+g.add_node("generate_direct", generate_direct)
+g.add_node("retrieve", retrieve)
+g.add_node("is_relevant", is_relevant)
+g.add_node("generate_from_context", generate_from_context)
+g.add_node("is_sup", is_sup)
+g.add_node("revise_answer", revise_answer)
+g.add_node("is_use", is_use)
+g.add_node("rewrite_question", rewrite_question)
+
+# Flow edges
+g.add_edge(START, "decide_retrieval")
+g.add_conditional_edges("decide_retrieval", route_after_decide, {
+    "generate_direct": "generate_direct", 
+    "retrieve": "retrieve"
+})
+g.add_edge("retrieve", "is_relevant")
+g.add_conditional_edges("is_relevant", route_after_relevance, {
+    "generate_from_context": "generate_from_context",
+    "no_answer_found": "no_answer_found"
+})
+g.add_edge("generate_from_context", "is_sup")
+g.add_conditional_edges("is_sup", route_after_issup, {
+    "accept_answer": "is_use",
+    "revise_answer": "revise_answer"
+})
+g.add_edge("revise_answer", "is_sup")
+g.add_conditional_edges("is_use", route_after_isuse, {
+    "END": END,
+    "rewrite_question": "rewrite_question",
+    "no_answer_found": "no_answer_found"
+})
+g.add_edge("rewrite_question", "retrieve")
+
+app = g.compile()
+                                </pre>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-[10px] uppercase tracking-[0.4em]">
+        Agentic AI Self-RAG masterclass • Alignment & Autonomy
+    </footer>
+
+    <!-- INTERACTIVE SIMULATOR SCRIPTS -->
+    <script>
+        function switchTab(tabId) {
+            const tabs = ['theory', 'simulator', 'code'];
+            tabs.forEach(id => {
+                const el = document.getElementById('tab-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-lg";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "tab-btn px-6 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-300 text-slate-400 hover:text-white hover:bg-white/5";
+                }
+            });
+        }
+
+        function switchCodeTab(tabId) {
+            const codeTabs = ['code-state', 'code-issup', 'code-revise', 'code-routing'];
+            codeTabs.forEach(id => {
+                const el = document.getElementById('code-content-' + id);
+                const btn = document.getElementById('btn-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide bg-neon-purple/10 text-neon-purple border border-neon-purple/20";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "code-tab-btn text-left px-4 py-3 rounded-xl text-xs font-bold font-mono tracking-wide text-slate-400 hover:text-white transition-all";
+                }
+            });
+        }
+
+        // JS Simulated state machine
+        async function runSelfRAGSimulation() {
+            const scenario = document.getElementById('sim-scenario').value;
+            const speed = parseInt(document.getElementById('sim-speed').value);
+            const btn = document.getElementById('btn-run-sim');
+            const consoleEl = document.getElementById('sim-console');
+            const monitorEl = document.getElementById('state-monitor');
+            const previewEl = document.getElementById('answer-preview');
+            
+            btn.disabled = true;
+            btn.textContent = "Graph Executing...";
+            consoleEl.innerHTML = "";
+            previewEl.innerHTML = `<div class="h-full flex items-center justify-center text-center italic text-slate-600">Executing node synthesis...</div>`;
+            
+            // Helper functions
+            const logConsole = (msg, type = 'info') => {
+                let colorClass = 'text-slate-400';
+                if (type === 'success') colorClass = 'text-emerald-400';
+                if (type === 'error') colorClass = 'text-neon-pink';
+                if (type === 'warning') colorClass = 'text-neon-blue';
+                consoleEl.innerHTML += `<div class="${colorClass}">[StateNode]: ${msg}</div>`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            };
+
+            const updateMonitor = (state) => {
+                monitorEl.innerHTML = `
+                    <div><span class="text-slate-500">question:</span> <span class="text-slate-300">"${state.question}"</span></div>
+                    <div><span class="text-slate-500">retrieval_query:</span> <span class="text-slate-300">"${state.retrieval_query}"</span></div>
+                    <div><span class="text-slate-500">rewrite_tries:</span> <span class="text-slate-300">${state.rewrite_tries}</span></div>
+                    <div><span class="text-slate-500">need_retrieval:</span> <span class="text-slate-300">${state.need_retrieval}</span></div>
+                    <div><span class="text-slate-500">relevant_docs:</span> <span class="text-slate-300">${state.relevant_docs}</span></div>
+                    <div><span class="text-slate-500">issup_grade:</span> <span class="text-slate-300">${state.issup_grade ? \`"\${state.issup_grade}"\` : 'null'}</span></div>
+                    <div><span class="text-slate-500">grounding_retries:</span> <span class="text-slate-300">${state.grounding_retries}</span></div>
+                    <div><span class="text-slate-500">isuse_grade:</span> <span class="text-slate-300">${state.isuse_grade ? \`"\${state.isuse_grade}"\` : 'null'}</span></div>
+                `;
+            };
+
+            const resetVisuals = () => {
+                const nodes = ['decide', 'direct', 'retrieve', 'relevant', 'generate', 'issup', 'revise', 'isuse', 'rewrite'];
+                nodes.forEach(id => {
+                    const el = document.querySelector(`#node-\${id} rect`) || document.querySelector(`#node-\${id} polygon`) || document.querySelector(`#node-\${id} circle`);
+                    if (el) {
+                        el.style.stroke = "#475569";
+                        el.style.filter = "none";
+                        el.style.strokeWidth = "1.5";
+                    }
+                });
+                const paths = document.querySelectorAll('svg path');
+                paths.forEach(p => {
+                    p.style.stroke = "#334155";
+                    p.style.strokeDasharray = "none";
+                    p.style.animation = "none";
+                });
+            };
+
+            const pulseNode = (id, status = 'active') => {
+                const el = document.querySelector(`#node-\${id} rect`) || document.querySelector(`#node-\${id} polygon`) || document.querySelector(`#node-\${id} circle`);
+                if (el) {
+                    if (status === 'active') {
+                        el.style.stroke = "#00f2ff";
+                        el.style.filter = "drop-shadow(0 0 8px rgba(0, 242, 255, 0.6))";
+                        el.style.strokeWidth = "2.5px";
+                    } else if (status === 'completed') {
+                        el.style.stroke = "#22c55e";
+                        el.style.filter = "drop-shadow(0 0 6px rgba(34, 197, 94, 0.4))";
+                        el.style.strokeWidth = "2px";
+                    } else if (status === 'error') {
+                        el.style.stroke = "#ff007f";
+                        el.style.filter = "drop-shadow(0 0 8px rgba(255, 0, 127, 0.6))";
+                        el.style.strokeWidth = "2.5px";
+                    }
+                }
+            };
+
+            const animatePath = (id, status = 'active') => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (status === 'active') {
+                        el.style.stroke = "#00f2ff";
+                        el.style.strokeDasharray = "6";
+                        el.style.animation = "dash 1s linear infinite";
+                    } else if (status === 'completed') {
+                        el.style.stroke = "#22c55e";
+                        el.style.strokeDasharray = "none";
+                        el.style.animation = "none";
+                    }
+                }
+            };
+
+            const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+            resetVisuals();
+
+            // Run Scenario
+            if (scenario === 'culture') {
+                let state = {
+                    question: "Describe NexaAI’s company culture.",
+                    retrieval_query: "Describe NexaAI’s company culture.",
+                    rewrite_tries: 0,
+                    need_retrieval: null,
+                    relevant_docs: 0,
+                    issup_grade: null,
+                    grounding_retries: 0,
+                    isuse_grade: null
+                };
+                updateMonitor(state);
+
+                // START -> decide
+                animatePath('path-start-decide');
+                logConsole("Graph invoked with START.", 'info');
+                await wait(speed);
+                pulseNode('decide', 'active');
+                logConsole("Node decide_retrieval started. Assessing context requirement...", 'info');
+                await wait(speed);
+                state.need_retrieval = true;
+                updateMonitor(state);
+                pulseNode('decide', 'completed');
+                animatePath('path-start-decide', 'completed');
+
+                // decide -> retrieve
+                animatePath('path-decide-retrieve');
+                await wait(speed);
+                pulseNode('retrieve', 'active');
+                logConsole("Adaptive retrieval gating returned True. Initiating Vector DB search...", 'warning');
+                await wait(speed);
+                state.relevant_docs = 4;
+                updateMonitor(state);
+                pulseNode('retrieve', 'completed');
+                animatePath('path-decide-retrieve', 'completed');
+
+                // retrieve -> relevant
+                animatePath('path-retrieve-relevant');
+                await wait(speed);
+                pulseNode('relevant', 'active');
+                logConsole("Retrieved 4 chunks from FAISS index. Performing topic relevance filtering...", 'info');
+                await wait(speed);
+                state.relevant_docs = 2;
+                updateMonitor(state);
+                pulseNode('relevant', 'completed');
+                animatePath('path-retrieve-relevant', 'completed');
+
+                // relevant -> generate
+                animatePath('path-relevant-generate');
+                await wait(speed);
+                pulseNode('generate', 'active');
+                logConsole("Relevance grading filtered out 2 noisy chunks. Passing 2 high-signal chunks to Generator.", 'success');
+                await wait(speed);
+                pulseNode('generate', 'completed');
+                animatePath('path-relevant-generate', 'completed');
+
+                // generate -> issup (Fail 1st pass)
+                animatePath('path-generate-issup');
+                await wait(speed);
+                pulseNode('issup', 'active');
+                logConsole("Generator drafted response. Initiating IsSUP Grounding check...", 'info');
+                await wait(speed);
+                state.issup_grade = "partially_supported";
+                updateMonitor(state);
+                logConsole("IsSUP check failed: Grade = partially_supported. Hallucination terms detected ('generous', 'culture').", 'error');
+                pulseNode('issup', 'error');
+                animatePath('path-generate-issup', 'completed');
+
+                // issup -> revise
+                animatePath('path-issup-revise');
+                await wait(speed);
+                pulseNode('revise', 'active');
+                logConsole("Branching to revise_answer. Invoking strict quote-only prompt constraints...", 'warning');
+                await wait(speed);
+                state.grounding_retries = 1;
+                updateMonitor(state);
+                pulseNode('revise', 'completed');
+                animatePath('path-issup-revise', 'completed');
+
+                // revise -> issup (Pass 2nd pass)
+                animatePath('path-revise-issup');
+                await wait(speed);
+                pulseNode('issup', 'active');
+                logConsole("Revised answer compiled. Re-evaluating IsSUP grounding...", 'info');
+                await wait(speed);
+                state.issup_grade = "fully_supported";
+                updateMonitor(state);
+                logConsole("IsSUP check passed: Grade = fully_supported. Output strictly aligned with source quotes.", 'success');
+                pulseNode('issup', 'completed');
+                animatePath('path-revise-issup', 'completed');
+
+                // issup -> isuse
+                animatePath('path-issup-isuse');
+                await wait(speed);
+                pulseNode('isuse', 'active');
+                logConsole("Routing to is_use node. Assessing query alignment usefulness...", 'info');
+                await wait(speed);
+                state.isuse_grade = "useful";
+                updateMonitor(state);
+                logConsole("Usefulness grade passed. Query answered accurately.", 'success');
+                pulseNode('isuse', 'completed');
+                animatePath('path-issup-isuse', 'completed');
+
+                // isuse -> END
+                animatePath('path-isuse-end');
+                await wait(speed);
+                animatePath('path-isuse-end', 'completed');
+                logConsole("Graph execution finished. Returning final grounded response.", 'success');
+                
+                previewEl.innerHTML = `
+                    <div class="space-y-2 p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-xl">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest font-mono">[Success - Fully Grounded]</span>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            - "NexaAI is committed to maintaining a fair, inclusive, and performance-driven workplace." <br/>
+                            - "Employees are encouraged to maintain a healthy work-life balance."
+                        </p>
+                    </div>
+                `;
+
+            } else if (scenario === 'refund') {
+                let state = {
+                    question: "What is the refund policy of NexaAI?",
+                    retrieval_query: "What is the refund policy of NexaAI?",
+                    rewrite_tries: 0,
+                    need_retrieval: null,
+                    relevant_docs: 0,
+                    issup_grade: null,
+                    grounding_retries: 0,
+                    isuse_grade: null
+                };
+                updateMonitor(state);
+
+                // START -> decide
+                animatePath('path-start-decide');
+                logConsole("Graph invoked with START.", 'info');
+                await wait(speed);
+                pulseNode('decide', 'active');
+                logConsole("Node decide_retrieval started. Assessing context requirement...", 'info');
+                await wait(speed);
+                state.need_retrieval = true;
+                updateMonitor(state);
+                pulseNode('decide', 'completed');
+                animatePath('path-start-decide', 'completed');
+
+                // decide -> retrieve
+                animatePath('path-decide-retrieve');
+                await wait(speed);
+                pulseNode('retrieve', 'active');
+                logConsole("Adaptive retrieval gating returned True. Querying vector database...", 'warning');
+                await wait(speed);
+                state.relevant_docs = 4;
+                updateMonitor(state);
+                pulseNode('retrieve', 'completed');
+                animatePath('path-decide-retrieve', 'completed');
+
+                // retrieve -> relevant (No relevant docs!)
+                animatePath('path-retrieve-relevant');
+                await wait(speed);
+                pulseNode('relevant', 'active');
+                logConsole("Retrieved 4 chunks. Scoring semantic relevance against PDF index...", 'info');
+                await wait(speed);
+                state.relevant_docs = 0;
+                updateMonitor(state);
+                logConsole("0 relevant local documents found! Information not present in vector DB.", 'error');
+                pulseNode('relevant', 'error');
+                animatePath('path-retrieve-relevant', 'completed');
+
+                // relevant -> Web Search Fallback
+                animatePath('path-relevant-web');
+                await wait(speed);
+                logConsole("Vector DB failed. Triggering web search query refiner...", 'warning');
+                pulseNode('rewrite', 'active');
+                await wait(speed);
+                state.retrieval_query = "NexaAI refund policy cancellation timeline";
+                updateMonitor(state);
+                pulseNode('rewrite', 'completed');
+                
+                pulseNode('search', 'active');
+                logConsole("Executing Tavily Search API on refined query...", 'warning');
+                await wait(speed);
+                logConsole("Tavily retrieved 3 search log contexts from web pages.", 'success');
+                pulseNode('search', 'completed');
+                
+                state.relevant_docs = 3;
+                updateMonitor(state);
+                animatePath('path-relevant-web', 'completed');
+
+                // Web Context -> Generate
+                animatePath('path-relevant-generate');
+                await wait(speed);
+                pulseNode('generate', 'active');
+                logConsole("Injecting web research ground truth blocks into Generator prompt.", 'success');
+                await wait(speed);
+                pulseNode('generate', 'completed');
+                animatePath('path-relevant-generate', 'completed');
+
+                // Generate -> IsSUP
+                animatePath('path-generate-issup');
+                await wait(speed);
+                pulseNode('issup', 'active');
+                logConsole("Generator response finished. Assessing fact grounding...", 'info');
+                await wait(speed);
+                state.issup_grade = "fully_supported";
+                updateMonitor(state);
+                logConsole("IsSUP grounding check passed. Details supported by web search.", 'success');
+                pulseNode('issup', 'completed');
+                animatePath('path-generate-issup', 'completed');
+
+                // IsSUP -> IsUSE
+                animatePath('path-issup-isuse');
+                await wait(speed);
+                pulseNode('isuse', 'active');
+                logConsole("Assessing answer usefulness against initial refund request...", 'info');
+                await wait(speed);
+                state.isuse_grade = "useful";
+                updateMonitor(state);
+                pulseNode('isuse', 'completed');
+                animatePath('path-issup-isuse', 'completed');
+
+                // IsUSE -> END
+                animatePath('path-isuse-end');
+                await wait(speed);
+                animatePath('path-isuse-end', 'completed');
+                logConsole("Graph finished. Outputting web-grounded refund policy.", 'success');
+                
+                previewEl.innerHTML = `
+                    <div class="space-y-2 p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-xl">
+                        <span class="text-xs font-bold text-neon-blue uppercase tracking-widest font-mono">[Success - Web Grounded]</span>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            - "NexaAI offers a full refund within 14 days of subscription cancellation." <br/>
+                            - "Refunds are processed back to the original payment method within 5-10 business days."
+                        </p>
+                    </div>
+                `;
+
+            } else if (scenario === 'trial') {
+                let state = {
+                    question: "Is there a free trial for the premium plan?",
+                    retrieval_query: "Is there a free trial for the premium plan?",
+                    rewrite_tries: 0,
+                    need_retrieval: null,
+                    relevant_docs: 0,
+                    issup_grade: null,
+                    grounding_retries: 0,
+                    isuse_grade: null
+                };
+                updateMonitor(state);
+
+                // START -> decide
+                animatePath('path-start-decide');
+                logConsole("Graph invoked with START.", 'info');
+                await wait(speed);
+                pulseNode('decide', 'active');
+                logConsole("Assessing retrieval requirement...", 'info');
+                await wait(speed);
+                state.need_retrieval = true;
+                updateMonitor(state);
+                pulseNode('decide', 'completed');
+                animatePath('path-start-decide', 'completed');
+
+                // decide -> retrieve
+                animatePath('path-decide-retrieve');
+                await wait(speed);
+                pulseNode('retrieve', 'active');
+                logConsole("Querying vector database...", 'warning');
+                await wait(speed);
+                state.relevant_docs = 4;
+                updateMonitor(state);
+                pulseNode('retrieve', 'completed');
+                animatePath('path-decide-retrieve', 'completed');
+
+                // retrieve -> relevant
+                animatePath('path-retrieve-relevant');
+                await wait(speed);
+                pulseNode('relevant', 'active');
+                logConsole("Scoring context relevance...", 'info');
+                await wait(speed);
+                state.relevant_docs = 1;
+                updateMonitor(state);
+                pulseNode('relevant', 'completed');
+                animatePath('path-retrieve-relevant', 'completed');
+
+                // relevant -> generate
+                animatePath('path-relevant-generate');
+                await wait(speed);
+                pulseNode('generate', 'active');
+                logConsole("Synthesizing answer from internal context...", 'info');
+                await wait(speed);
+                pulseNode('generate', 'completed');
+                animatePath('path-relevant-generate', 'completed');
+
+                // Generate -> IsSUP
+                animatePath('path-generate-issup');
+                await wait(speed);
+                pulseNode('issup', 'active');
+                logConsole("Assessing grounding support...", 'info');
+                await wait(speed);
+                state.issup_grade = "fully_supported";
+                updateMonitor(state);
+                logConsole("IsSUP grounding check passed.", 'success');
+                pulseNode('issup', 'completed');
+                animatePath('path-generate-issup', 'completed');
+
+                // IsSUP -> IsUSE (Fail)
+                animatePath('path-issup-isuse');
+                await wait(speed);
+                pulseNode('isuse', 'active');
+                logConsole("Checking usefulness of the answer...", 'info');
+                await wait(speed);
+                state.isuse_grade = "not_useful";
+                updateMonitor(state);
+                logConsole("IsUSE check failed: Answer is generic and fails to answer trial details.", 'error');
+                pulseNode('isuse', 'error');
+                animatePath('path-issup-isuse', 'completed');
+
+                // IsUSE -> rewrite_question (Query Refinement)
+                animatePath('path-isuse-rewrite');
+                await wait(speed);
+                pulseNode('rewrite', 'active');
+                logConsole("Triggering Query Refinement loop. Generating search keywords...", 'warning');
+                await wait(speed);
+                state.retrieval_query = "NexaAI premium plan free trial duration duration details";
+                state.rewrite_tries = 1;
+                updateMonitor(state);
+                pulseNode('rewrite', 'completed');
+                animatePath('path-isuse-rewrite', 'completed');
+
+                // rewrite -> retrieve (Try again)
+                animatePath('path-rewrite-retrieve');
+                await wait(speed);
+                pulseNode('retrieve', 'active');
+                logConsole("Rerunning retrieval node with rewritten query...", 'warning');
+                await wait(speed);
+                state.relevant_docs = 4;
+                updateMonitor(state);
+                pulseNode('retrieve', 'completed');
+                animatePath('path-rewrite-retrieve', 'completed');
+
+                // retrieve -> relevant
+                animatePath('path-retrieve-relevant');
+                await wait(speed);
+                pulseNode('relevant', 'active');
+                logConsole("Scoring refined search results...", 'info');
+                await wait(speed);
+                state.relevant_docs = 3;
+                updateMonitor(state);
+                pulseNode('relevant', 'completed');
+                animatePath('path-retrieve-relevant', 'completed');
+
+                // relevant -> generate
+                animatePath('path-relevant-generate');
+                await wait(speed);
+                pulseNode('generate', 'active');
+                logConsole("Synthesizing refined answer...", 'info');
+                await wait(speed);
+                pulseNode('generate', 'completed');
+                animatePath('path-relevant-generate', 'completed');
+
+                // Generate -> IsSUP
+                animatePath('path-generate-issup');
+                await wait(speed);
+                pulseNode('issup', 'active');
+                logConsole("Assessing grounding support...", 'info');
+                await wait(speed);
+                state.issup_grade = "fully_supported";
+                updateMonitor(state);
+                pulseNode('issup', 'completed');
+                animatePath('path-generate-issup', 'completed');
+
+                // IsSUP -> IsUSE (Pass)
+                animatePath('path-issup-isuse');
+                await wait(speed);
+                pulseNode('isuse', 'active');
+                logConsole("Checking usefulness...", 'info');
+                await wait(speed);
+                state.isuse_grade = "useful";
+                updateMonitor(state);
+                logConsole("Usefulness grade passed. Query resolved.", 'success');
+                pulseNode('isuse', 'completed');
+                animatePath('path-issup-isuse', 'completed');
+
+                // IsUSE -> END
+                animatePath('path-isuse-end');
+                await wait(speed);
+                animatePath('path-isuse-end', 'completed');
+                logConsole("Graph execution finished.", 'success');
+                
+                previewEl.innerHTML = `
+                    <div class="space-y-2 p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-xl">
+                        <span class="text-xs font-bold text-neon-purple uppercase tracking-widest font-mono">[Success - Refined & Grounded]</span>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            - "NexaAI plans include a 7-day free trial for new premium accounts." <br/>
+                            - "A credit card is required to initiate the trial, but no charges are made before the trial ends."
+                        </p>
+                    </div>
+                `;
+            }
+
+            btn.disabled = false;
+            btn.textContent = "Run Self-RAG Graph";
+        }
+    </script>
+</body>
+</html>

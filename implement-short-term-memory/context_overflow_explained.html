@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theory: The Context Overflow Problem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #ec4899;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            padding: 4rem;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        h1 { font-size: 4rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2rem; }
+        h2 { font-size: 2.2rem; color: var(--primary); margin: 3rem 0 1rem 0; border-left: 5px solid var(--secondary); padding-left: 1rem; }
+        
+        .theory-block {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .formula {
+            background: #020617;
+            padding: 2rem;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin: 2rem 0;
+            border: 1px dashed var(--accent);
+        }
+
+        code { background: #000; color: var(--secondary); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
+
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .token-box {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .math-list { list-style: none; }
+        .math-list li::before { content: "∑ "; color: var(--secondary); font-weight: 800; margin-right: 10px; }
+
+        .warning-pill {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 800;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="warning-pill">CORE LLM CONSTRAINT</div>
+            <h1>Context Overflow Theory</h1>
+            <p style="font-size: 1.2rem; color: #94a3b8;">Why "Unlimited Memory" is physically impossible in current Transformer architectures.</p>
+        </header>
+
+        <section class="section">
+            <h2>1. The Tokenization Layer</h2>
+            <div class="theory-block">
+                <p>LLMs do not read words; they read **Tokens**. A token is a numerical representation of a chunk of characters. On average, 1000 tokens ≈ 750 words.</p>
+                
+                <div class="token-grid">
+                    <div class="token-box">Agentic [452]</div>
+                    <div class="token-box">AI [98]</div>
+                    <div class="token-box">is [12]</div>
+                    <div class="token-box">great [567]</div>
+                </div>
+
+                <p>In Short-Term Memory, every turn of the conversation adds more tokens to the "History". This is a linear growth: <code>O(N)</code> where N is the number of messages.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>2. The Quadratic Scaling Problem</h2>
+            <div class="theory-block">
+                <p>Most LLMs use the <strong>Self-Attention Mechanism</strong>. To understand the context, every token looks at every other token in the sequence. This means the computational cost grows <strong>quadratically</strong> (N²).</p>
+                
+                <div class="formula">
+                    Cost = (Tokens)<sup>2</sup>
+                </div>
+
+                <p>Because of this math, providers (OpenAI, Anthropic) set a hard limit called the <strong>Context Window</strong> to prevent their servers from melting down.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>3. The Context Window Equation</h2>
+            <div class="theory-block">
+                <p>The total capacity is shared between your **Input** and the model's **Output**. If your input (STM) is too large, there is no "room" left for the model to think.</p>
+
+                <ul class="math-list" style="margin: 2rem 0;">
+                    <li><code>Prompt_Tokens</code> (Your instructions)</li>
+                    <li><code>History_Tokens</code> (The STM messages)</li>
+                    <li><code>Completion_Tokens</code> (The AI's actual response)</li>
+                </ul>
+
+                <div class="formula" style="border-color: var(--secondary); color: var(--secondary);">
+                    Total ≤ Max_Context_Limit
+                </div>
+
+                <p>For example, if <code>GPT-4o</code> has a 128k limit, but you send 127.9k tokens of history, the model can only generate a few words before it "hits the wall" and cuts off.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>4. Symptom: The "Lost in the Middle" Effect</h2>
+            <div class="theory-block">
+                <p>Even before an overflow error happens, long context causes performance issues. Studies show that LLMs are great at remembering the <strong>Start</strong> and <strong>End</strong> of a prompt, but they often forget the middle. This is why trimming and summarization are not just for saving space—they are for <strong>Accuracy</strong>.</p>
+            </div>
+        </section>
+    </div>
+
+</body>
+</html>

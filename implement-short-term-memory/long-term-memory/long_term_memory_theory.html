@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph LTM: The BaseStore Deep-Dive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg: #020617;
+            --card: #0f172a;
+            --border: #1e293b;
+            --text: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 300px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .sidebar h3 { font-size: 0.8rem; letter-spacing: 2px; color: #64748b; margin-top: 2rem; }
+        .sidebar a { color: #94a3b8; text-decoration: none; font-size: 0.95rem; transition: 0.2s; }
+        .sidebar a:hover { color: var(--primary); padding-left: 5px; }
+
+        /* Main Content */
+        main { margin-left: 300px; padding: 4rem; max-width: 1200px; }
+
+        .hero { margin-bottom: 6rem; }
+        .hero h1 { font-size: 4rem; font-weight: 800; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; color: #94a3b8; max-width: 800px; }
+
+        .section { margin-bottom: 8rem; }
+        .section h2 { font-size: 2.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+
+        .concept-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .highlight-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        /* Technical Diagrams (CSS Grid based) */
+        .diagram-container {
+            background: #000;
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .node-box {
+            border: 2px solid var(--primary);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            position: relative;
+        }
+
+        .arrow-down { width: 2px; height: 40px; background: var(--border); position: relative; }
+        .arrow-down::after { content: "▼"; position: absolute; bottom: -10px; left: -6px; color: var(--border); }
+
+        /* Code Blocks */
+        pre {
+            background: #020617;
+            padding: 1.5rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            margin: 1.5rem 0;
+        }
+
+        code { font-family: 'JetBrains Mono', monospace; color: var(--secondary); font-size: 0.9rem; }
+
+        .fact-table {
+            width: 100%;
+            margin-top: 1rem;
+            border-collapse: collapse;
+        }
+        .fact-table th { color: var(--primary); text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
+        .fact-table td { padding: 0.5rem; font-size: 0.9rem; color: #cbd5e1; }
+
+        /* Namespacing Visualizer */
+        .namespace-tree {
+            font-family: 'JetBrains Mono', monospace;
+            padding-left: 20px;
+            border-left: 1px dashed #334155;
+        }
+        .tree-item { margin: 10px 0; }
+        .tree-key { color: var(--accent); }
+        .tree-val { color: var(--secondary); }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h2 style="color: var(--primary)">LTM DOCS</h2>
+        
+        <h3>FUNDAMENTALS</h3>
+        <a href="#intro">Introduction to LTM</a>
+        <a href="#store-vs-checkpointer">Store vs Checkpointer</a>
+        
+        <h3>THE BASESTORE</h3>
+        <a href="#basestore-api">BaseStore Interface</a>
+        <a href="#namespaces">Namespacing Concepts</a>
+        
+        <h3>OPERATIONS</h3>
+        <a href="#crud">CRUD Operations</a>
+        <a href="#search">Semantic Search</a>
+        
+        <h3>PRACTICAL</h3>
+        <a href="#implementation">Implementation Guide</a>
+    </aside>
+
+    <main>
+        <div class="hero" id="intro">
+            <p style="color: var(--secondary); font-weight: 800; letter-spacing: 2px;">TECHNICAL DEEP-DIVE</p>
+            <h1>Long-Term Memory Mechanics</h1>
+            <p>Moving beyond simple chat history to a persistent, searchable knowledge layer using the <strong>LangGraph BaseStore</strong> architecture.</p>
+        </div>
+
+        <section class="section" id="store-vs-checkpointer">
+            <h2>1. Store vs. Checkpointer</h2>
+            <div class="concept-card">
+                <p>One of the most common mistakes is confusing <strong>Persistence</strong> (Checkpointers) with <strong>Memory</strong> (Stores). Let's define them technically:</p>
+                
+                <div class="highlight-box">
+                    <strong>Checkpointer (Episodic Memory):</strong> Tied to a <code>thread_id</code>. It saves the state of a single conversation. If User A talks to Agent B, only they can see this state.
+                </div>
+                
+                <div class="highlight-box" style="border-left-color: var(--secondary);">
+                    <strong>BaseStore (Semantic Memory):</strong> Tied to a <code>namespace</code>. It is cross-thread. Information stored here (like a user's birthday or preferences) can be accessed by ANY agent in ANY thread.
+                </div>
+
+                <div class="diagram-container">
+                    <div class="node-box">LangGraph Engine</div>
+                    <div style="display: flex; gap: 4rem;">
+                        <div style="text-align: center;">
+                            <div class="arrow-down"></div>
+                            <div class="node-box" style="border-color: var(--accent)">SqliteSaver<br><small>(Thread ID)</small></div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="arrow-down"></div>
+                            <div class="node-box" style="border-color: var(--secondary)">BaseStore<br><small>(Namespace)</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="basestore-api">
+            <h2>2. The BaseStore Interface</h2>
+            <div class="concept-card">
+                <p>The <code>BaseStore</code> is an abstract interface that provides the blueprint for long-term storage. Whether you use <code>InMemoryStore</code> or <code>PostgresStore</code>, the operations are identical:</p>
+                
+                <pre><code>from langchain_core.stores import BaseStore
+
+# CORE OPERATIONS:
+# .put(namespace, key, value)   -> Create/Edit
+# .get(namespace, key)          -> Retrieve
+# .delete(namespace, key)       -> Remove
+# .search(query)                -> Semantic Lookup (if supported)</code></pre>
+
+                <p>In LangGraph, this is often implemented as an <code>InMemoryStore</code> for development and a specialized DB-backed store for production.</p>
+            </div>
+        </section>
+
+        <section class="section" id="namespaces">
+            <h2>3. Namespacing & Hierarchy</h2>
+            <div class="concept-card">
+                <p>Think of Namespaces as **Folders** in a file system (like Google Drive). A namespace is a <strong>tuple of strings</strong> that allows you to isolate memory for different users or entities.</p>
+                
+                <div class="namespace-tree">
+                    <div class="tree-item">📁 <span class="tree-key">("users", "u1")</span></div>
+                    <div class="namespace-tree">
+                        <div class="tree-item">📄 <span class="tree-key">"profile"</span>: <span class="tree-val">{"name": "Divyansh", "role": "Dev"}</span></div>
+                        <div class="tree-item">📄 <span class="tree-key">"prefs"</span>: <span class="tree-val">{"theme": "dark"}</span></div>
+                    </div>
+                    <div class="tree-item">📁 <span class="tree-key">("users", "u2")</span></div>
+                    <div class="namespace-tree">
+                        <div class="tree-item">📄 <span class="tree-key">"profile"</span>: <span class="tree-val">{"name": "Alice"}</span></div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Key Insight:</strong> By using <code>("users", user_id)</code> as a namespace, you ensure that User A's long-term memories never leak into User B's conversation.
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="crud">
+            <h2>4. CRUD Operations in Depth</h2>
+            <div class="concept-card">
+                <h3>CREATE / EDIT (The <code>.put</code> method)</h3>
+                <p>The <code>put</code> method is an "upsert". If the key exists, it edits. If not, it creates.</p>
+                <pre><code>store.put(("users", "u1"), "bio", {"content": "Likes Python"})</code></pre>
+
+                <h3>SEARCH (Semantic Lookup)</h3>
+                <p>This is where Long-Term Memory becomes "Agentic". We can search for relevant past memories using natural language queries.</p>
+                <pre><code># Find anything related to 'preferences'
+results = store.search(("users", "u1"), query="What does the user like?")</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="implementation">
+            <h2>5. Advanced Implementation Strategy</h2>
+            <div class="concept-card">
+                <p>To implement this in a real-world LangGraph agent, follow this pattern:</p>
+                <ol style="margin-left: 2rem;">
+                    <li><strong>Inject Store:</strong> Pass the store into the <code>StateGraph</code> during compilation.</li>
+                    <li><strong>Read in Node:</strong> Use <code>config["configurable"]["store"]</code> to access memory.</li>
+                    <li><strong>Update in Reflection:</strong> Use a background node to summarize and <code>.put</code> data back into the store.</li>
+                </ol>
+                
+                <pre><code>def my_node(state, config):
+    store = config["configurable"]["store"]
+    user_id = config["configurable"]["user_id"]
+    
+    # Retrieve LTM
+    memories = store.get(("users", user_id), "profile")
+    # ... use memories in prompt ...</code></pre>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>

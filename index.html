@@ -82,146 +82,335 @@
     <!-- Content Sections -->
     <main class="max-w-7xl mx-auto px-8 pb-32 space-y-24">
 
-        <!-- Module Group 1 -->
+        <!-- Section 01: Core Foundations -->
         <section>
             <h2 class="text-xs font-bold uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-4">
-                Section 01 <span class="h-px flex-1 bg-white/5"></span> Foundations
+                Section 01 <span class="h-px flex-1 bg-white/5"></span> Core Foundations
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="langgraph_topics/01_What_is_LangGraph/what_is_langgraph.html" class="glass p-8 rounded-3xl module-card block">
+                <!-- Ch 01 -->
+                <a href="langgraph_topics/01_What_is_LangGraph/what_is_langgraph.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
                     <span class="module-number text-4xl font-bold mb-4 block">01</span>
                     <h3 class="text-lg font-bold mb-2">What is LangGraph?</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">State machine paradigms and agentic agency boundaries.</p>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">State machine paradigms and agentic agency boundaries.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-brand-400/10 text-brand-400 border border-brand-400/20">LangGraph Core</span>
+                    </div>
                 </a>
+                <!-- Ch 02 -->
                 <a href="langgraph_topics/02_LLM_Workflows/llm_workflows.html" class="glass p-8 rounded-3xl module-card block">
                     <span class="module-number text-4xl font-bold mb-4 block">02</span>
-                    <h3 class="text-lg font-bold mb-2">LLM Workflows</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Chaining, Routing, and Parallel execution topologies.</p>
+                    <h3 class="text-lg font-bold mb-2">LLM Workflows & Chaining</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Chaining, Routing, and Parallel execution topologies.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-brand-400/10 text-brand-400 border border-brand-400/20">Topologies</span>
+                    </div>
                 </a>
+                <!-- Ch 03 -->
                 <a href="langgraph_topics/03_Graphs_Nodes_and_Edges/graphs_nodes_and_edges.html" class="glass p-8 rounded-3xl module-card block">
                     <span class="module-number text-4xl font-bold mb-4 block">03</span>
                     <h3 class="text-lg font-bold mb-2">Graphs, Nodes & Edges</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">The programmatic building blocks of stateful graphs.</p>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">The programmatic building blocks of stateful graphs.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-brand-400/10 text-brand-400 border border-brand-400/20">Graph Construction</span>
+                    </div>
                 </a>
+                <!-- Ch 04 -->
                 <a href="langgraph_topics/04_State/state.html" class="glass p-8 rounded-3xl module-card block">
                     <span class="module-number text-4xl font-bold mb-4 block">04</span>
-                    <h3 class="text-lg font-bold mb-2">State Management</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Schema contracts and Pydantic validation bounds.</p>
+                    <h3 class="text-lg font-bold mb-2">State Management Contracts</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Schema contracts and Pydantic validation bounds.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-brand-400/10 text-brand-400 border border-brand-400/20">Pydantic State</span>
+                    </div>
                 </a>
+                <!-- Ch 05 -->
                 <a href="langgraph_topics/05_Reducers/reducers.html" class="glass p-8 rounded-3xl module-card block">
                     <span class="module-number text-4xl font-bold mb-4 block">05</span>
-                    <h3 class="text-lg font-bold mb-2">Reducers</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Solving value clobbering in parallel fan-out/fan-in flows.</p>
+                    <h3 class="text-lg font-bold mb-2">Reducers & Parallelism</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Solving value clobbering in parallel fan-out/fan-in flows.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-brand-400/10 text-brand-400 border border-brand-400/20">Reducers</span>
+                    </div>
                 </a>
             </div>
         </section>
 
-        <!-- Module Group 2 -->
+        <!-- Section 02: Runtime Persistence & Time Travel -->
         <section>
             <h2 class="text-xs font-bold uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-4">
-                Section 02 <span class="h-px flex-1 bg-white/5"></span> Persistence & Execution
+                Section 02 <span class="h-px flex-1 bg-white/5"></span> Runtime Persistence & Time Travel
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="langgraph_topics/06_LangGraph_Execution_Model/langgraph_execution_model.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
+                <!-- Ch 06 -->
+                <a href="langgraph_topics/06_LangGraph_Execution_Model/langgraph_execution_model.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-neon-purple">
                     <span class="module-number text-4xl font-bold mb-4 block">06</span>
-                    <h3 class="text-lg font-bold mb-2">Execution Model</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Superstep synchronous boundaries and the lifecycle of a run.</p>
+                    <h3 class="text-lg font-bold mb-2">LangGraph Execution Model</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Superstep synchronous boundaries and the lifecycle of a run.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-neon-purple/10 text-neon-purple border border-neon-purple/20">Supersteps</span>
+                    </div>
                 </a>
-                <a href="langgraph_topics/07_Persistence_and_Checkpointing/persistence_and_checkpointing.html" class="glass p-8 rounded-3xl module-card block">
+                <!-- Ch 07 -->
+                <div class="glass p-8 rounded-3xl module-card block border-t-2 border-brand-400">
                     <span class="module-number text-4xl font-bold mb-4 block">07</span>
                     <h3 class="text-lg font-bold mb-2">Persistence & Time Travel</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">MemorySaver, thread partitioning, and state interrogation.</p>
-                </a>
-                <a href="langgraph_topics/08_Tool_Calling_Agents/tool_calling_agents.html" class="glass p-8 rounded-3xl module-card block">
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">MemorySaver, thread partitioning, and state database checkpointers.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="langgraph_topics/07_Persistence_and_Checkpointing/persistence_and_checkpointing.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. Persistence & Checkpointing</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="langgraph_topics/10_Database_Checkpointers/database_checkpointers.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. Database Checkpointers (SQLite/Postgres)</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 03: Integrations & Protocols -->
+        <section>
+            <h2 class="text-xs font-bold uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-4">
+                Section 03 <span class="h-px flex-1 bg-white/5"></span> Integrations, Protocols & Frontends
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Ch 08 -->
+                <div class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
                     <span class="module-number text-4xl font-bold mb-4 block">08</span>
-                    <h3 class="text-lg font-bold mb-2">Tool Calling Agents</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Native dispatch hubs and automated execution hubs.</p>
-                </a>
-                <a href="langgraph_topics/09_Chatbot_UI_and_Streaming/chatbot_ui_and_streaming.html" class="glass p-8 rounded-3xl module-card block">
+                    <h3 class="text-lg font-bold mb-2">Tool Calling Mechanics</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Native tool binding, automated dispatch hubs, and secure execution bounds.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="langgraph_topics/08_Tool_Calling_Agents/tool_calling_agents.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. Basic Tool calling Agents</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="Tools-in-LangGraph/tools_in_langgraph_guide.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. Advanced Custom Tool Integrations</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Ch 09 -->
+                <div class="glass p-8 rounded-3xl module-card block border-l-2 border-neon-purple">
                     <span class="module-number text-4xl font-bold mb-4 block">09</span>
-                    <h3 class="text-lg font-bold mb-2">UI & Streaming</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Real-time token unpacking and session resumption engine.</p>
-                </a>
-                <a href="langgraph_topics/10_Database_Checkpointers/database_checkpointers.html" class="glass p-8 rounded-3xl module-card block">
+                    <h3 class="text-lg font-bold mb-2">UI Chatbots & Streaming</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Real-time token unpacking, session resumption, and streaming architectures.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="langgraph_topics/09_Chatbot_UI_and_Streaming/chatbot_ui_and_streaming.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. UI & Streaming Basics</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="streaming_use_cases_and_implementation/streaming_documentation.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. Advanced Streaming Topologies</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Ch 10 -->
+                <div class="glass p-8 rounded-3xl module-card block border-t-2 border-neon-blue">
                     <span class="module-number text-4xl font-bold mb-4 block">10</span>
-                    <h3 class="text-lg font-bold mb-2">Database Checkpointers</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">SQLite and Async Postgres enterprise persistence.</p>
+                    <h3 class="text-lg font-bold mb-2">Model Context Protocol (MCP)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">dynamic tool exposing client-server specifications and dynamic workflows.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="langgraph_topics/12_Model_Context_Protocol_MCP/mcp_client_integration.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. Client Integration Guide</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="MCP/README.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. Client-Server Architecture (README)</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 04: Production Observability -->
+        <section>
+            <h2 class="text-xs font-bold uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-4">
+                Section 04 <span class="h-px flex-1 bg-white/5"></span> Production Observability
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Ch 11 -->
+                <div class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
+                    <span class="module-number text-4xl font-bold mb-4 block">11</span>
+                    <h3 class="text-lg font-bold mb-2">Observability & Tracing Guides</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">LangSmith tracing, token cost monitoring, and latency analysis.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="langgraph_topics/11_Observability_and_LangSmith/observability_and_langsmith.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. Observability foundations</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="Obsrevability-in-LangGraph/observability_guide.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. Observability Deep Dive Guide</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Ch 12 -->
+                <a href="Langsmith-Tutorial/00-Syllabus.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-neon-purple">
+                    <span class="module-number text-4xl font-bold mb-4 block">12</span>
+                    <h3 class="text-lg font-bold mb-2">LangSmith Masterclass Series</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">A complete 9-part nested syllabus masterclass on evaluations, custom function tracing, and agent datasets.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-neon-purple/10 text-neon-purple border border-neon-purple/20">LangSmith Series</span>
+                    </div>
                 </a>
             </div>
         </section>
 
-        <!-- Module Group 3 -->
+        <!-- Section 05: Stateful Memory Systems -->
         <section>
             <h2 class="text-xs font-bold uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-4">
-                Section 03 <span class="h-px flex-1 bg-white/5"></span> Observability & Tools
+                Section 05 <span class="h-px flex-1 bg-white/5"></span> Stateful Memory Systems
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="langgraph_topics/11_Observability_and_LangSmith/observability_and_langsmith.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-neon-purple">
-                    <span class="module-number text-4xl font-bold mb-4 block">11</span>
-                    <h3 class="text-lg font-bold mb-2">Observability</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">LangSmith tracing, token monitoring, and latency analysis.</p>
-                </a>
-                <a href="langgraph_topics/12_Model_Context_Protocol_MCP/mcp_client_integration.html" class="glass p-8 rounded-3xl module-card block">
-                    <a href="syllabus.html" class="flex items-center gap-2 text-neon-purple text-sm font-bold group">
-                View Roadmap
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-        </div>
-
-        <!-- Module 7: RAG Masterclass -->
-        <div class="glass p-8 rounded-3xl group">
-            <div class="w-12 h-12 bg-brand-400/10 rounded-2xl flex items-center justify-center mb-6 border border-brand-400/20 text-brand-400 group-hover:scale-110 transition-transform">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
-            </div>
-            <h3 class="text-xl font-display font-bold mb-3">RAG Masterclass</h3>
-            <p class="text-slate-400 text-sm leading-relaxed mb-6">Everything about Retrieval-Augmented Generation, from Naive ETL to Agentic Self-Correction.</p>
-            <a href="RAG/rag_encyclopedia.html" class="flex items-center gap-2 text-brand-400 text-sm font-bold group">
-                Open Encyclopedia
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-        </div>
-</section>
-
-        <!-- Module Group 4 -->
-        <section>
-            <h2 class="text-xs font-bold uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-4">
-                Section 04 <span class="h-px flex-1 bg-white/5"></span> Advanced Architectures
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="langgraph_topics/13_Agentic_RAG_and_Vector_Search/agentic_rag.html" class="glass p-8 rounded-3xl module-card block">
+                <!-- Ch 13 -->
+                <div class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
                     <span class="module-number text-4xl font-bold mb-4 block">13</span>
-                    <h3 class="text-lg font-bold mb-2">Agentic RAG</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Stateful retrieval, routing, and iterative self-correction.</p>
-                </a>
-                <a href="langgraph_topics/14_Human_in_the_Loop_HITL/hitl_supervision.html" class="glass p-8 rounded-3xl module-card block">
+                    <h3 class="text-lg font-bold mb-2">Context Window Overflow</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Managing token limits, window message trimming, and summarization loops.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="implement-short-term-memory/context_overflow_solutions.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. Trim Solutions Portal</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="implement-short-term-memory/context_overflow_explained.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. Overflow Mechanics Explained</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Ch 14 -->
+                <a href="langgraph_topics/16_Memory_Mechanics_Deep_Dive/memory_mechanics.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-neon-purple">
                     <span class="module-number text-4xl font-bold mb-4 block">14</span>
-                    <h3 class="text-lg font-bold mb-2">Human-in-the-Loop</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Security checkpoints and manual execution overrides.</p>
+                    <h3 class="text-lg font-bold mb-2">Thread Memory Mechanics</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Short-term thread partitioning and graph checkpoint state boundaries.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-neon-purple/10 text-neon-purple border border-neon-purple/20">Thread Memory</span>
+                    </div>
                 </a>
-                <a href="langgraph_topics/15_Subgraphs_Orchestration/subgraphs_orchestration.html" class="glass p-8 rounded-3xl module-card block">
+                <!-- Ch 15 -->
+                <div class="glass p-8 rounded-3xl module-card block border-t-2 border-neon-blue">
                     <span class="module-number text-4xl font-bold mb-4 block">15</span>
-                    <h3 class="text-lg font-bold mb-2">Subgraphs</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Modular encapsulation and hierarchical graph design.</p>
-                </a>
-                <a href="langgraph_topics/16_Memory_Mechanics_Deep_Dive/memory_mechanics.html" class="glass p-8 rounded-3xl module-card block">
+                    <h3 class="text-lg font-bold mb-2">Long-Term Memory (LTM)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Postgres semantic profile stores, long-term state extraction and reflection paradigms.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="implement-short-term-memory/long-term-memory/long_term_memory_theory.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. Long-Term Memory Theory</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="implement-short-term-memory/long-term-memory/long_term_memory_explained.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. Postgres Memory Mechanics</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 06: Advanced RAG Masterclass -->
+        <section>
+            <h2 class="text-xs font-bold uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-4">
+                Section 06 <span class="h-px flex-1 bg-white/5"></span> Advanced RAG Masterclass
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Ch 16 -->
+                <div class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
                     <span class="module-number text-4xl font-bold mb-4 block">16</span>
-                    <h3 class="text-lg font-bold mb-2">Memory Mechanics</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Short-term thread memory vs long-term semantic stores.</p>
-                </a>
-                <a href="langgraph_topics/17_Multi_Agent_Systems/multi_agent_systems.html" class="glass p-8 rounded-3xl module-card block">
+                    <h3 class="text-lg font-bold mb-2">Agentic RAG & Vector Search</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Stateful vector query routing, embeddings and similarity index portals.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="langgraph_topics/13_Agentic_RAG_and_Vector_Search/agentic_rag.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. Agentic RAG Theory</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="RAG/rag_encyclopedia.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. RAG Encyclopedia Index</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Ch 17 -->
+                <a href="RAG/Advance-Rag-corrective-rag/corrective_rag_theory.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-neon-purple">
                     <span class="module-number text-4xl font-bold mb-4 block">17</span>
-                    <h3 class="text-lg font-bold mb-2">Multi-Agent Systems</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Supervisor orchestration and distributed intelligence.</p>
+                    <h3 class="text-lg font-bold mb-2">Corrective RAG (CRAG)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Retrieval evaluators, deconstruction grading and Tavily Search fallback ingestion.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-neon-purple/10 text-neon-purple border border-neon-purple/20">CRAG Theory</span>
+                    </div>
                 </a>
-                <a href="langgraph_topics/18_Self_Corrective_RAG_Loops/self_corrective_rag.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-500">
+                <!-- Ch 18 -->
+                <div class="glass p-8 rounded-3xl module-card block border-t-2 border-neon-blue">
                     <span class="module-number text-4xl font-bold mb-4 block">18</span>
-                    <h3 class="text-lg font-bold mb-2">Self-Corrective RAG</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">CRAG, Self-RAG, and infinite self-correction loops.</p>
-                </a>
-                <a href="planing-agents/planning_agents_theory.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
+                    <h3 class="text-lg font-bold mb-2">Self-Reflective RAG (Self-RAG)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-6">Adaptive retrieval gating, IsSUP fact grounding and strict quote reviser loop pathways.</p>
+                    <div class="flex flex-col gap-2">
+                        <a href="RAG/Advance-self-rag-main/self_rag_theory.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-brand-400/10 text-brand-400 border border-brand-400/20 hover:bg-brand-400/20 transition-all">
+                            <span>1. Self-RAG theory Portal</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="langgraph_topics/18_Self_Corrective_RAG_Loops/self_corrective_rag.html" class="inline-flex items-center justify-between px-4 py-2 text-xs font-semibold rounded-xl bg-neon-purple/10 text-neon-purple border border-neon-purple/20 hover:bg-neon-purple/20 transition-all">
+                            <span>2. Self-Corrective Loops</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 07: Swarms & Orchestration -->
+        <section>
+            <h2 class="text-xs font-bold uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-4">
+                Section 07 <span class="h-px flex-1 bg-white/5"></span> Swarms & Orchestration
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Ch 19 -->
+                <a href="langgraph_topics/14_Human_in_the_Loop_HITL/hitl_supervision.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
                     <span class="module-number text-4xl font-bold mb-4 block">19</span>
-                    <h3 class="text-lg font-bold mb-2">Planning Agents</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">Deconstruction, dynamic fanning out & reducer stitching workflows.</p>
+                    <h3 class="text-lg font-bold mb-2">Human-in-the-Loop Supervision</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Security checkpoints, validation gates and manual execution overrides.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-brand-400/10 text-brand-400 border border-brand-400/20">HITL Gateways</span>
+                    </div>
+                </a>
+                <!-- Ch 20 -->
+                <a href="langgraph_topics/15_Subgraphs_Orchestration/subgraphs_orchestration.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-neon-purple">
+                    <span class="module-number text-4xl font-bold mb-4 block">20</span>
+                    <h3 class="text-lg font-bold mb-2">Subgraph Orchestration</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Modular encapsulation, state sharing models and hierarchy designs.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-neon-purple/10 text-neon-purple border border-neon-purple/20">Subgraphs</span>
+                    </div>
+                </a>
+                <!-- Ch 21 -->
+                <a href="langgraph_topics/17_Multi_Agent_Systems/multi_agent_systems.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-neon-blue">
+                    <span class="module-number text-4xl font-bold mb-4 block">21</span>
+                    <h3 class="text-lg font-bold mb-2">Multi-Agent Systems & Swarms</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Supervisor orchestrated workflows, routers and distributed swarms.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-neon-blue/10 text-neon-blue border border-neon-blue/20">Agent Swarms</span>
+                    </div>
+                </a>
+                <!-- Ch 22 -->
+                <a href="planing-agents/planning_agents_theory.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-500">
+                    <span class="module-number text-4xl font-bold mb-4 block">22</span>
+                    <h3 class="text-lg font-bold mb-2">Planning & Deconstruction Agents</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">Plan decomposition, dynamic parallel fanning and stitch reducers.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-brand-500/10 text-brand-500 border border-brand-500/20">Planning</span>
+                    </div>
+                </a>
+                <!-- Ch 23 -->
+                <a href="sre_comparison_matrix.html" class="glass p-8 rounded-3xl module-card block border-l-2 border-brand-400">
+                    <span class="module-number text-4xl font-bold mb-4 block">23</span>
+                    <h3 class="text-lg font-bold mb-2">SRE Agent Architectures Matrix</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-4">High-fidelity engineering comparison covering SRE framework aspects.</p>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-brand-400/10 text-brand-400 border border-brand-400/20">SRE Comparison</span>
+                    </div>
                 </a>
             </div>
         </section>
